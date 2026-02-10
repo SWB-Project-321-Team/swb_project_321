@@ -1,0 +1,32 @@
+# Data and credentials (per README – no raw/curated data in repo)
+*.csv
+*.parquet
+*.xlsx
+*.xls
+.env
+.env.*
+*.pem
+secrets*
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+.venv/
+venv/
+.env
+.Python
+*.egg-info/
+.eggs/
+dist/
+build/
+
+# Jupyter
+.ipynb_checkpoints/
+*/.ipynb_checkpoints/
+
+# IDE / OS
+.idea/
+.vscode/
+.DS_Store
+Thumbs.db
