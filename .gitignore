@@ -1,4 +1,5 @@
 # Data and credentials (per README – no raw/curated data in repo)
+data/
 *.csv
 *.parquet
 *.xlsx

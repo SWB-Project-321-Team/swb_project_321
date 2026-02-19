@@ -44,20 +44,29 @@ SWB Operations/Project Data/321_Black_Hills_Area_Community_Foundation_2025_08/
 │   │   ├── irs_990/
 │   │   ├── givingtuesday_990/
 │   │   └── census_acs/
+│   │       ├── ACSDP5Y2024.DP03_2026-02-18T223058/   (5-Year ACS DP03)
+│   │       ├── ACS_employment_2021_2024/              (1-Year ACS DP03, 2021-2024)
+│   │       ├── ACS_population_2021_2024/              (1-Year ACS S0201, 2021-2024)
+│   │       └── tl_2025_us_county/                     (county-level shapefiles)
 │   │
 │   ├── reference/
+│   │   ├── GEOID_reference.xlsx
 │   │   ├── zip_to_county_fips.csv
 │   │   ├── county_to_region_map.csv
 │   │   ├── ntee_codes.csv
 │   │   └── benchmark_regions.csv
 │   │
 │   ├── staging/
+│   │   ├── census_acs/
+│   │   │   └── county_acs_extract.csv
 │   │   ├── org/
 │   │   ├── filing/
 │   │   ├── financial_fact/
 │   │   └── geo_bridge/
 │   │
 │   ├── curated/
+│   │   ├── census_acs/
+│   │   │   └── regional_summary.csv
 │   │   ├── v1_YYYY-MM-DD/
 │   │   │   ├── org.parquet
 │   │   │   ├── filing.parquet
@@ -118,6 +127,7 @@ Lookup and mapping tables that staging and curated logic depend on (geography, N
 
 | Example file | Purpose |
 |--------------|---------|
+| **GEOID_reference.xlsx** | County names, 5-digit FIPS GEOIDs, and cluster (region) assignments for benchmark region analysis. |
 | **zip_to_county_fips.csv** | Mapping from ZIP codes to county FIPS codes. |
 | **county_to_region_map.csv** | Mapping from counties to project regions (e.g. Black Hills, benchmark regions). |
 | **ntee_codes.csv** | NTEE classification codes and descriptions. |
@@ -127,10 +137,11 @@ Lookup and mapping tables that staging and curated logic depend on (geography, N
 
 #### **01_data/staging/** (silver)
 
-Output of **python/ingest** and **sql/staging**: cleaned, normalized, one row per entity or filing. Not yet filtered or aggregated for a specific report. **sql/curated** reads from here and writes to **curated/**.
+Output of **python/ingest**, **python/transform**, and **sql/staging**: cleaned, normalized, one row per entity or filing. Not yet filtered or aggregated for a specific report. Curated logic reads from here and writes to **curated/**.
 
 | Subfolder | Contents |
 |-----------|----------|
+| **census_acs/** | County-level ACS variable extracts filtered to target counties. Produced by `python/transform/extract_acs_variables.py`. |
 | **org/** | Organization-level staging (one row per org, normalized fields). |
 | **filing/** | Filing-level staging (one row per 990 filing). |
 | **financial_fact/** | Financial facts (revenue, expenses, assets, etc.) linked to org/filing. |
@@ -146,6 +157,7 @@ Analysis-ready datasets. Each release is a **dated snapshot** so you can reprodu
 
 | Item | Purpose |
 |------|---------|
+| **census_acs/** | Aggregated regional summaries derived from ACS staging data. Produced by `python/transform/compute_regional_summary.py`. |
 | **v1_YYYY-MM-DD/** | One snapshot per release date. Contains e.g. `org.parquet`, `filing.parquet`, `financial_fact.parquet`, `geo_bridge.parquet`. |
 | **CURRENT.txt** | Text file pointing to the active version (e.g. `v1_2025-02-10`). Scripts and notebooks read this to find the latest curated path. |
 
@@ -214,6 +226,8 @@ form-990-benchmarking/
 ├── python/
 │   ├── ingest/
 │   ├── transform/
+│   │   ├── extract_acs_variables.py
+│   │   └── compute_regional_summary.py
 │   ├── export/
 │   └── utils/
 │
@@ -243,11 +257,11 @@ form-990-benchmarking/
 ```
 OneDrive/raw
    ↓
-python/ingest + sql/staging
+python/ingest + sql/staging + python/transform (extraction)
    ↓
 OneDrive/staging
    ↓
-sql/curated
+sql/curated + python/transform (aggregation)
    ↓
 OneDrive/curated
    ├── build .duckdb / .db from curated  →  OneDrive/database   [read-only querying]

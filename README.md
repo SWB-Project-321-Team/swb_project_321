@@ -13,7 +13,7 @@ The goal of this project is to:
 - Compare nonprofit scale, composition, and financial capacity against selected benchmark regions
 - Deliver transparent, reproducible analysis and analysis-ready datasets to the client
 
-The analysis is based primarily on **IRS Form 990 filings** (Forms 990, 990-EZ, and 990-PF), supplemented with geographic reference data and U.S. Census context.
+The analysis is based primarily on **IRS Form 990 filings** (Forms 990, 990-EZ, and 990-PF), supplemented with geographic reference data and **U.S. Census American Community Survey (ACS)** data for benchmark region comparisons.
 
 ---
 
@@ -40,7 +40,7 @@ This project intentionally separates **code**, **data**, and **outputs**:
 
 ---
 
-## Preliminary Repository Structure
+## Repository Structure
 ```
 swb_project_321/
 │
@@ -55,7 +55,9 @@ swb_project_321/
 │
 ├── python/
 │ ├── ingest/ # Source ingestion scripts
-│ ├── transform/ # Data validation and orchestration
+│ ├── transform/ # Data extraction, aggregation, and summarization
+│ │ ├── extract_acs_variables.py # ACS DP03 county-level extraction (raw → staging)
+│ │ └── compute_regional_summary.py # Weighted regional averages (staging → curated)
 │ ├── export/ # Export CSV / Excel deliverables
 │ └── utils/ # Shared helper functions
 │
