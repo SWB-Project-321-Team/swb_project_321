@@ -131,6 +131,49 @@ CLUSTER_ORDER = [
     (4, "Missoula, MT"),
 ]
 
+# ── Income bracket aggregation ────────────────────────────────────────────────
+# The table shell groups the 10 individual income brackets into three tiers.
+LOW_INCOME_VARS = [
+    "DP03_0052PE", "DP03_0053PE", "DP03_0054PE", "DP03_0055PE", "DP03_0056PE",
+]
+MID_INCOME_VARS = [
+    "DP03_0057PE", "DP03_0058PE", "DP03_0059PE",
+]
+HIGH_INCOME_VARS = [
+    "DP03_0060PE", "DP03_0061PE",
+]
+
+# ── Human-readable column names ───────────────────────────────────────────────
+# Maps each ACS variable code to a label matching the table shell in the
+# Benchmark Regions document. The final CSV columns use the format
+# "Label | Variable_Code" so both are visible.
+COLUMN_LABELS = {
+    "Cluster_ID":   "Cluster_ID",
+    "Region":       "Region",
+    "DP03_0009PE":  "Unemployment Rate (%) | DP03_0009PE",
+    "DP03_0002E":   "Population 16+ in Labor Force | DP03_0002E",
+    "DP03_0026E":   "Civilian Employed Population (16+) | DP03_0026E",
+    "DP03_0006PE":  "Armed Forces (%) | DP03_0006PE",
+    "DP03_0027PE":  "Management, Business, Science & Arts (%) | DP03_0027PE",
+    "DP03_0028PE":  "Service Occupations (%) | DP03_0028PE",
+    "DP03_0029PE":  "Sales & Office Occupations (%) | DP03_0029PE",
+    "DP03_0030PE":  "Natural Resources, Construction & Maintenance (%) | DP03_0030PE",
+    "DP03_0051E":   "Total Households | DP03_0051E",
+    "DP03_0064E":   "Households with Earnings | DP03_0064E",
+    "DP03_0065E":   "Mean Earnings ($) | DP03_0065E",
+    "DP03_0068PE":  "Households with Retirement Income (%) | DP03_0068PE",
+    "DP03_0052PE":  "Income < $10k (%) | DP03_0052PE",
+    "DP03_0053PE":  "Income $10k-$15k (%) | DP03_0053PE",
+    "DP03_0054PE":  "Income $15k-$25k (%) | DP03_0054PE",
+    "DP03_0055PE":  "Income $25k-$35k (%) | DP03_0055PE",
+    "DP03_0056PE":  "Income $35k-$50k (%) | DP03_0056PE",
+    "DP03_0057PE":  "Income $50k-$75k (%) | DP03_0057PE",
+    "DP03_0058PE":  "Income $75k-$100k (%) | DP03_0058PE",
+    "DP03_0059PE":  "Income $100k-$150k (%) | DP03_0059PE",
+    "DP03_0060PE":  "Income $150k-$200k (%) | DP03_0060PE",
+    "DP03_0061PE":  "Income $200k+ (%) | DP03_0061PE",
+}
+
 
 def weighted_avg(group: pd.DataFrame, val_col: str, wt_col: str) -> float:
     """Compute a weighted average of val_col using wt_col as weights.
@@ -151,6 +194,10 @@ def compute_regional_summary(df: pd.DataFrame) -> pd.DataFrame:
     Percent, rate, and dollar variables are computed as weighted averages
     using the WEIGHT_MAP to determine which count column serves as
     the weight for each variable.
+
+    After computing per-variable results, the 10 individual income bracket
+    percentages are aggregated into Low (<$50k), Middle ($50k-$149k), and
+    High ($150k+) columns.
     """
     rows = []
     for cluster_id, label in CLUSTER_ORDER:
@@ -164,6 +211,11 @@ def compute_regional_summary(df: pd.DataFrame) -> pd.DataFrame:
         # Compute weighted averages for all percent, rate, and dollar variables
         for var in PERCENT_VARS + RATE_VARS + DOLLAR_VARS:
             row[var] = weighted_avg(g, var, WEIGHT_MAP[var])
+
+        # Aggregate income brackets into Low / Middle / High tiers
+        row["Income_Low_Pct"] = sum(row[v] for v in LOW_INCOME_VARS)
+        row["Income_Mid_Pct"] = sum(row[v] for v in MID_INCOME_VARS)
+        row["Income_High_Pct"] = sum(row[v] for v in HIGH_INCOME_VARS)
 
         rows.append(row)
 
@@ -181,6 +233,14 @@ def main():
     # Compute weighted averages for each regional cluster
     print("\nComputing weighted regional averages...")
     summary = compute_regional_summary(df)
+
+    # Add human-readable labels for the aggregated income columns
+    labels = dict(COLUMN_LABELS)
+    labels["Income_Low_Pct"] = "Income Low <$50k (%)"
+    labels["Income_Mid_Pct"] = "Income Middle $50k-$149k (%)"
+    labels["Income_High_Pct"] = "Income High $150k+ (%)"
+
+    summary = summary.rename(columns=labels)
 
     # Save the summary as a CSV
     summary_path = OUT_DIR / "regional_summary.csv"
