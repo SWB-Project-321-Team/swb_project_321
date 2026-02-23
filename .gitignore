@@ -1,13 +1,17 @@
 # Data and credentials (per README – no raw/curated data in repo)
 data/
 *.csv
+tests/sample_990_api_output/
 *.parquet
 *.xlsx
 *.xls
 .env
 .env.*
 *.pem
-secrets*
+# Secrets folder – ignore contents, keep folder in repo
+secrets/*
+!secrets/.gitkeep
+!secrets/README.md
 
 # Python
 __pycache__/
