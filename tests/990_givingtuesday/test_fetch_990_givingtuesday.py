@@ -3,10 +3,10 @@ Test fetch: request a small amount of curated 990 data from the GivingTuesday
 API to verify connectivity, response shape, and that 2021+ data are returned.
 
 Uses a fixed list of 3 EINs (no project EIN list or data folder required).
-Writes raw JSON responses to tests/sample_990_api_output/ and a combined
-sample CSV to tests/sample_990_api_output/sample_990_basic120.csv.
+Writes raw JSON responses to tests/990_givingtuesday/sample_990_api_output/ and a combined
+sample CSV to tests/990_givingtuesday/sample_990_api_output/sample_990_basic120.csv.
 
-Run from repo root: python tests/test_fetch_990_givingtuesday.py
+Run from repo root: python tests/990_givingtuesday/test_fetch_990_givingtuesday.py
 """
 
 import json
@@ -15,7 +15,7 @@ from pathlib import Path
 
 import requests
 
-# Same endpoint as python/ingest/990_givingtuesday/04_fetch_990_givingtuesday.py
+# Same endpoint as python/ingest/990_givingtuesday/api/04_fetch_990_givingtuesday.py
 API_BASE = "https://990-infrastructure.gtdata.org"
 ENDPOINT = "/irs-data/990basic120fields"
 SLEEP_SECONDS = 1.1
@@ -27,9 +27,9 @@ TEST_EINS = [
     "941655673",   # Additional sample
 ]
 
-# Output under tests/ (keep test data out of 01_data)
-TESTS_DIR = Path(__file__).resolve().parent
-SAMPLE_OUTPUT_DIR = TESTS_DIR / "sample_990_api_output"
+# Output under this test folder (keep test data out of 01_data)
+_THIS_DIR = Path(__file__).resolve().parent
+SAMPLE_OUTPUT_DIR = _THIS_DIR / "sample_990_api_output"
 SAMPLE_CSV = SAMPLE_OUTPUT_DIR / "sample_990_basic120.csv"
 
 TAX_YEAR_MIN = 2021

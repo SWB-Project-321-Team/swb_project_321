@@ -69,7 +69,10 @@ swb_project_321/
 │ ├── methodology.md
 │ ├── benchmark_regions.md
 │ ├── data_sources.md
-│ └── decisions.md
+│ ├── decisions.md
+│ ├── project_purpose_methods_data_sources_variables.md
+│ ├── onedrive/          # OneDrive layout & local setup
+│ └── 990/                # Form 990 pipeline plans
 │
 └── tests/
 ```

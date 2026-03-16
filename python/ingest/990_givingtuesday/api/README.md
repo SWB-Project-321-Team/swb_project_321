@@ -12,21 +12,21 @@ Run these scripts **in order** from the repo root to fetch Form 990 data for org
 **Run the whole pipeline (Windows):**
 
 - **Command Prompt or PowerShell:**  
-  From repo root: `python\ingest\990_givingtuesday\run_990_pipeline.cmd`  
-  With force on step 04: `python\ingest\990_givingtuesday\run_990_pipeline_force.cmd`
+  From repo root: `python\ingest\990_givingtuesday\api\run_990_pipeline.cmd`  
+  With force on step 04: `python\ingest\990_givingtuesday\api\run_990_pipeline_force.cmd`
 - **PowerShell:**  
-  From the `990_givingtuesday` folder: `.\run_990_pipeline.ps1` or `.\run_990_pipeline_force.ps1`
+  From the `990_givingtuesday\api` folder: `.\run_990_pipeline.ps1` or `.\run_990_pipeline_force.ps1`
 
 **Or run steps by hand (from repo root):**
 
 ```powershell
 cd "C:\Users\eilke\Desktop\Github Repo\swb_project_321"
-python python/ingest/990_givingtuesday/01_fetch_zip_to_county.py
-python python/ingest/990_givingtuesday/02_fetch_bmf.py
-python python/ingest/990_givingtuesday/03_build_ein_list.py
-python python/ingest/990_givingtuesday/04_fetch_990_givingtuesday.py
+python python/ingest/990_givingtuesday/api/01_fetch_zip_to_county.py
+python python/ingest/990_givingtuesday/api/02_fetch_bmf.py
+python python/ingest/990_givingtuesday/api/03_build_ein_list.py
+python python/ingest/990_givingtuesday/api/04_fetch_990_givingtuesday.py
 ```
 
 (In PowerShell use `;` instead of `&&` if you put commands on one line.)
 
-See `docs/990_data_fetch_plan.md` for details. Step 04 supports `--force` to re-fetch all EINs and skips EINs that already have a response file by default (resume).
+See `docs/990/990_data_fetch_plan.md` for details. Step 04 supports `--force` to re-fetch all EINs and skips EINs that already have a response file by default (resume).

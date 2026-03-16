@@ -9,7 +9,7 @@ Region filter: only EINs that appear in the project EIN list (orgs in the 18
 county benchmark regions). The EIN list must exist at
 01_data/reference/eins_in_benchmark_regions.csv with at least an "EIN"
 column (9 digits, leading zeros optional). To create that file, run the
-steps in docs/990_data_fetch_plan.md (run 01_, 02_, 03_ in python/ingest/990_givingtuesday/).
+steps in docs/990/990_data_fetch_plan.md (run 01_, 02_, 03_ in python/ingest/990_givingtuesday/api/).
 Optionally, if the EIN list file is missing but BMF and zip-to-county files
 are present, the script will try to build the EIN list (see _build_ein_list_from_bmf).
 
@@ -26,8 +26,8 @@ Output:
 By default, EINs that already have a saved response file are skipped (resume).
 Use --force to re-fetch all EINs from the API.
 
-Run from repo root: python python/ingest/990_givingtuesday/04_fetch_990_givingtuesday.py
-For immediate output in terminal/IDE, use: python -u python/ingest/990_givingtuesday/04_fetch_990_givingtuesday.py
+Run from repo root: python python/ingest/990_givingtuesday/api/04_fetch_990_givingtuesday.py
+For immediate output in terminal/IDE, use: python -u python/ingest/990_givingtuesday/api/04_fetch_990_givingtuesday.py
 """
 
 import argparse
@@ -44,9 +44,12 @@ import requests
 if hasattr(sys.stdout, "reconfigure"):
     sys.stdout.reconfigure(line_buffering=True)
 
-# ── File paths (repo root = 4 levels up: 990_givingtuesday -> ingest -> python -> root) ─────────
-BASE = Path(__file__).resolve().parent.parent.parent.parent
-DATA = BASE / "data" / "321_Black_Hills_Area_Community_Foundation_2025_08" / "01_data"
+# Ensure python/ is on path so we can import utils
+_SCRIPT_DIR = Path(__file__).resolve()
+_PYTHON_DIR = _SCRIPT_DIR.parents[3]  # api -> 990_givingtuesday -> ingest -> python
+if str(_PYTHON_DIR) not in sys.path:
+    sys.path.insert(0, str(_PYTHON_DIR))
+from utils.paths import DATA
 
 EIN_LIST_CSV = DATA / "reference" / "eins_in_benchmark_regions.csv"
 REF_GEOID_XLSX = DATA / "reference" / "GEOID_reference.xlsx"
@@ -104,7 +107,7 @@ def _build_ein_list_from_bmf() -> pd.DataFrame:
     """
     if not REF_GEOID_XLSX.exists():
         raise FileNotFoundError(
-            f"EIN list not found at {EIN_LIST_CSV}. Create it per docs/990_data_fetch_plan.md, "
+            f"EIN list not found at {EIN_LIST_CSV}. Create it per docs/990/990_data_fetch_plan.md, "
             "or provide GEOID_reference.xlsx and BMF + zip-to-county to build it."
         )
     ref = pd.read_excel(REF_GEOID_XLSX)

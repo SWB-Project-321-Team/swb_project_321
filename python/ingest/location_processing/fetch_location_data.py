@@ -20,15 +20,22 @@ API: https://api.census.gov/data/2020/dec/pl
 """
 
 import argparse
+import sys
+from concurrent.futures import ThreadPoolExecutor, as_completed
 from io import StringIO
 from pathlib import Path
 
 import pandas as pd
 import requests
+from tqdm import tqdm
 
-# ── Paths ────────────────────────────────────────────────────────────────────
-BASE = Path(__file__).resolve().parent.parent.parent.parent  # location_processing -> ingest -> python -> root
-DATA = BASE / "data" / "321_Black_Hills_Area_Community_Foundation_2025_08" / "01_data"
+# Ensure python/ is on path so we can import utils
+_SCRIPT_DIR = Path(__file__).resolve()
+_PYTHON_DIR = _SCRIPT_DIR.parents[2]
+if str(_PYTHON_DIR) not in sys.path:
+    sys.path.insert(0, str(_PYTHON_DIR))
+from utils.paths import DATA
+
 DEFAULT_OUT = DATA / "reference" / "locations.csv"
 
 CENSUS_API = "https://api.census.gov/data/2020/dec/pl"
@@ -165,14 +172,22 @@ def fetch_all_geoids(state_fips_list: list[str] | None = None) -> pd.DataFrame:
             if not county_rows:
                 state_fips_list = _fetch_states(session)
                 county_rows = []
-                for state_fips in state_fips_list:
-                    state_fips = str(state_fips).zfill(2)
-                    county_rows.extend(_fetch_counties_for_state(state_fips, session))
+                with ThreadPoolExecutor(max_workers=8) as ex:
+                    future_to_fips = {
+                        ex.submit(_fetch_counties_for_state, str(sf).zfill(2), session): sf
+                        for sf in state_fips_list
+                    }
+                    for future in tqdm(as_completed(future_to_fips), total=len(future_to_fips), desc="States", unit="state"):
+                        county_rows.extend(future.result())
         else:
             county_rows = []
-            for state_fips in state_fips_list:
-                state_fips = str(state_fips).zfill(2)
-                county_rows.extend(_fetch_counties_for_state(state_fips, session))
+            with ThreadPoolExecutor(max_workers=min(8, len(state_fips_list))) as ex:
+                future_to_fips = {
+                    ex.submit(_fetch_counties_for_state, str(sf).zfill(2), session): sf
+                    for sf in state_fips_list
+                }
+                for future in tqdm(as_completed(future_to_fips), total=len(future_to_fips), desc="States", unit="state"):
+                    county_rows.extend(future.result())
 
         rows = []
         for row in county_rows:
@@ -194,16 +209,22 @@ def fetch_all_geoids(state_fips_list: list[str] | None = None) -> pd.DataFrame:
         # Normalize GEOID once for all downstream merges
         df["GEOID"] = df["GEOID"].astype(str).str.strip().str.zfill(5)
 
-        # Add county seat (city) and ZIPs
-        print("Fetching county seats (city names)...")
-        try:
-            seat_df = _fetch_county_seats(session)
+        # Fetch county seats and ZCTA–county in parallel (independent requests)
+        print("Fetching county seats and ZCTA–county (parallel)...")
+        seat_df = None
+        zip_df = None
+        with ThreadPoolExecutor(max_workers=2) as ex:
+            f_seats = ex.submit(_fetch_county_seats, session)
+            f_zcta = ex.submit(_fetch_zcta_county, session)
+            try:
+                seat_df = f_seats.result()
+            except Exception as e:
+                print(f"Warning: could not fetch county seats: {e}. City column will be empty.")
+            zip_df = f_zcta.result()
+        if seat_df is not None:
             df = df.merge(seat_df[["GEOID", "City"]], on="GEOID", how="left")
-        except Exception as e:
-            print(f"Warning: could not fetch county seats: {e}. City column will be empty.")
+        else:
             df["City"] = ""
-        print("Fetching ZCTA–county relationship from Census...")
-        zip_df = _fetch_zcta_county(session)
 
     our_geoids = set(df["GEOID"])
     zip_in_scope = zip_df.loc[zip_df["GEOID"].isin(our_geoids), ["GEOID", "ZIP"]].drop_duplicates()

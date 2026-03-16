@@ -8,7 +8,7 @@ the county with the largest overlapping land area is chosen (one row per ZIP).
 Reads: none (downloads from URL).
 Writes: 01_data/reference/zip_to_county_fips.csv (columns: ZIP, FIPS)
 
-Run from repo root: python python/ingest/990_givingtuesday/01_fetch_zip_to_county.py
+Run from repo root: python python/ingest/990_givingtuesday/api/01_fetch_zip_to_county.py
 
 Alternative: To use HUD USPS Crosswalk instead (ZIP–County, requires login),
 download the ZIP–County file from https://www.huduser.gov/portal/datasets/usps_crosswalk.html,
@@ -16,14 +16,19 @@ then run with --local path/to/downloaded.csv to normalize and copy to reference.
 """
 
 import argparse
+import sys
 from pathlib import Path
 
 import pandas as pd
 import requests
 
-# ── Paths (repo root = 4 levels up from this file: 990_givingtuesday -> ingest -> python -> root) ───
-BASE = Path(__file__).resolve().parent.parent.parent.parent
-DATA = BASE / "data" / "321_Black_Hills_Area_Community_Foundation_2025_08" / "01_data"
+# Ensure python/ is on path so we can import utils
+_SCRIPT_DIR = Path(__file__).resolve()
+_PYTHON_DIR = _SCRIPT_DIR.parents[3]  # api -> 990_givingtuesday -> ingest -> python
+if str(_PYTHON_DIR) not in sys.path:
+    sys.path.insert(0, str(_PYTHON_DIR))
+from utils.paths import DATA
+
 ZIP_TO_COUNTY_CSV = DATA / "reference" / "zip_to_county_fips.csv"
 
 # Census 2020 ZCTA5 to County relationship (tab-delimited, ~6.5 MB)

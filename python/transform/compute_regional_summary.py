@@ -18,15 +18,18 @@ Output:
   - 01_data/curated/census_acs/regional_summary.csv
 """
 
-import pandas as pd
-import numpy as np
+import sys
 from pathlib import Path
 
-# ── File paths ────────────────────────────────────────────────────────────────
-# All paths are relative to the project root (two levels up from python/transform/).
+import numpy as np
+import pandas as pd
 
-BASE = Path(__file__).resolve().parent.parent.parent
-DATA = BASE / "data" / "321_Black_Hills_Area_Community_Foundation_2025_08" / "01_data"
+# Ensure python/ is on path so we can import utils
+_SCRIPT_DIR = Path(__file__).resolve()
+_PYTHON_DIR = _SCRIPT_DIR.parents[1]  # transform -> python
+if str(_PYTHON_DIR) not in sys.path:
+    sys.path.insert(0, str(_PYTHON_DIR))
+from utils.paths import DATA
 
 # Input: the county-level extract produced by extract_acs_variables.py
 EXTRACT_CSV = DATA / "staging" / "census_acs" / "county_acs_extract.csv"

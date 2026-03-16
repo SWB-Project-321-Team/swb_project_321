@@ -10,18 +10,22 @@ Reads:
 Writes:
   - 01_data/reference/eins_in_benchmark_regions.csv (column EIN)
 
-Run from repo root: python python/ingest/990_givingtuesday/03_build_ein_list.py
+Run from repo root: python python/ingest/990_givingtuesday/api/03_build_ein_list.py
 
-See docs/990_data_fetch_plan.md for how to obtain BMF and zip-to-county data.
+See docs/990/990_data_fetch_plan.md for how to obtain BMF and zip-to-county data.
 """
 
+import sys
 from pathlib import Path
 
 import pandas as pd
 
-# ── Paths (repo root = 4 levels up from this file: 990_givingtuesday -> ingest -> python -> root) ───
-BASE = Path(__file__).resolve().parent.parent.parent.parent
-DATA = BASE / "data" / "321_Black_Hills_Area_Community_Foundation_2025_08" / "01_data"
+# Ensure python/ is on path so we can import utils
+_SCRIPT_DIR = Path(__file__).resolve()
+_PYTHON_DIR = _SCRIPT_DIR.parents[3]  # api -> 990_givingtuesday -> ingest -> python
+if str(_PYTHON_DIR) not in sys.path:
+    sys.path.insert(0, str(_PYTHON_DIR))
+from utils.paths import DATA
 
 EIN_LIST_CSV = DATA / "reference" / "eins_in_benchmark_regions.csv"
 REF_GEOID_XLSX = DATA / "reference" / "GEOID_reference.xlsx"

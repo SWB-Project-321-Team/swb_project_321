@@ -9,19 +9,24 @@ regions we only need SD, MN, MT, and AZ. Other states can be added via
 Reads: none (downloads from IRS).
 Writes: 01_data/raw/irs_bmf/eo_sd.csv, eo_mn.csv, eo_mt.csv, eo_az.csv (default)
 
-Run from repo root: python python/ingest/990_givingtuesday/02_fetch_bmf.py
+Run from repo root: python python/ingest/990_givingtuesday/api/02_fetch_bmf.py
 
 Source: https://www.irs.gov/charities-non-profits/exempt-organizations-business-master-file-extract-eo-bmf
 """
 
 import argparse
+import sys
 from pathlib import Path
 
 import requests
 
-# ── Paths (repo root = 4 levels up from this file: 990_givingtuesday -> ingest -> python -> root) ───
-BASE = Path(__file__).resolve().parent.parent.parent.parent
-DATA = BASE / "data" / "321_Black_Hills_Area_Community_Foundation_2025_08" / "01_data"
+# Ensure python/ is on path so we can import utils
+_SCRIPT_DIR = Path(__file__).resolve()
+_PYTHON_DIR = _SCRIPT_DIR.parents[3]  # api -> 990_givingtuesday -> ingest -> python
+if str(_PYTHON_DIR) not in sys.path:
+    sys.path.insert(0, str(_PYTHON_DIR))
+from utils.paths import DATA
+
 BMF_DIR = DATA / "raw" / "irs_bmf"
 
 # IRS EO BMF: one CSV per state (lowercase state abbreviation)

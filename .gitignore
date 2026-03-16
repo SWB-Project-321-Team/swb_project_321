@@ -1,6 +1,7 @@
 # Data and credentials (per README – no raw/curated data in repo)
 data/
 *.csv
+!docs/990/sample_parsed_irs_990_10.csv
 tests/sample_990_api_output/
 *.parquet
 *.xlsx
@@ -12,6 +13,12 @@ tests/sample_990_api_output/
 secrets/*
 !secrets/.gitkeep
 !secrets/README.md
+!secrets/.env.example
+
+# AWS setup package – ignore credential files in distribution folder
+aws_setup/secrets/*
+!aws_setup/secrets/.gitkeep
+!aws_setup/secrets/.env.example
 
 # Python
 __pycache__/
