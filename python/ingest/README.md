@@ -55,6 +55,24 @@ Run 01 -> 02 -> 03 (optionally 04 to merge silver parts). See `990_irs/README.md
 
 Default bucket: `swb-321-irs990-teos`, prefix: `bronze/irs990/teos_xml`.
 
+## irs_soi/ - IRS SOI county data -> local raw -> S3 -> benchmark filter
+
+Scripts that discover the latest IRS SOI county release, preserve the official raw county files
+locally, upload them to S3, and build separate benchmark-county filtered CSVs using the same
+benchmark county scope as `990_irs`.
+
+| Step | Script | Output |
+|------|--------|--------|
+| 01 | `irs_soi/01_discover_county_release.py` | metadata JSON with latest release and asset URLs |
+| 02 | `irs_soi/02_download_county_release.py` | raw county CSVs + users guide under `raw/irs_soi/county/` |
+| 03 | `irs_soi/03_upload_county_release_to_s3.py` | Bronze raw + metadata upload |
+| 04 | `irs_soi/04_verify_county_release_source_local_s3.py` | raw source/local/S3 size verification report |
+| 05 | `irs_soi/05_filter_county_release_to_benchmark_local.py` | local benchmark-filtered county CSVs |
+| 06 | `irs_soi/06_upload_filtered_county_release_to_s3.py` | Silver filtered CSV upload |
+| Run all | `../run_irs_soi_county.py` | orchestrates steps 01-06 |
+
+Default bucket: `swb-321-irs990-teos`, raw prefix: `bronze/irs_soi/county/raw`, filtered prefix: `silver/irs_soi/county`.
+
 ---
 
 ## Output file checklist (01_data paths)
@@ -78,3 +96,6 @@ Default bucket: `swb-321-irs990-teos`, prefix: `bronze/irs990/teos_xml`.
 | location_processing/03_build_zip_list_for_geoids | reference/zip_codes_in_benchmark_regions.csv | ZIP, GEOID, Region | One row per ZIP in 18 counties |
 | 990_irs/03_parse_irs_990_zips_to_staging | staging/filing/irs_990_filings.parquet | ein, tax_year, form_type, revenue, expenses, assets, source_file, source_zip, region | Parquet or CSV; geography filter + region |
 | 990_irs/04_merge_990_parts_to_staging | staging/filing/irs_990_filings.parquet | same as 03 | Merge from silver part Parquets; geography filter + region |
+| irs_soi/02_download_county_release | raw/irs_soi/county/raw/tax_year=YYYY/*.csv/.docx | official IRS county AGI CSV, no-AGI CSV, and users guide | Local bytes == source Content-Length |
+| irs_soi/04_verify_county_release_source_local_s3 | raw/irs_soi/county/metadata/size_verification_tax_year=YYYY.csv | source/local/S3 bytes for raw county assets | Every row has size_match=TRUE |
+| irs_soi/05_filter_county_release_to_benchmark_local | staging/irs_soi/tax_year=YYYY/irs_soi_county_benchmark_*.csv | benchmark-county subset with county_fips + region | Rows reduced vs raw and region populated |
