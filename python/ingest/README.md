@@ -73,6 +73,24 @@ benchmark county scope as `990_irs`.
 
 Default bucket: `swb-321-irs990-teos`, raw prefix: `bronze/irs_soi/county/raw`, filtered prefix: `silver/irs_soi/county`.
 
+## nccs_990_core/ - NCCS Core Series + Unified BMF -> local raw -> S3 -> benchmark filter
+
+Scripts that discover the latest common NCCS Core year across the required PZ/PC/PF families,
+download the official Core CSVs plus Unified BMF bridge files, upload them to S3, verify
+source/local/S3 size parity, and build separate benchmark-county filtered CSVs.
+
+| Step | Script | Output |
+|------|--------|--------|
+| 01 | `nccs_990_core/01_discover_core_release.py` | metadata JSON with latest common year, asset URLs, and benchmark states |
+| 02 | `nccs_990_core/02_download_core_release.py` | Core CSVs, Unified BMF bridge files, and dictionaries under `raw/nccs_990/core/` |
+| 03 | `nccs_990_core/03_upload_core_release_to_s3.py` | Bronze raw + metadata upload |
+| 04 | `nccs_990_core/04_verify_core_source_local_s3.py` | raw source/local/S3 size verification report |
+| 05 | `nccs_990_core/05_filter_core_to_benchmark_local.py` | local benchmark-filtered Core CSVs |
+| 06 | `nccs_990_core/06_upload_filtered_core_to_s3.py` | Silver filtered CSV upload |
+| Run all | `../run_nccs_990_core.py` | orchestrates steps 01-06 |
+
+Default bucket: `swb-321-irs990-teos`, raw prefix: `bronze/nccs_990/core/raw`, bridge prefix: `bronze/nccs_990/core/bridge_bmf`, filtered prefix: `silver/nccs_990/core`.
+
 ---
 
 ## Output file checklist (01_data paths)
@@ -99,3 +117,6 @@ Default bucket: `swb-321-irs990-teos`, raw prefix: `bronze/irs_soi/county/raw`, 
 | irs_soi/02_download_county_release | raw/irs_soi/county/raw/tax_year=YYYY/*.csv/.docx | official IRS county AGI CSV, no-AGI CSV, and users guide | Local bytes == source Content-Length |
 | irs_soi/04_verify_county_release_source_local_s3 | raw/irs_soi/county/metadata/size_verification_tax_year=YYYY.csv | source/local/S3 bytes for raw county assets | Every row has size_match=TRUE |
 | irs_soi/05_filter_county_release_to_benchmark_local | staging/irs_soi/tax_year=YYYY/irs_soi_county_benchmark_*.csv | benchmark-county subset with county_fips + region | Rows reduced vs raw and region populated |
+| nccs_990_core/02_download_core_release | raw/nccs_990/core/raw/year=YYYY/*.csv + raw/nccs_990/core/bridge_bmf/state=XX/*.csv | official NCCS Core CSVs, dictionaries, and Unified BMF bridge files | Local bytes == source Content-Length |
+| nccs_990_core/04_verify_core_source_local_s3 | raw/nccs_990/core/metadata/size_verification_year=YYYY.csv | source/local/S3 bytes for Core raw assets | Every required row has size_match=TRUE |
+| nccs_990_core/05_filter_core_to_benchmark_local | staging/nccs_990/core/year=YYYY/*__benchmark.csv | benchmark-county subset with county_fips + region + match source | Rows reduced vs raw and region populated |

@@ -28,6 +28,26 @@ context datasets. Local file paths are environment-specific through `SWB_321_DAT
     - all-states county CSV excluding AGI
     - County Income Data Users Guide DOCX
 
+## NCCS Core 990 data
+
+- **NCCS Core Series**
+  - Source catalog: `https://nccs.urban.org/nccs/catalogs/catalog-core.html`
+  - Purpose: official harmonized 990-family extracts used as a benchmark-filtered alternative to IRS TEOS XML
+  - Coverage rule in this pipeline: latest common complete year across required PZ/PC/PF Core families
+  - Raw local storage: `01_data/raw/nccs_990/core/raw/year=YYYY/`
+  - Raw S3 storage: `bronze/nccs_990/core/raw/year=YYYY/`
+  - Metadata local storage: `01_data/raw/nccs_990/core/metadata/`
+  - Metadata S3 storage: `bronze/nccs_990/core/metadata/`
+- **NCCS Unified BMF**
+  - Source catalog: `https://nccs.urban.org/nccs/catalogs/catalog-bmf.html`
+  - Purpose: geography bridge for mapping Core EINs to benchmark counties
+  - Local bridge storage: `01_data/raw/nccs_990/core/bridge_bmf/state=XX/`
+  - S3 bridge storage: `bronze/nccs_990/core/bridge_bmf/state=XX/`
+- **NCCS Core benchmark-filtered outputs**
+  - Purpose: county-benchmark subset of each selected Core raw file
+  - Filtered local storage: `01_data/staging/nccs_990/core/year=YYYY/`
+  - Filtered S3 storage: `silver/nccs_990/core/year=YYYY/`
+
 ## Benchmark geography references
 
 - **GEOID_reference.csv**
