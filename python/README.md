@@ -44,3 +44,33 @@ python python/ingest/nccs_990_core/05_filter_core_to_benchmark_local.py
 python python/ingest/nccs_990_core/06_upload_filtered_core_to_s3.py
 ```
 Or use the runner: `python python/run_nccs_990_core.py` (see `ingest/nccs_990_core/README.md`).
+
+**nccs_990_postcard** (NCCS 990-N monthly snapshots -> S3 -> combined benchmark county CSV): run **01 -> 06**.
+```bash
+python python/ingest/nccs_990_postcard/01_discover_postcard_release.py
+python python/ingest/nccs_990_postcard/02_download_postcard_release.py
+python python/ingest/nccs_990_postcard/03_upload_postcard_release_to_s3.py
+python python/ingest/nccs_990_postcard/04_verify_postcard_source_local_s3.py
+python python/ingest/nccs_990_postcard/05_filter_postcard_to_benchmark_local.py
+python python/ingest/nccs_990_postcard/06_upload_filtered_postcard_to_s3.py
+```
+Or use the runner: `python python/run_nccs_990_postcard.py` (see `ingest/nccs_990_postcard/README.md`).
+
+**nccs_bmf** (NCCS BMF yearly 2022-present -> S3 -> benchmark county Parquets): run **01 -> 06**.
+```bash
+python python/ingest/nccs_bmf/01_discover_bmf_release.py
+python python/ingest/nccs_bmf/02_download_bmf_release.py
+python python/ingest/nccs_bmf/03_upload_bmf_release_to_s3.py
+python python/ingest/nccs_bmf/04_verify_bmf_source_local_s3.py
+python python/ingest/nccs_bmf/05_filter_bmf_to_benchmark_local.py
+python python/ingest/nccs_bmf/06_upload_filtered_bmf_to_s3.py
+```
+Or use the runner: `python python/run_nccs_bmf.py` (see `ingest/nccs_bmf/README.md`).
+
+**combined_990** (source-preserving union of already-filtered GivingTuesday + NCCS postcard + NCCS Core + NCCS BMF): run **01 -> 03**.
+```bash
+python python/ingest/combined_990/01_build_combined_filtered_local.py
+python python/ingest/combined_990/02_upload_combined_filtered_to_s3.py
+python python/ingest/combined_990/03_verify_combined_filtered_local_s3.py
+```
+Or use the runner: `python python/run_combined_990.py` (see `ingest/combined_990/README.md`).

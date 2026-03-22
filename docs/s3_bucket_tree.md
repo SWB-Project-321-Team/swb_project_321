@@ -2,7 +2,7 @@
 
 - Bucket: `swb-321-irs990-teos`
 - Region: `us-east-2`
-- Snapshot date: `2026-03-20`
+- Snapshot date: `2026-03-22`
 - Source: live recursive S3 listing
 
 ```text
@@ -77,34 +77,77 @@ swb-321-irs990-teos/
 |   |               |-- 22incyallagi.csv
 |   |               |-- 22incyallnoagi.csv
 |   |               `-- 22incydocguide.docx
-|   `-- nccs_990/
-|       `-- core/
-|           |-- bridge_bmf/
-|           |   |-- state=AZ/
-|           |   |   `-- AZ_BMF_V1.1.csv
-|           |   |-- state=MN/
-|           |   |   `-- MN_BMF_V1.1.csv
-|           |   |-- state=MT/
-|           |   |   `-- MT_BMF_V1.1.csv
-|           |   `-- state=SD/
-|           |       `-- SD_BMF_V1.1.csv
-|           |-- metadata/
-|           |   |-- CORE-HRMN_dd.csv
-|           |   |-- DD-PF-HRMN-V0.csv
-|           |   |-- catalog_bmf.html
-|           |   |-- catalog_core.html
-|           |   |-- harmonized_data_dictionary.xlsx
-|           |   |-- latest_release.json
-|           |   |-- release_manifest_year=2022.csv
-|           |   `-- size_verification_year=2022.csv
-|           `-- raw/
-|               `-- year=2022/
-|                   |-- CORE-2022-501C3-CHARITIES-PC-HRMN.csv
-|                   |-- CORE-2022-501C3-CHARITIES-PZ-HRMN.csv
-|                   |-- CORE-2022-501C3-PRIVFOUND-PF-HRMN-V0.csv
-|                   |-- CORE-2022-501CE-NONPROFIT-PC-HRMN.csv
-|                   `-- CORE-2022-501CE-NONPROFIT-PZ-HRMN.csv
+|   |-- nccs_990/
+|   |   |-- core/
+|   |   |   |-- bridge_bmf/
+|   |   |   |   |-- state=AZ/
+|   |   |   |   |   `-- AZ_BMF_V1.1.csv
+|   |   |   |   |-- state=MN/
+|   |   |   |   |   `-- MN_BMF_V1.1.csv
+|   |   |   |   |-- state=MT/
+|   |   |   |   |   `-- MT_BMF_V1.1.csv
+|   |   |   |   `-- state=SD/
+|   |   |   |       `-- SD_BMF_V1.1.csv
+|   |   |   |-- metadata/
+|   |   |   |   |-- CORE-HRMN_dd.csv
+|   |   |   |   |-- DD-PF-HRMN-V0.csv
+|   |   |   |   |-- catalog_bmf.html
+|   |   |   |   |-- catalog_core.html
+|   |   |   |   |-- harmonized_data_dictionary.xlsx
+|   |   |   |   |-- latest_release.json
+|   |   |   |   |-- release_manifest_year=2022.csv
+|   |   |   |   `-- size_verification_year=2022.csv
+|   |   |   `-- raw/
+|   |   |       `-- year=2022/
+|   |   |           |-- CORE-2022-501C3-CHARITIES-PC-HRMN.csv
+|   |   |           |-- CORE-2022-501C3-CHARITIES-PZ-HRMN.csv
+|   |   |           |-- CORE-2022-501C3-PRIVFOUND-PF-HRMN-V0.csv
+|   |   |           |-- CORE-2022-501CE-NONPROFIT-PC-HRMN.csv
+|   |   |           `-- CORE-2022-501CE-NONPROFIT-PZ-HRMN.csv
+|   |   `-- postcard/
+|   |       |-- metadata/
+|   |       |   |-- latest_release.json
+|   |       |   |-- postcard_page.html
+|   |       |   |-- release_manifest_snapshot_year=2026.csv
+|   |       |   `-- size_verification_snapshot_year=2026.csv
+|   |       `-- raw/
+|   |           `-- snapshot_year=2026/
+|   |               |-- snapshot_month=2026-01/
+|   |               |   `-- 2026-01-E-POSTCARD.csv
+|   |               |-- snapshot_month=2026-02/
+|   |               |   `-- 2026-02-E-POSTCARD.csv
+|   |               `-- snapshot_month=2026-03/
+|   |                   `-- 2026-03-E-POSTCARD.csv
+|   `-- nccs_bmf/
+|       |-- metadata/
+|       |   |-- catalog_bmf.html
+|       |   |-- dataset_bmf.html
+|       |   |-- latest_release.json
+|       |   |-- release_manifest_start_year=2022.csv
+|       |   `-- size_verification_start_year=2022.csv
+|       `-- raw/
+|           |-- year=2022/
+|           |   `-- BMF-2022-08-501CX-NONPROFIT-PX.csv
+|           |-- year=2023/
+|           |   `-- 2023-12-BMF.csv
+|           |-- year=2024/
+|           |   `-- 2024-12-BMF.csv
+|           |-- year=2025/
+|           |   `-- 2025-12-BMF.csv
+|           `-- year=2026/
+|               `-- 2026-03-BMF.csv
 `-- silver/
+    |-- combined_990/
+    |   |-- metadata/
+    |   |   |-- build_summary.json
+    |   |   |-- column_dictionary.csv
+    |   |   |-- diag_overlap_by_ein.csv
+    |   |   |-- diag_overlap_by_ein_tax_year.csv
+    |   |   |-- diag_overlap_summary.csv
+    |   |   |-- field_availability_matrix.csv
+    |   |   |-- size_verification.csv
+    |   |   `-- source_input_manifest.csv
+    |   `-- combined_990_filtered_source_union.parquet
     |-- givingtuesday_990/
     |   `-- filing/
     |       |-- givingtuesday_990_filings_benchmark.parquet
@@ -118,13 +161,30 @@ swb-321-irs990-teos/
     |           |-- filter_manifest_2022.csv
     |           |-- irs_soi_county_benchmark_agi_2022.csv
     |           `-- irs_soi_county_benchmark_noagi_2022.csv
-    `-- nccs_990/
-        `-- core/
-            `-- year=2022/
-                |-- CORE-2022-501C3-CHARITIES-PC-HRMN__benchmark.csv
-                |-- CORE-2022-501C3-CHARITIES-PZ-HRMN__benchmark.csv
-                |-- CORE-2022-501C3-PRIVFOUND-PF-HRMN-V0__benchmark.csv
-                |-- CORE-2022-501CE-NONPROFIT-PC-HRMN__benchmark.csv
-                |-- CORE-2022-501CE-NONPROFIT-PZ-HRMN__benchmark.csv
-                `-- filter_manifest_year=2022.csv
+    |-- nccs_990/
+    |   |-- core/
+    |   |   `-- year=2022/
+    |   |       |-- CORE-2022-501C3-CHARITIES-PC-HRMN__benchmark.csv
+    |   |       |-- CORE-2022-501C3-CHARITIES-PZ-HRMN__benchmark.csv
+    |   |       |-- CORE-2022-501C3-PRIVFOUND-PF-HRMN-V0__benchmark.csv
+    |   |       |-- CORE-2022-501CE-NONPROFIT-PC-HRMN__benchmark.csv
+    |   |       |-- CORE-2022-501CE-NONPROFIT-PZ-HRMN__benchmark.csv
+    |   |       `-- filter_manifest_year=2022.csv
+    |   `-- postcard/
+    |       `-- snapshot_year=2026/
+    |           |-- filter_manifest_snapshot_year=2026.csv
+    |           `-- nccs_990_postcard_benchmark_snapshot_year=2026.csv
+    `-- nccs_bmf/
+        |-- metadata/
+        |   `-- filter_manifest_start_year=2022.csv
+        |-- year=2022/
+        |   `-- nccs_bmf_benchmark_year=2022.parquet
+        |-- year=2023/
+        |   `-- nccs_bmf_benchmark_year=2023.parquet
+        |-- year=2024/
+        |   `-- nccs_bmf_benchmark_year=2024.parquet
+        |-- year=2025/
+        |   `-- nccs_bmf_benchmark_year=2025.parquet
+        `-- year=2026/
+            `-- nccs_bmf_benchmark_year=2026.parquet
 ```

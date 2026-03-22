@@ -91,6 +91,57 @@ source/local/S3 size parity, and build separate benchmark-county filtered CSVs.
 
 Default bucket: `swb-321-irs990-teos`, raw prefix: `bronze/nccs_990/core/raw`, bridge prefix: `bronze/nccs_990/core/bridge_bmf`, filtered prefix: `silver/nccs_990/core`.
 
+## nccs_990_postcard/ - NCCS 990-N e-Postcard monthly snapshots -> local raw -> S3 -> annual benchmark filter
+
+Scripts that discover the latest NCCS e-Postcard snapshot year, download all available monthly
+snapshots in that year, upload them to S3, verify source/local/S3 size parity, and build one
+combined benchmark-county annual derivative using postcard ZIP fields.
+
+| Step | Script | Output |
+|------|--------|--------|
+| 01 | `nccs_990_postcard/01_discover_postcard_release.py` | metadata JSON with latest snapshot year, latest month, and available monthly asset URLs |
+| 02 | `nccs_990_postcard/02_download_postcard_release.py` | monthly postcard CSVs under `raw/nccs_990/postcard/` |
+| 03 | `nccs_990_postcard/03_upload_postcard_release_to_s3.py` | Bronze raw + metadata upload |
+| 04 | `nccs_990_postcard/04_verify_postcard_source_local_s3.py` | raw source/local/S3 size verification report |
+| 05 | `nccs_990_postcard/05_filter_postcard_to_benchmark_local.py` | combined local benchmark-filtered postcard CSV |
+| 06 | `nccs_990_postcard/06_upload_filtered_postcard_to_s3.py` | Silver filtered CSV upload |
+| Run all | `../run_nccs_990_postcard.py` | orchestrates steps 01-06 |
+
+Default bucket: `swb-321-irs990-teos`, raw prefix: `bronze/nccs_990/postcard/raw`, filtered prefix: `silver/nccs_990/postcard`.
+
+## nccs_bmf/ - NCCS BMF 2022-present yearly snapshots -> local raw -> S3 -> benchmark filter
+
+Scripts that discover one representative NCCS BMF snapshot per year from `2022-present`,
+download the selected raw files, upload them to S3, verify source/local/S3 size parity, and
+write one benchmark-county filtered Parquet per year.
+
+| Step | Script | Output |
+|------|--------|--------|
+| 01 | `nccs_bmf/01_discover_bmf_release.py` | metadata JSON with selected yearly BMF asset URLs |
+| 02 | `nccs_bmf/02_download_bmf_release.py` | yearly raw BMF CSVs under `raw/nccs_bmf/` |
+| 03 | `nccs_bmf/03_upload_bmf_release_to_s3.py` | Bronze raw + metadata upload |
+| 04 | `nccs_bmf/04_verify_bmf_source_local_s3.py` | raw source/local/S3 size verification report |
+| 05 | `nccs_bmf/05_filter_bmf_to_benchmark_local.py` | local benchmark-filtered yearly BMF Parquets |
+| 06 | `nccs_bmf/06_upload_filtered_bmf_to_s3.py` | Silver filtered yearly BMF Parquet upload |
+| Run all | `../run_nccs_bmf.py` | orchestrates steps 01-06 |
+
+Default bucket: `swb-321-irs990-teos`, raw prefix: `bronze/nccs_bmf/raw`, filtered prefix: `silver/nccs_bmf`.
+
+## combined_990/ - Combined filtered source-preserving union table
+
+Scripts that read only the existing filtered outputs from GivingTuesday, NCCS postcard, NCCS Core
+charities/nonprofits, and NCCS BMF yearly benchmark files, then build one combined
+source-preserving union table plus diagnostics and upload those artifacts to Silver.
+
+| Step | Script | Output |
+|------|--------|--------|
+| 01 | `combined_990/01_build_combined_filtered_local.py` | combined parquet + metadata + diagnostics under `staging/combined_990/` |
+| 02 | `combined_990/02_upload_combined_filtered_to_s3.py` | Silver combined parquet + metadata upload |
+| 03 | `combined_990/03_verify_combined_filtered_local_s3.py` | local/S3 size verification report |
+| Run all | `../run_combined_990.py` | orchestrates steps 01-03 |
+
+Default bucket: `swb-321-irs990-teos`, silver prefix: `silver/combined_990`.
+
 ---
 
 ## Output file checklist (01_data paths)
@@ -120,3 +171,10 @@ Default bucket: `swb-321-irs990-teos`, raw prefix: `bronze/nccs_990/core/raw`, b
 | nccs_990_core/02_download_core_release | raw/nccs_990/core/raw/year=YYYY/*.csv + raw/nccs_990/core/bridge_bmf/state=XX/*.csv | official NCCS Core CSVs, dictionaries, and Unified BMF bridge files | Local bytes == source Content-Length |
 | nccs_990_core/04_verify_core_source_local_s3 | raw/nccs_990/core/metadata/size_verification_year=YYYY.csv | source/local/S3 bytes for Core raw assets | Every required row has size_match=TRUE |
 | nccs_990_core/05_filter_core_to_benchmark_local | staging/nccs_990/core/year=YYYY/*__benchmark.csv | benchmark-county subset with county_fips + region + match source | Rows reduced vs raw and region populated |
+| nccs_990_postcard/02_download_postcard_release | raw/nccs_990/postcard/raw/snapshot_year=YYYY/snapshot_month=YYYY-MM/*.csv | official NCCS postcard monthly snapshot CSVs | Local bytes == source Content-Length |
+| nccs_990_postcard/04_verify_postcard_source_local_s3 | raw/nccs_990/postcard/metadata/size_verification_snapshot_year=YYYY.csv | source/local/S3 bytes for postcard raw assets | Every required row has size_match=TRUE |
+| nccs_990_postcard/05_filter_postcard_to_benchmark_local | staging/nccs_990/postcard/snapshot_year=YYYY/nccs_990_postcard_benchmark_snapshot_year=YYYY.csv | combined benchmark-county postcard output with county_fips + region + match source | Rows reduced vs raw and region populated |
+| nccs_bmf/02_download_bmf_release | raw/nccs_bmf/raw/year=YYYY/*.csv | selected yearly NCCS BMF raw CSVs | Local bytes == source Content-Length |
+| nccs_bmf/04_verify_bmf_source_local_s3 | raw/nccs_bmf/metadata/size_verification_start_year=2022.csv | source/local/S3 bytes for selected raw BMF assets | Every required row has size_match=TRUE |
+| nccs_bmf/05_filter_bmf_to_benchmark_local | staging/nccs_bmf/year=YYYY/nccs_bmf_benchmark_year=YYYY.parquet | benchmark-county subset of each yearly BMF snapshot with county_fips + region + snapshot fields | Rows reduced vs raw and region populated |
+| combined_990/01_build_combined_filtered_local | staging/combined_990/combined_990_filtered_source_union.parquet | source-preserving union table plus row provenance, harmonized fields, per-field provenance, overlay flags, diagnostics | Non-zero rows and schema metadata written |
