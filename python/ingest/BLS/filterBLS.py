@@ -26,9 +26,10 @@ regions = ["Sioux Falls", "Billings", "Flagstaff", "Missoula"]
 regions_FIPS =[4362, 1374, 2238, 3354]
 df_filtered = df[(df['fips'].isin(regions_FIPS)) & (df['naics']=='10')]
 
-# Filter the DataFrame for BlackHills region only.
+# Filter the DataFrame for BlackHills region only. 
+blackhills_fips = [46019, 46093, 46081, 46103, 46033, 46102, 46047]
+df_blackhills = df[df['fips'].isin(blackhills_fips) & (df['naics']=='10')]
 
 # Aggregate the BlackHills regions by summing the relevant columns.
 
-# Combine the benchmark regions with the aggregated BlackHills region. 
 
