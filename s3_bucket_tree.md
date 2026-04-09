@@ -23,9 +23,9 @@ swb-321-irs990-teos/
 |   |       |   |-- 2025_08_29_All_Years_990PFStandardFields.csv
 |   |       |   |-- 2025_10_18_All_Years_990StandardFields.csv
 |   |       |   `-- 2025_10_28_All_Years_990EZStandardFields.csv
-|   |       `-- unfiltered/
-|   |           |-- givingtuesday_990_basic_allforms_unfiltered.parquet
-|   |           `-- givingtuesday_990_basic_plus_combined_unfiltered.parquet
+|   |       `-- presilver/
+|   |           |-- givingtuesday_990_basic_allforms_presilver.parquet
+|   |           `-- givingtuesday_990_basic_plus_combined_presilver.parquet
 |   |-- irs990/
 |   |   |-- bmf/
 |   |   |   |-- eo_az.csv
@@ -65,7 +65,7 @@ swb-321-irs990-teos/
 |   |           |-- year=2025/
 |   |           |   `-- 17 objects total: .keep, 2025_TEOS_XML_01A.zip, and 15 additional ZIP objects
 |   |           `-- year=2026/
-|   |               `-- 1 object total: 2026_TEOS_XML_01A.zip
+|   |               `-- 1 objects total: 2026_TEOS_XML_01A.zip
 |   |-- irs_soi/
 |   |   `-- county/
 |   |       |-- metadata/
@@ -118,24 +118,53 @@ swb-321-irs990-teos/
 |   |               |   `-- 2026-02-E-POSTCARD.csv
 |   |               `-- snapshot_month=2026-03/
 |   |                   `-- 2026-03-E-POSTCARD.csv
-|   `-- nccs_bmf/
+|   |-- nccs_bmf/
+|   |   |-- metadata/
+|   |   |   |-- catalog_bmf.html
+|   |   |   |-- dataset_bmf.html
+|   |   |   |-- latest_release.json
+|   |   |   |-- release_manifest_start_year=2022.csv
+|   |   |   `-- size_verification_start_year=2022.csv
+|   |   `-- raw/
+|   |       |-- year=2022/
+|   |       |   `-- BMF-2022-08-501CX-NONPROFIT-PX.csv
+|   |       |-- year=2023/
+|   |       |   `-- 2023-12-BMF.csv
+|   |       |-- year=2024/
+|   |       |   `-- 2024-12-BMF.csv
+|   |       |-- year=2025/
+|   |       |   `-- 2025-12-BMF.csv
+|   |       `-- year=2026/
+|   |           `-- 2026-03-BMF.csv
+|   `-- nccs_efile/
 |       |-- metadata/
-|       |   |-- catalog_bmf.html
-|       |   |-- dataset_bmf.html
+|       |   |-- catalog_efile.html
+|       |   |-- dataset_efile.html
 |       |   |-- latest_release.json
 |       |   |-- release_manifest_start_year=2022.csv
 |       |   `-- size_verification_start_year=2022.csv
 |       `-- raw/
-|           |-- year=2022/
-|           |   `-- BMF-2022-08-501CX-NONPROFIT-PX.csv
-|           |-- year=2023/
-|           |   `-- 2023-12-BMF.csv
-|           |-- year=2024/
-|           |   `-- 2024-12-BMF.csv
-|           |-- year=2025/
-|           |   `-- 2025-12-BMF.csv
-|           `-- year=2026/
-|               `-- 2026-03-BMF.csv
+|           |-- tax_year=2022/
+|           |   |-- table=F9-P00-T00-HEADER/
+|           |   |   `-- F9-P00-T00-HEADER-2022.CSV
+|           |   |-- table=F9-P01-T00-SUMMARY/
+|           |   |   `-- F9-P01-T00-SUMMARY-2022.CSV
+|           |   `-- table=SA-P01-T00-PUBLIC-CHARITY-STATUS/
+|           |       `-- SA-P01-T00-PUBLIC-CHARITY-STATUS-2022.CSV
+|           |-- tax_year=2023/
+|           |   |-- table=F9-P00-T00-HEADER/
+|           |   |   `-- F9-P00-T00-HEADER-2023.CSV
+|           |   |-- table=F9-P01-T00-SUMMARY/
+|           |   |   `-- F9-P01-T00-SUMMARY-2023.CSV
+|           |   `-- table=SA-P01-T00-PUBLIC-CHARITY-STATUS/
+|           |       `-- SA-P01-T00-PUBLIC-CHARITY-STATUS-2023.CSV
+|           `-- tax_year=2024/
+|               |-- table=F9-P00-T00-HEADER/
+|               |   `-- F9-P00-T00-HEADER-2024.CSV
+|               |-- table=F9-P01-T00-SUMMARY/
+|               |   `-- F9-P01-T00-SUMMARY-2024.CSV
+|               `-- table=SA-P01-T00-PUBLIC-CHARITY-STATUS/
+|                   `-- SA-P01-T00-PUBLIC-CHARITY-STATUS-2024.CSV
 `-- silver/
     |-- combined_990/
     |   |-- metadata/
@@ -145,9 +174,15 @@ swb-321-irs990-teos/
     |   |   |-- diag_overlap_by_ein_tax_year.csv
     |   |   |-- diag_overlap_summary.csv
     |   |   |-- field_availability_matrix.csv
+    |   |   |-- master_column_dictionary.csv
+    |   |   |-- master_conflict_detail.csv
+    |   |   |-- master_conflict_detail.parquet
+    |   |   |-- master_conflict_summary.csv
+    |   |   |-- master_field_selection_summary.csv
     |   |   |-- size_verification.csv
     |   |   `-- source_input_manifest.csv
-    |   `-- combined_990_filtered_source_union.parquet
+    |   |-- combined_990_filtered_source_union.parquet
+    |   `-- combined_990_master_ein_tax_year.parquet
     |-- givingtuesday_990/
     |   `-- filing/
     |       |-- givingtuesday_990_filings_benchmark.parquet
@@ -173,18 +208,36 @@ swb-321-irs990-teos/
     |   `-- postcard/
     |       `-- snapshot_year=2026/
     |           |-- filter_manifest_snapshot_year=2026.csv
-    |           `-- nccs_990_postcard_benchmark_snapshot_year=2026.csv
-    `-- nccs_bmf/
-        |-- metadata/
-        |   `-- filter_manifest_start_year=2022.csv
-        |-- year=2022/
-        |   `-- nccs_bmf_benchmark_year=2022.parquet
-        |-- year=2023/
-        |   `-- nccs_bmf_benchmark_year=2023.parquet
-        |-- year=2024/
-        |   `-- nccs_bmf_benchmark_year=2024.parquet
-        |-- year=2025/
-        |   `-- nccs_bmf_benchmark_year=2025.parquet
-        `-- year=2026/
-            `-- nccs_bmf_benchmark_year=2026.parquet
+    |           |-- filter_manifest_snapshot_year=2026_tax_year_start=2022.csv
+    |           |-- nccs_990_postcard_benchmark_snapshot_year=2026.csv
+    |           `-- nccs_990_postcard_benchmark_tax_year_start=2022_snapshot_year=2026.csv
+    |-- nccs_bmf/
+    |   |-- metadata/
+    |   |   `-- filter_manifest_start_year=2022.csv
+    |   |-- year=2022/
+    |   |   `-- nccs_bmf_benchmark_year=2022.parquet
+    |   |-- year=2023/
+    |   |   `-- nccs_bmf_benchmark_year=2023.parquet
+    |   |-- year=2024/
+    |   |   `-- nccs_bmf_benchmark_year=2024.parquet
+    |   |-- year=2025/
+    |   |   `-- nccs_bmf_benchmark_year=2025.parquet
+    |   `-- year=2026/
+    |       `-- nccs_bmf_benchmark_year=2026.parquet
+    `-- nccs_efile/
+        |-- comparison/
+        |   `-- tax_year=2022/
+        |       |-- efile_vs_core_conflicts_tax_year=2022.csv
+        |       |-- efile_vs_core_fill_rates_tax_year=2022.csv
+        |       |-- efile_vs_core_row_counts_tax_year=2022.csv
+        |       `-- efile_vs_core_summary_tax_year=2022.json
+        |-- tax_year=2022/
+        |   |-- filter_manifest_tax_year=2022.csv
+        |   `-- nccs_efile_benchmark_tax_year=2022.parquet
+        |-- tax_year=2023/
+        |   |-- filter_manifest_tax_year=2023.csv
+        |   `-- nccs_efile_benchmark_tax_year=2023.parquet
+        `-- tax_year=2024/
+            |-- filter_manifest_tax_year=2024.csv
+            `-- nccs_efile_benchmark_tax_year=2024.parquet
 ```

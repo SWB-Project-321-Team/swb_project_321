@@ -1,0 +1,65 @@
+# NCCS BMF Analysis Variable Mapping
+
+- Source family: `nccs_bmf`
+- Analysis output: `C:\Users\eilke\Desktop\Github Repo\swb_project_321\data\321_Black_Hills_Area_Community_Foundation_2025_08\01_data\staging\nccs_bmf\nccs_bmf_analysis_variables.parquet`
+- Geography metrics output: `C:\Users\eilke\Desktop\Github Repo\swb_project_321\data\321_Black_Hills_Area_Community_Foundation_2025_08\01_data\staging\nccs_bmf\nccs_bmf_analysis_geography_metrics.parquet`
+- Field metrics output: `C:\Users\eilke\Desktop\Github Repo\swb_project_321\data\321_Black_Hills_Area_Community_Foundation_2025_08\01_data\staging\nccs_bmf\nccs_bmf_analysis_field_metrics.parquet`
+- Coverage report: `C:\Users\eilke\Desktop\Github Repo\swb_project_321\data\321_Black_Hills_Area_Community_Foundation_2025_08\01_data\raw\nccs_bmf\metadata\nccs_bmf_analysis_variable_coverage.csv`
+- Scope: `2022-2024` only
+
+## Extracted Variables
+
+|canonical_variable|variable_role|draft_variable|source_rule|provenance_column|notes|
+|---|---|---|---|---|---|
+
+## Unavailable Variables
+
+|canonical_variable|availability_status|draft_variable|notes|
+|---|---|---|---|
+|analysis_total_revenue_amount|direct|Total revenue|Year-aware direct BMF revenue field|analysis_total_revenue_amount_source_column|Regionwide total-revenue metric.|
+|analysis_total_assets_amount|direct|Total assets|Year-aware direct BMF asset field|analysis_total_assets_amount_source_column|Regionwide total-assets metric.|
+|analysis_total_income_amount|direct|Total income|Year-aware direct BMF income field|analysis_total_income_amount_source_column|Performance support metric for the draft's time-trend notes.|
+|analysis_ntee_code|enriched|NTEE filed classification code|Exact-year BMF lookup joined on EIN + tax_year, then nearest-year BMF, then IRS EO BMF EIN fallback|analysis_ntee_code_source_column|Analysis-ready classification support field.|
+|analysis_subsection_code|enriched|Subsection code|Exact-year BMF lookup joined on EIN + tax_year, then nearest-year BMF, then IRS EO BMF EIN fallback|analysis_subsection_code_source_column|Political-organization support field.|
+|analysis_calculated_ntee_broad_code|calculated|Broad NTEE field classification code|First letter of analysis_ntee_code|analysis_calculated_ntee_broad_code_source_column|Broad field representation metric.|
+|analysis_is_hospital|proxy|Hospital flag|NTEE proxy from analysis_ntee_code|analysis_is_hospital_source_column|Source-backed hospital proxy.|
+|analysis_is_university|proxy|University flag|NTEE proxy from analysis_ntee_code|analysis_is_university_source_column|Source-backed university proxy.|
+|analysis_is_political_org|proxy|Political organization flag|Subsection proxy from analysis_subsection_code|analysis_is_political_org_source_column|Source-backed political proxy.|
+|analysis_imputed_is_hospital|imputed|Hospital flag|analysis_is_hospital, then conservative name fallback, then default false|analysis_imputed_is_hospital_source_column|Complete hospital flag for analysis exclusions.|
+|analysis_imputed_is_university|imputed|University flag|analysis_is_university, then conservative name fallback, then default false|analysis_imputed_is_university_source_column|Complete university flag for analysis exclusions.|
+|analysis_imputed_is_political_org|imputed|Political organization flag|analysis_is_political_org, then conservative name fallback, then default false|analysis_imputed_is_political_org_source_column|Complete political-organization flag for analysis exclusions.|
+|analysis_program_service_revenue_amount|unavailable|Program service revenue|BMF does not carry this 990-style revenue-source field.|
+|analysis_calculated_total_contributions_amount|unavailable|Total contributions|BMF does not carry this 990-style revenue-source field.|
+|analysis_other_contributions_amount|unavailable|Other contributions|BMF does not carry this 990-style revenue-source field.|
+|analysis_calculated_grants_total_amount|unavailable|Grants (total amount)|BMF does not carry this 990-style revenue-source field.|
+|analysis_total_expense_amount|unavailable|Total expense|BMF does not carry this expense field.|
+|analysis_net_asset_amount|unavailable|Net asset|BMF does not provide a direct net-asset field in the current pipeline.|
+|analysis_calculated_surplus_amount|unavailable|Surplus|BMF does not carry a direct revenue-minus-expense surplus field in the current pipeline.|
+|analysis_calculated_net_margin_ratio|unavailable|Net margin|BMF cannot calculate net margin without total expenses.|
+|analysis_calculated_months_of_reserves|unavailable|Months of reserves|BMF cannot calculate months of reserves without total expenses and a direct net-asset field.|
+
+## Draft Alignment Appendix
+
+|draft_variable|source_specific_output|status|rule_or_reason|
+|---|---|---|---|
+|Total revenue|analysis_total_revenue_amount|direct|Year-aware direct BMF revenue field|
+|Total assets|analysis_total_assets_amount|direct|Year-aware direct BMF asset field|
+|Total income|analysis_total_income_amount|direct|Year-aware direct BMF income field|
+|NTEE filed classification code|analysis_ntee_code|enriched|Exact-year BMF lookup joined on EIN + tax_year, then nearest-year BMF, then IRS EO BMF EIN fallback|
+|Subsection code|analysis_subsection_code|enriched|Exact-year BMF lookup joined on EIN + tax_year, then nearest-year BMF, then IRS EO BMF EIN fallback|
+|Broad NTEE field classification code|analysis_calculated_ntee_broad_code|calculated|First letter of analysis_ntee_code|
+|Hospital flag|analysis_is_hospital|proxy|NTEE proxy from analysis_ntee_code|
+|University flag|analysis_is_university|proxy|NTEE proxy from analysis_ntee_code|
+|Political organization flag|analysis_is_political_org|proxy|Subsection proxy from analysis_subsection_code|
+|Hospital flag|analysis_imputed_is_hospital|imputed|analysis_is_hospital, then conservative name fallback, then default false|
+|University flag|analysis_imputed_is_university|imputed|analysis_is_university, then conservative name fallback, then default false|
+|Political organization flag|analysis_imputed_is_political_org|imputed|analysis_is_political_org, then conservative name fallback, then default false|
+|Program service revenue|analysis_program_service_revenue_amount|unavailable|BMF does not carry this 990-style revenue-source field.|
+|Total contributions|analysis_calculated_total_contributions_amount|unavailable|BMF does not carry this 990-style revenue-source field.|
+|Other contributions|analysis_other_contributions_amount|unavailable|BMF does not carry this 990-style revenue-source field.|
+|Grants (total amount)|analysis_calculated_grants_total_amount|unavailable|BMF does not carry this 990-style revenue-source field.|
+|Total expense|analysis_total_expense_amount|unavailable|BMF does not carry this expense field.|
+|Net asset|analysis_net_asset_amount|unavailable|BMF does not provide a direct net-asset field in the current pipeline.|
+|Surplus|analysis_calculated_surplus_amount|unavailable|BMF does not carry a direct revenue-minus-expense surplus field in the current pipeline.|
+|Net margin|analysis_calculated_net_margin_ratio|unavailable|BMF cannot calculate net margin without total expenses.|
+|Months of reserves|analysis_calculated_months_of_reserves|unavailable|BMF cannot calculate months of reserves without total expenses and a direct net-asset field.|

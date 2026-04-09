@@ -1,5 +1,5 @@
 """
-Shared helpers for the NCCS BMF 2022-present ingestion pipeline.
+Shared helpers for the NCCS BMF 2021-present ingestion pipeline.
 
 This pipeline mirrors the existing NCCS Core and Postcard pipelines:
 - step-wise CLI scripts with explicit startup banners
@@ -9,7 +9,7 @@ This pipeline mirrors the existing NCCS Core and Postcard pipelines:
 
 The source landscape is different from the other NCCS pipelines, so discovery
 logic is more opinionated:
-- 2022 uses the latest available legacy BMF release in calendar year 2022
+- 2021-2022 use the latest available legacy BMF release in the matching calendar year
 - 2023+ uses one representative raw monthly snapshot per year
 - completed years prefer December when present
 - the current year uses the latest currently available month
@@ -36,6 +36,7 @@ _PYTHON_DIR = _THIS_FILE.parents[2]
 if str(_PYTHON_DIR) not in sys.path:
     sys.path.insert(0, str(_PYTHON_DIR))
 
+from ingest._shared import transfers as shared_transfers  # noqa: E402
 _CORE_COMMON_PATH = _PYTHON_DIR / "ingest" / "nccs_990_core" / "common.py"
 _CORE_COMMON_SPEC = importlib.util.spec_from_file_location("nccs_990_core_common", _CORE_COMMON_PATH)
 if _CORE_COMMON_SPEC is None or _CORE_COMMON_SPEC.loader is None:
@@ -44,7 +45,7 @@ _CORE_COMMON = importlib.util.module_from_spec(_CORE_COMMON_SPEC)
 sys.modules.setdefault("nccs_990_core_common", _CORE_COMMON)
 _CORE_COMMON_SPEC.loader.exec_module(_CORE_COMMON)
 
-from utils.paths import DATA  # noqa: E402
+from utils.paths import DATA, get_base  # noqa: E402
 
 if hasattr(sys.stdout, "reconfigure"):
     sys.stdout.reconfigure(line_buffering=True)
@@ -58,6 +59,8 @@ RAW_ROOT = DATA / "raw" / "nccs_bmf"
 BMF_RAW_DIR = RAW_ROOT / "raw"
 META_DIR = RAW_ROOT / "metadata"
 STAGING_DIR = DATA / "staging" / "nccs_bmf"
+DOCS_ANALYSIS_DIR = get_base() / "docs" / "analysis"
+DOCS_DATA_PROCESSING_DIR = get_base() / "docs" / "data_processing"
 
 LATEST_RELEASE_JSON = META_DIR / "latest_release.json"
 BMF_DATASET_SNAPSHOT = META_DIR / "dataset_bmf.html"
@@ -68,15 +71,22 @@ DEFAULT_S3_REGION = _CORE_COMMON.DEFAULT_S3_REGION
 RAW_PREFIX = "bronze/nccs_bmf/raw"
 META_PREFIX = "bronze/nccs_bmf/metadata"
 SILVER_PREFIX = "silver/nccs_bmf"
+ANALYSIS_PREFIX = f"{SILVER_PREFIX}/analysis"
+ANALYSIS_META_PREFIX = f"{ANALYSIS_PREFIX}/metadata"
 
 GEOID_REFERENCE_CSV = _CORE_COMMON.GEOID_REFERENCE_CSV
 ZIP_TO_COUNTY_CSV = _CORE_COMMON.ZIP_TO_COUNTY_CSV
 
 START_YEAR_DEFAULT = 2022
+ANALYSIS_TAX_YEAR_MIN = 2022
+ANALYSIS_TAX_YEAR_MAX = 2024
 LOOKBACK_MONTHS_DEFAULT = 48
-DOWNLOAD_WORKERS = int(os.environ.get("NCCS_BMF_DOWNLOAD_WORKERS", "2"))
-UPLOAD_WORKERS = int(os.environ.get("NCCS_BMF_UPLOAD_WORKERS", "2"))
+DOWNLOAD_WORKERS = shared_transfers.DOWNLOAD_WORKERS_DEFAULT
+UPLOAD_WORKERS = shared_transfers.UPLOAD_WORKERS_DEFAULT
 _TQDM_KW = getattr(_CORE_COMMON, "_TQDM_KW", {})
+print_transfer_settings = shared_transfers.print_transfer_settings
+parallel_map = shared_transfers.parallel_map
+batch_s3_object_sizes = shared_transfers.batch_s3_object_sizes
 
 _RAW_MONTHLY_REGEX = re.compile(r"(?P<year>\d{4})-(?P<month>\d{2})-BMF\.csv$", re.IGNORECASE)
 _LEGACY_REGEX = re.compile(r"BMF-(?P<year>\d{4})-(?P<month>\d{2})-501CX-NONPROFIT-PX\.csv$", re.IGNORECASE)
@@ -223,9 +233,44 @@ def filtered_output_path(staging_dir: Path, snapshot_year: int) -> Path:
     return year_staging_dir(staging_dir, snapshot_year) / f"nccs_bmf_benchmark_year={snapshot_year}.parquet"
 
 
+def exact_year_lookup_output_path(staging_dir: Path, snapshot_year: int) -> Path:
+    """Return the exact-year enrichment lookup parquet path for one BMF year."""
+    return year_staging_dir(staging_dir, snapshot_year) / f"nccs_bmf_exact_year_lookup_year={snapshot_year}.parquet"
+
+
 def filter_manifest_path(staging_dir: Path, start_year: int = START_YEAR_DEFAULT) -> Path:
     """Return the benchmark-filter manifest path."""
     return staging_dir / f"filter_manifest_start_year={start_year}.csv"
+
+
+def analysis_variables_output_path(staging_dir: Path = STAGING_DIR) -> Path:
+    """Return the BMF row-level analysis parquet path."""
+    return staging_dir / "nccs_bmf_analysis_variables.parquet"
+
+
+def analysis_geography_metrics_output_path(staging_dir: Path = STAGING_DIR) -> Path:
+    """Return the BMF geography metrics parquet path."""
+    return staging_dir / "nccs_bmf_analysis_geography_metrics.parquet"
+
+
+def analysis_field_metrics_output_path(staging_dir: Path = STAGING_DIR) -> Path:
+    """Return the BMF NTEE field metrics parquet path."""
+    return staging_dir / "nccs_bmf_analysis_field_metrics.parquet"
+
+
+def analysis_variable_coverage_path(metadata_dir: Path = META_DIR) -> Path:
+    """Return the BMF analysis coverage CSV path."""
+    return metadata_dir / "nccs_bmf_analysis_variable_coverage.csv"
+
+
+def analysis_variable_mapping_path() -> Path:
+    """Return the BMF analysis mapping Markdown path."""
+    return DOCS_ANALYSIS_DIR / "nccs_bmf_analysis_variable_mapping.md"
+
+
+def analysis_data_processing_doc_path() -> Path:
+    """Return the BMF data-processing documentation path."""
+    return DOCS_DATA_PROCESSING_DIR / "nccs_bmf_pipeline.md"
 
 
 def raw_s3_key(raw_prefix: str, snapshot_year: int, filename: str) -> str:
@@ -398,12 +443,18 @@ def discover_latest_available_raw_month(
     )
 
 
-def _select_legacy_2022_asset(legacy_links_by_period: dict[str, str]) -> tuple[str, str]:
-    """Select the latest available 2022 legacy BMF asset from the catalog links."""
-    legacy_2022_periods = sorted(period for period in legacy_links_by_period if period.startswith("2022-"))
-    if not legacy_2022_periods:
-        raise ValueError("BMF catalog did not expose any 2022 legacy BMF assets.")
-    selected_period = legacy_2022_periods[-1]
+def _select_latest_legacy_asset_for_year(legacy_links_by_period: dict[str, str], legacy_year: int) -> tuple[str, str]:
+    """
+    Select the latest available legacy BMF asset for one requested year.
+
+    The GT exact-year NTEE enrichment needs a true 2021 lookup, so this helper
+    intentionally supports both 2021 and 2022 instead of hardcoding only the
+    previous 2022 case.
+    """
+    legacy_periods = sorted(period for period in legacy_links_by_period if period.startswith(f"{legacy_year}-"))
+    if not legacy_periods:
+        raise ValueError(f"BMF catalog did not expose any {legacy_year} legacy BMF assets.")
+    selected_period = legacy_periods[-1]
     return selected_period, legacy_links_by_period[selected_period]
 
 
@@ -487,9 +538,9 @@ def discover_release(
     start_year: int = START_YEAR_DEFAULT,
     today: date | None = None,
 ) -> tuple[dict[str, Any], str, str]:
-    """Discover the yearly NCCS BMF snapshot set for 2022-present."""
-    if start_year != 2022:
-        raise ValueError("This v1 NCCS BMF pipeline is scoped to start_year=2022.")
+    """Discover the yearly NCCS BMF snapshot set for 2021-present."""
+    if start_year < 2021:
+        raise ValueError("This NCCS BMF pipeline is scoped to start_year>=2021.")
 
     dataset_html = fetch_text(BMF_DATASET_URL)
     catalog_html = fetch_text(BMF_CATALOG_URL)
@@ -502,20 +553,21 @@ def discover_release(
 
     selected_assets_list: list[BMFAssetRecord] = []
 
-    legacy_period, legacy_url = _select_legacy_2022_asset(catalog_info["legacy_links_by_period"])
-    selected_assets_list.append(
-        build_asset_record(
-            asset_group="legacy_bmf_csv",
-            asset_type="legacy_bmf_csv",
-            snapshot_year=2022,
-            snapshot_month="",
-            source_period=legacy_period,
-            source_url=legacy_url,
-            year_basis="legacy_latest_in_year",
+    for legacy_year in range(start_year, min(2022, latest_raw_year) + 1):
+        legacy_period, legacy_url = _select_latest_legacy_asset_for_year(catalog_info["legacy_links_by_period"], legacy_year)
+        selected_assets_list.append(
+            build_asset_record(
+                asset_group="legacy_bmf_csv",
+                asset_type="legacy_bmf_csv",
+                snapshot_year=legacy_year,
+                snapshot_month="",
+                source_period=legacy_period,
+                source_url=legacy_url,
+                year_basis="legacy_latest_in_year",
+            )
         )
-    )
 
-    for year in range(2023, latest_raw_year + 1):
+    for year in range(max(2023, start_year), latest_raw_year + 1):
         if year == latest_raw_year:
             selected_period = latest_raw_month
             selected_meta = latest_raw_meta
@@ -593,34 +645,14 @@ def download_with_progress(
     desc: str | None = None,
 ) -> int:
     """Download one raw BMF asset with a visible byte progress bar."""
-    output_path.parent.mkdir(parents=True, exist_ok=True)
-    with requests.get(url, stream=True, timeout=timeout) as response:
-        response.raise_for_status()
-        total = expected_bytes
-        if total is None:
-            header = response.headers.get("Content-Length")
-            content_encoding = response.headers.get("Content-Encoding", "").lower()
-            if header and header.isdigit() and content_encoding != "gzip":
-                total = int(header)
-        tqdm_kwargs = dict(_TQDM_KW)
-        if position is not None:
-            tqdm_kwargs["position"] = position
-        with tqdm(
-            total=total,
-            unit="B",
-            unit_scale=True,
-            unit_divisor=1024,
-            desc=desc or f"download {output_path.name}",
-            leave=True,
-            **tqdm_kwargs,
-        ) as pbar:
-            with open(output_path, "wb") as handle:
-                for chunk in response.iter_content(chunk_size=1024 * 1024):
-                    if not chunk:
-                        continue
-                    handle.write(chunk)
-                    pbar.update(len(chunk))
-    return output_path.stat().st_size
+    return shared_transfers.download_with_progress(
+        url,
+        output_path,
+        expected_bytes=expected_bytes,
+        timeout=timeout,
+        position=position,
+        desc=desc,
+    )
 
 
 def upload_file_with_progress(
@@ -634,37 +666,15 @@ def upload_file_with_progress(
     desc: str | None = None,
 ) -> None:
     """Upload one local BMF file to S3 with a visible byte progress bar."""
-    client = s3_client(region)
-    size = local_path.stat().st_size
-    transfer_config = s3_transfer_config()
-    print(
-        "[upload-config] "
-        f"threshold={_CORE_COMMON.S3_MULTIPART_THRESHOLD_MB}MB "
-        f"chunk={_CORE_COMMON.S3_MULTIPART_CHUNKSIZE_MB}MB "
-        f"concurrency={_CORE_COMMON.S3_MAX_CONCURRENCY}",
-        flush=True,
+    shared_transfers.upload_file_with_progress(
+        local_path,
+        bucket,
+        key,
+        region,
+        extra_args=extra_args,
+        position=position,
+        desc=desc,
     )
-    tqdm_kwargs = dict(_TQDM_KW)
-    if position is not None:
-        tqdm_kwargs["position"] = position
-    with tqdm(
-        total=size,
-        unit="B",
-        unit_scale=True,
-        unit_divisor=1024,
-        desc=desc or f"upload {local_path.name}",
-        leave=True,
-        **tqdm_kwargs,
-    ) as pbar:
-        callback = _CORE_COMMON._TqdmUpload(pbar)
-        client.upload_file(
-            str(local_path),
-            bucket,
-            key,
-            ExtraArgs=extra_args or {},
-            Callback=callback,
-            Config=transfer_config,
-        )
 
 
 def _blank_expr(expr: pl.Expr) -> pl.Expr:
@@ -676,6 +686,18 @@ def _normalize_zip5_expr(expr: pl.Expr) -> pl.Expr:
     """Normalize ZIP-like values to 5-digit ZIP codes."""
     digits = expr.cast(pl.Utf8, strict=False).fill_null("").str.replace_all(r"[^0-9]", "")
     return pl.when(digits.str.len_chars() >= 5).then(digits.str.slice(0, 5)).otherwise(pl.lit(""))
+
+
+def _normalize_ein9_expr(expr: pl.Expr) -> pl.Expr:
+    """Normalize EIN-like values to 9-digit strings where possible."""
+    digits = expr.cast(pl.Utf8, strict=False).fill_null("").str.replace_all(r"[^0-9]", "")
+    return (
+        pl.when(digits.str.len_chars() == 0)
+        .then(pl.lit(""))
+        .when(digits.str.len_chars() < 9)
+        .then(digits.str.zfill(9))
+        .otherwise(digits.str.slice(-9))
+    )
 
 
 def _normalize_fips5_expr(expr: pl.Expr) -> pl.Expr:
@@ -701,11 +723,18 @@ def _load_geoid_reference(path_csv: Path) -> pl.DataFrame:
     region_col = next((c for c in ref.columns if c.lower() in ("cluster_name", "region", "cluster")), None)
     if region_col is None:
         raise RuntimeError("GEOID reference missing region/cluster column.")
+    state_col = next((c for c in ref.columns if c.lower() == "state"), None)
+    state_expr = (
+        pl.col(state_col).cast(pl.Utf8, strict=False).fill_null("").str.strip_chars().str.to_uppercase().alias("benchmark_state")
+        if state_col is not None
+        else pl.lit("").alias("benchmark_state")
+    )
     return (
         ref.select(
             [
                 _normalize_fips5_expr(pl.col(geoid_col)).alias("county_fips"),
                 pl.col(region_col).cast(pl.Utf8, strict=False).fill_null("").alias("region"),
+                state_expr,
             ]
         )
         .filter((pl.col("county_fips").str.len_chars() == 5) & ~_blank_expr(pl.col("region")))
@@ -714,7 +743,7 @@ def _load_geoid_reference(path_csv: Path) -> pl.DataFrame:
 
 
 def _load_zip_to_fips(path_csv: Path) -> pl.DataFrame:
-    """Load the ZIP-to-county crosswalk with one primary county per ZIP."""
+    """Load the ZIP-to-county crosswalk as normalized ZIP/county pairs."""
     if not path_csv.exists():
         raise FileNotFoundError(f"ZIP-to-county CSV not found: {path_csv}")
     df = pl.read_csv(str(path_csv), infer_schema_length=0)
@@ -730,8 +759,34 @@ def _load_zip_to_fips(path_csv: Path) -> pl.DataFrame:
             ]
         )
         .filter((pl.col("zip5").str.len_chars() == 5) & (pl.col("county_fips").str.len_chars() == 5))
-        .unique(subset=["zip5"], keep="first", maintain_order=True)
+        .unique(subset=["zip5", "county_fips"], keep="first", maintain_order=True)
     )
+
+
+def _build_benchmark_zip_df(zip_df: pl.DataFrame, geoid_df: pl.DataFrame) -> pl.DataFrame:
+    """Build the explicit benchmark ZIP map and reject ambiguous ZIP assignments."""
+    benchmark_zip_df = (
+        zip_df.join(geoid_df, on="county_fips", how="inner")
+        .select(["zip5", "county_fips", "region", "benchmark_state"])
+        .unique(subset=["zip5", "county_fips"], keep="first", maintain_order=True)
+    )
+    ambiguous = (
+        benchmark_zip_df.group_by("zip5")
+        .agg(pl.col("county_fips").n_unique().alias("county_count"))
+        .filter(pl.col("county_count") > 1)
+    )
+    if ambiguous.height:
+        examples = ", ".join(ambiguous.get_column("zip5").head(10).to_list())
+        raise RuntimeError(
+            "Benchmark ZIP map is ambiguous: at least one ZIP maps to multiple benchmark counties. "
+            f"Examples: {examples}"
+        )
+    return benchmark_zip_df.unique(subset=["zip5"], keep="first", maintain_order=True)
+
+
+def _normalize_state2_expr(expr: pl.Expr) -> pl.Expr:
+    """Normalize state-like values to uppercase 2-character abbreviations when present."""
+    return expr.cast(pl.Utf8, strict=False).fill_null("").str.strip_chars().str.to_uppercase()
 
 
 def _bmf_schema_info(asset: dict[str, Any]) -> dict[str, str]:
@@ -790,6 +845,7 @@ def filter_bmf_file_to_benchmark(
     schema = _bmf_schema_info(asset)
     geoid_df = _load_geoid_reference(geoid_reference_path)
     zip_df = _load_zip_to_fips(zip_to_county_path)
+    benchmark_zip_df = _build_benchmark_zip_df(zip_df, geoid_df)
 
     input_lf = pl.scan_csv(str(local_bmf_path), infer_schema_length=0)
     input_columns = input_lf.collect_schema().names()
@@ -800,11 +856,29 @@ def filter_bmf_file_to_benchmark(
     rows_input = input_lf.select(pl.len().alias("n")).collect().item(0, 0)
     print(f"[filter] Source rows in {local_bmf_path.name}: {int(rows_input):,}", flush=True)
 
-    filtered_lf = (
+    geo_matched_lf = (
         input_lf.with_columns([_normalize_zip5_expr(pl.col(zip_col)).alias("__zip5")])
-        .join(zip_df.lazy(), left_on="__zip5", right_on="zip5", how="left")
-        .join(geoid_df.lazy(), on="county_fips", how="left")
+        .join(benchmark_zip_df.lazy(), left_on="__zip5", right_on="zip5", how="inner")
         .filter(pl.col("county_fips").is_not_null() & pl.col("region").is_not_null())
+    )
+
+    state_col = schema["state_col"]
+    state_validation_applied = state_col in input_columns
+    if state_validation_applied:
+        print(
+            f"[filter] Applying benchmark-state validation using source column '{state_col}' for {local_bmf_path.name}.",
+            flush=True,
+        )
+        filtered_lf = geo_matched_lf.filter(
+            _blank_expr(pl.col(state_col))
+            | _blank_expr(pl.col("benchmark_state"))
+            | (_normalize_state2_expr(pl.col(state_col)) == _normalize_state2_expr(pl.col("benchmark_state")))
+        )
+    else:
+        filtered_lf = geo_matched_lf
+
+    filtered_lf = (
+        filtered_lf
         .with_columns(
             [
                 pl.lit("zip_to_county").alias("benchmark_match_source"),
@@ -813,7 +887,7 @@ def filter_bmf_file_to_benchmark(
                 pl.lit("True").alias("is_benchmark_county"),
             ]
         )
-        .drop("__zip5")
+        .drop("__zip5", "benchmark_state")
     )
 
     output_columns = filtered_lf.collect_schema().names()
@@ -828,15 +902,102 @@ def filter_bmf_file_to_benchmark(
         )
         filtered_lf.collect().write_parquet(str(output_path), compression="zstd")
 
+    rows_geo_matched = geo_matched_lf.select(pl.len().alias("n")).collect().item(0, 0)
+    print(
+        f"[filter] Rows admitted by benchmark ZIP geography before downstream use: {int(rows_geo_matched):,}",
+        flush=True,
+    )
     filtered_df = pl.read_parquet(str(output_path))
     rows_output = filtered_df.height
     matched_counties = filtered_df.select(pl.col("county_fips").n_unique()).item()
     return {
         "input_row_count": int(rows_input),
+        "rows_after_zip_geography_filter": int(rows_geo_matched),
         "output_row_count": int(rows_output),
         "matched_county_fips_count": int(matched_counties),
         "geoid_reference_path": str(geoid_reference_path),
         "zip_to_county_path": str(zip_to_county_path),
         "schema_variant": schema["variant"],
         "zip_column_used": zip_col,
+        "state_validation_applied": bool(state_validation_applied),
+        "state_mismatch_dropped_count": int(rows_geo_matched) - int(rows_output) if state_validation_applied else 0,
+    }
+
+
+def build_bmf_exact_year_lookup(
+    *,
+    asset: dict[str, Any],
+    local_bmf_path: Path,
+    output_path: Path,
+) -> dict[str, Any]:
+    """
+    Build one exact-year BMF enrichment lookup without benchmark geography filtering.
+
+    The benchmark-filtered yearly BMF parquet should remain semantically narrow:
+    only in-scope benchmark rows belong there. The combined pipeline still needs
+    exact-year identity/classification values for any in-scope org-year that has
+    a matching BMF record, even when that BMF record did not survive benchmark
+    geography filtering. This lookup captures only those harmonized enrichment
+    fields and their provenance, keyed by `harm_ein + harm_tax_year`.
+    """
+    output_path.parent.mkdir(parents=True, exist_ok=True)
+    schema = _bmf_schema_info(asset)
+    snapshot_year = str(asset["snapshot_year"])
+    source_variant = ("legacy_bmf_lookup_" if schema["variant"] == "legacy" else "raw_bmf_lookup_") + snapshot_year
+
+    input_lf = pl.scan_csv(str(local_bmf_path), infer_schema_length=0)
+    rows_input = input_lf.select(pl.len().alias("n")).collect().item(0, 0)
+    print(f"[lookup] Source rows in {local_bmf_path.name}: {int(rows_input):,}", flush=True)
+
+    lookup_lf = (
+        input_lf.select(
+            [
+                _normalize_ein9_expr(pl.col(schema["ein_col"])).alias("harm_ein"),
+                pl.lit(snapshot_year).alias("harm_tax_year"),
+                pl.col(schema["name_col"]).cast(pl.Utf8, strict=False).fill_null("").alias("harm_org_name"),
+                _normalize_state2_expr(pl.col(schema["state_col"])).alias("harm_state"),
+                _normalize_zip5_expr(pl.col(schema["zip_col"])).alias("harm_zip5"),
+                pl.col(schema["ntee_col"]).cast(pl.Utf8, strict=False).fill_null("").str.strip_chars().alias("harm_ntee_code"),
+                pl.col(schema["subsection_col"]).cast(pl.Utf8, strict=False).fill_null("").str.strip_chars().alias("harm_subsection_code"),
+            ]
+        )
+        .filter(pl.col("harm_ein").str.len_chars() == 9)
+        .with_columns(
+            [
+                pl.when(~_blank_expr(pl.col("harm_org_name"))).then(pl.lit("nccs_bmf")).otherwise(pl.lit("")).alias("harm_org_name__source_family"),
+                pl.when(~_blank_expr(pl.col("harm_org_name"))).then(pl.lit(source_variant)).otherwise(pl.lit("")).alias("harm_org_name__source_variant"),
+                pl.when(~_blank_expr(pl.col("harm_org_name"))).then(pl.lit(schema["name_col"])).otherwise(pl.lit("")).alias("harm_org_name__source_column"),
+                pl.when(~_blank_expr(pl.col("harm_state"))).then(pl.lit("nccs_bmf")).otherwise(pl.lit("")).alias("harm_state__source_family"),
+                pl.when(~_blank_expr(pl.col("harm_state"))).then(pl.lit(source_variant)).otherwise(pl.lit("")).alias("harm_state__source_variant"),
+                pl.when(~_blank_expr(pl.col("harm_state"))).then(pl.lit(schema["state_col"])).otherwise(pl.lit("")).alias("harm_state__source_column"),
+                pl.when(~_blank_expr(pl.col("harm_zip5"))).then(pl.lit("nccs_bmf")).otherwise(pl.lit("")).alias("harm_zip5__source_family"),
+                pl.when(~_blank_expr(pl.col("harm_zip5"))).then(pl.lit(source_variant)).otherwise(pl.lit("")).alias("harm_zip5__source_variant"),
+                pl.when(~_blank_expr(pl.col("harm_zip5"))).then(pl.lit(schema["zip_col"])).otherwise(pl.lit("")).alias("harm_zip5__source_column"),
+                pl.when(~_blank_expr(pl.col("harm_ntee_code"))).then(pl.lit("nccs_bmf")).otherwise(pl.lit("")).alias("harm_ntee_code__source_family"),
+                pl.when(~_blank_expr(pl.col("harm_ntee_code"))).then(pl.lit(source_variant)).otherwise(pl.lit("")).alias("harm_ntee_code__source_variant"),
+                pl.when(~_blank_expr(pl.col("harm_ntee_code"))).then(pl.lit(schema["ntee_col"])).otherwise(pl.lit("")).alias("harm_ntee_code__source_column"),
+                pl.when(~_blank_expr(pl.col("harm_subsection_code"))).then(pl.lit("nccs_bmf")).otherwise(pl.lit("")).alias("harm_subsection_code__source_family"),
+                pl.when(~_blank_expr(pl.col("harm_subsection_code"))).then(pl.lit(source_variant)).otherwise(pl.lit("")).alias("harm_subsection_code__source_variant"),
+                pl.when(~_blank_expr(pl.col("harm_subsection_code"))).then(pl.lit(schema["subsection_col"])).otherwise(pl.lit("")).alias("harm_subsection_code__source_column"),
+            ]
+        )
+    )
+
+    pre_dedupe_df = lookup_lf.collect()
+    duplicate_group_count = int(
+        (pre_dedupe_df.group_by(["harm_ein", "harm_tax_year"]).len().filter(pl.col("len") > 1).height)
+    )
+    deduped = pre_dedupe_df.unique(subset=["harm_ein", "harm_tax_year"], keep="first", maintain_order=True)
+    deduped.write_parquet(str(output_path), compression="zstd")
+    print(
+        f"[lookup] Wrote {output_path} | pre_dedupe_rows={pre_dedupe_df.height:,} | "
+        f"duplicate_groups={duplicate_group_count:,} | output_rows={deduped.height:,}",
+        flush=True,
+    )
+    return {
+        "input_row_count": int(rows_input),
+        "lookup_pre_dedupe_row_count": int(pre_dedupe_df.height),
+        "lookup_duplicate_group_count": duplicate_group_count,
+        "lookup_output_row_count": int(deduped.height),
+        "lookup_source_variant": source_variant,
     }

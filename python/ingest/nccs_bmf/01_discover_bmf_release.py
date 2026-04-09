@@ -1,5 +1,5 @@
 """
-Step 01: Discover the NCCS BMF 2022-present yearly release selection.
+Step 01: Discover the NCCS BMF yearly release selection, including optional 2021 support.
 """
 
 from __future__ import annotations
@@ -20,7 +20,7 @@ from common import (
 
 
 def main() -> None:
-    parser = argparse.ArgumentParser(description="Discover the NCCS BMF yearly release selection for 2022-present.")
+    parser = argparse.ArgumentParser(description="Discover the NCCS BMF yearly release selection, including optional 2021 support.")
     parser.add_argument("--start-year", type=int, default=START_YEAR_DEFAULT, help="First year to include (default: 2022)")
     parser.add_argument("--metadata-dir", type=Path, default=META_DIR, help="Local metadata directory")
     args = parser.parse_args()

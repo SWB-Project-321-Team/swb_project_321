@@ -16,8 +16,8 @@ See **docs/990/990_irs_teos_s3_plan.md** for the full plan and S3 layout.
 
 ## Run order
 
-0. **00_fetch_bmf.py** — (Optional.) Download IRS EO BMF CSVs by state to `01_data/raw/irs_bmf/`. Use `--upload` to also upload to S3 (`s3://{bucket}/bronze/irs990/bmf/`). No dependency on 990_givingtuesday. Used if you want BMF in raw/silver or a reference EIN list (build_ein_list.py).
-0b. **00b_filter_bmf_to_benchmark_upload_silver.py** — (Optional.) Filter raw BMF to benchmark counties (GEOID reference + zip_to_county), write to `01_data/staging/org/irs_bmf_benchmark_counties.parquet`, and upload to S3 silver `s3://{bucket}/silver/irs990/bmf/`. Requires 00_fetch_bmf and location_processing 01 + 02.
+0. **00_fetch_bmf.py** — (Optional compatibility wrapper.) Delegates to the canonical `python/ingest/irs_bmf/01_fetch_bmf_release.py` pipeline step and can also trigger the raw upload step. Use this if older commands still point at `990_irs`.
+0b. **00b_filter_bmf_to_benchmark_upload_silver.py** — (Optional compatibility wrapper.) Delegates to the canonical `python/ingest/irs_bmf/04_filter_bmf_to_benchmark_local.py` and `05_upload_filtered_bmf_to_s3.py` steps while still refreshing `01_data/staging/org/irs_bmf_benchmark_counties.parquet`.
 1. **01_upload_irs_990_index_to_s3.py** — Upload index CSV for each year (2021–present) to S3.
 2. **02_upload_irs_990_zips_to_s3.py** — Upload all ZIP parts. Filter by geography happens in 03/04.
 3. **03_parse_irs_990_zips_to_staging.py** — Read ZIPs from S3, parse 990 XML, **filter by geography** (org address ZIP in benchmark counties via GEOID reference + zip_to_county), join region, write staging.
