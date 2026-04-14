@@ -1,13 +1,34 @@
 # S3 Bucket Tree
 
-- Bucket: `swb-321-irs990-teos`
-- Region: `us-east-2`
-- Snapshot date: `2026-03-22`
-- Source: live recursive S3 listing
+- Bucket: `swb-321-irs990-teos` (default; override with env `IRS_990_S3_BUCKET`)
+- Region: `us-east-2` (default; override with `AWS_DEFAULT_REGION`)
+- Documentation sync: `2026-04-11` — layout matches default prefixes in `python/ingest/*/common.py` and upload scripts.
+- Historical object inventory: `docs/s3_bucket_inventory.md` (recursive listing snapshot `2026-03-22`; newer keys such as analysis layers may not appear in that table).
+
+## Default prefix map (from code)
+
+| Dataset | Bronze | Silver (curated / filtered) | Analysis |
+|--------|--------|------------------------------|----------|
+| BLS QCEW (nonprofit) | `bronze/bls/` | — | — |
+| Giving Tuesday DataMart | `bronze/givingtuesday_990/datamarts/{raw,metadata,presilver}` | `silver/givingtuesday_990/filing/` (+ `filing/metadata/`) | `silver/givingtuesday_990/analysis/` (+ `analysis/metadata/`) |
+| IRS TEOS 990 XML | `bronze/irs990/teos_xml/` | — | — |
+| IRS EO BMF (state CSVs) | `bronze/irs990/bmf/` (+ `bmf/metadata/`) | `silver/irs990/bmf/` (+ `metadata/`, `year=YYYY/`) | `silver/irs990/bmf/analysis/` (+ `analysis/metadata/`) |
+| IRS SOI county | `bronze/irs_soi/county/` | `silver/irs_soi/county/` | — |
+| NCCS 990 Core | `bronze/nccs_990/core/` | `silver/nccs_990/core/` | `silver/nccs_990/core/analysis/` |
+| NCCS e-Postcard | `bronze/nccs_990/postcard/` | `silver/nccs_990/postcard/` | `silver/nccs_990/postcard/analysis/` |
+| NCCS BMF | `bronze/nccs_bmf/` | `silver/nccs_bmf/` | `silver/nccs_bmf/analysis/` |
+| NCCS efile | `bronze/nccs_efile/` | `silver/nccs_efile/` (+ `comparison/`) | `silver/nccs_efile/analysis/` |
+| Combined 990 | — | `silver/combined_990/` | — |
+
+## Representative tree (illustrative keys)
+
+Filenames and years vary with pipeline runs. Analysis subtrees follow each family’s upload scripts (steps 08/09/14 as applicable).
 
 ```text
 swb-321-irs990-teos/
 |-- bronze/
+|   |-- bls/
+|   |   `-- qcew-nonprofits-2022.xlsx
 |   |-- givingtuesday_990/
 |   |   `-- datamarts/
 |   |       |-- metadata/
@@ -28,6 +49,9 @@ swb-321-irs990-teos/
 |   |           `-- givingtuesday_990_basic_plus_combined_presilver.parquet
 |   |-- irs990/
 |   |   |-- bmf/
+|   |   |   |-- metadata/
+|   |   |   |   |-- irs_bmf_raw_manifest.csv
+|   |   |   |   `-- irs_bmf_raw_size_verification.csv
 |   |   |   |-- eo_az.csv
 |   |   |   |-- eo_mn.csv
 |   |   |   |-- eo_mt.csv
@@ -184,12 +208,38 @@ swb-321-irs990-teos/
     |   |-- combined_990_filtered_source_union.parquet
     |   `-- combined_990_master_ein_tax_year.parquet
     |-- givingtuesday_990/
-    |   `-- filing/
-    |       |-- givingtuesday_990_filings_benchmark.parquet
-    |       `-- manifest_filtered.json
+    |   |-- filing/
+    |   |   |-- metadata/
+    |   |   |-- givingtuesday_990_filings_benchmark.parquet
+    |   |   `-- manifest_filtered.json
+    |   `-- analysis/
+    |       |-- metadata/
+    |       |   |-- givingtuesday_990_basic_allforms_analysis_variable_coverage.csv
+    |       |   |-- givingtuesday_basic_analysis_variable_mapping.md
+    |       |   `-- givingtuesday_datamart_pipeline.md
+    |       |-- givingtuesday_990_basic_allforms_analysis_variables.parquet
+    |       `-- givingtuesday_990_basic_allforms_analysis_region_metrics.parquet
     |-- irs990/
     |   `-- bmf/
-    |       `-- bmf_benchmark_counties.parquet
+    |       |-- irs_bmf_combined_filtered.parquet
+    |       |-- bmf_benchmark_counties.parquet
+    |       |-- year=2022/
+    |       |   `-- irs_bmf_benchmark_year=2022.parquet
+    |       |-- year=2023/
+    |       |   `-- irs_bmf_benchmark_year=2023.parquet
+    |       |-- year=2024/
+    |       |   `-- irs_bmf_benchmark_year=2024.parquet
+    |       |-- metadata/
+    |       |   |-- irs_bmf_filter_manifest.csv
+    |       |   `-- irs_bmf_filtered_size_verification.csv
+    |       `-- analysis/
+    |           |-- metadata/
+    |           |   |-- irs_bmf_analysis_variable_coverage.csv
+    |           |   |-- irs_bmf_analysis_variable_mapping.md
+    |           |   `-- irs_bmf_pipeline.md
+    |           |-- irs_bmf_analysis_variables.parquet
+    |           |-- irs_bmf_analysis_geography_metrics.parquet
+    |           `-- irs_bmf_analysis_field_metrics.parquet
     |-- irs_soi/
     |   `-- county/
     |       `-- tax_year=2022/
@@ -198,32 +248,60 @@ swb-321-irs990-teos/
     |           `-- irs_soi_county_benchmark_noagi_2022.csv
     |-- nccs_990/
     |   |-- core/
-    |   |   `-- year=2022/
-    |   |       |-- CORE-2022-501C3-CHARITIES-PC-HRMN__benchmark.csv
-    |   |       |-- CORE-2022-501C3-CHARITIES-PZ-HRMN__benchmark.csv
-    |   |       |-- CORE-2022-501C3-PRIVFOUND-PF-HRMN-V0__benchmark.csv
-    |   |       |-- CORE-2022-501CE-NONPROFIT-PC-HRMN__benchmark.csv
-    |   |       |-- CORE-2022-501CE-NONPROFIT-PZ-HRMN__benchmark.csv
-    |   |       `-- filter_manifest_year=2022.csv
+    |   |   |-- year=2022/
+    |   |   |   |-- CORE-2022-501C3-CHARITIES-PC-HRMN__benchmark.csv
+    |   |   |   |-- CORE-2022-501C3-CHARITIES-PZ-HRMN__benchmark.csv
+    |   |   |   |-- CORE-2022-501C3-PRIVFOUND-PF-HRMN-V0__benchmark.csv
+    |   |   |   |-- CORE-2022-501CE-NONPROFIT-PC-HRMN__benchmark.csv
+    |   |   |   |-- CORE-2022-501CE-NONPROFIT-PZ-HRMN__benchmark.csv
+    |   |   |   |-- nccs_990_core_combined_filtered_year=2022.parquet
+    |   |   |   `-- filter_manifest_year=2022.csv
+    |   |   `-- analysis/
+    |   |       |-- metadata/
+    |   |       |   |-- nccs_990_core_analysis_variable_coverage.csv
+    |   |       |   |-- nccs_990_core_analysis_variable_mapping.md
+    |   |       |   `-- nccs_990_core_pipeline.md
+    |   |       |-- nccs_990_core_analysis_variables.parquet
+    |   |       `-- nccs_990_core_analysis_geography_metrics.parquet
     |   `-- postcard/
-    |       `-- snapshot_year=2026/
-    |           |-- filter_manifest_snapshot_year=2026.csv
-    |           |-- filter_manifest_snapshot_year=2026_tax_year_start=2022.csv
-    |           |-- nccs_990_postcard_benchmark_snapshot_year=2026.csv
-    |           `-- nccs_990_postcard_benchmark_tax_year_start=2022_snapshot_year=2026.csv
+    |       |-- snapshot_year=2026/
+    |       |   |-- filter_manifest_snapshot_year=2026.csv
+    |       |   |-- filter_manifest_snapshot_year=2026_tax_year_start=2022.csv
+    |       |   |-- nccs_990_postcard_benchmark_snapshot_year=2026.csv
+    |       |   `-- nccs_990_postcard_benchmark_tax_year_start=2022_snapshot_year=2026.csv
+    |       `-- analysis/
+    |           |-- metadata/
+    |           |   |-- nccs_990_postcard_analysis_variable_coverage.csv
+    |           |   |-- nccs_990_postcard_analysis_variable_mapping.md
+    |           |   `-- nccs_990_postcard_pipeline.md
+    |           |-- nccs_990_postcard_analysis_variables.parquet
+    |           `-- nccs_990_postcard_analysis_geography_metrics.parquet
     |-- nccs_bmf/
     |   |-- metadata/
     |   |   `-- filter_manifest_start_year=2022.csv
     |   |-- year=2022/
-    |   |   `-- nccs_bmf_benchmark_year=2022.parquet
+    |   |   |-- nccs_bmf_benchmark_year=2022.parquet
+    |   |   `-- nccs_bmf_exact_year_lookup_year=2022.parquet
     |   |-- year=2023/
-    |   |   `-- nccs_bmf_benchmark_year=2023.parquet
+    |   |   |-- nccs_bmf_benchmark_year=2023.parquet
+    |   |   `-- nccs_bmf_exact_year_lookup_year=2023.parquet
     |   |-- year=2024/
-    |   |   `-- nccs_bmf_benchmark_year=2024.parquet
+    |   |   |-- nccs_bmf_benchmark_year=2024.parquet
+    |   |   `-- nccs_bmf_exact_year_lookup_year=2024.parquet
     |   |-- year=2025/
-    |   |   `-- nccs_bmf_benchmark_year=2025.parquet
-    |   `-- year=2026/
-    |       `-- nccs_bmf_benchmark_year=2026.parquet
+    |   |   |-- nccs_bmf_benchmark_year=2025.parquet
+    |   |   `-- nccs_bmf_exact_year_lookup_year=2025.parquet
+    |   |-- year=2026/
+    |   |   |-- nccs_bmf_benchmark_year=2026.parquet
+    |   |   `-- nccs_bmf_exact_year_lookup_year=2026.parquet
+    |   `-- analysis/
+    |       |-- metadata/
+    |       |   |-- nccs_bmf_analysis_variable_coverage.csv
+    |       |   |-- nccs_bmf_analysis_variable_mapping.md
+    |       |   `-- nccs_bmf_pipeline.md
+    |       |-- nccs_bmf_analysis_variables.parquet
+    |       |-- nccs_bmf_analysis_geography_metrics.parquet
+    |       `-- nccs_bmf_analysis_field_metrics.parquet
     `-- nccs_efile/
         |-- comparison/
         |   `-- tax_year=2022/
@@ -237,7 +315,22 @@ swb-321-irs990-teos/
         |-- tax_year=2023/
         |   |-- filter_manifest_tax_year=2023.csv
         |   `-- nccs_efile_benchmark_tax_year=2023.parquet
-        `-- tax_year=2024/
-            |-- filter_manifest_tax_year=2024.csv
-            `-- nccs_efile_benchmark_tax_year=2024.parquet
+        |-- tax_year=2024/
+        |   |-- filter_manifest_tax_year=2024.csv
+        |   `-- nccs_efile_benchmark_tax_year=2024.parquet
+        `-- analysis/
+            |-- metadata/
+            |   |-- nccs_efile_analysis_variable_coverage.csv
+            |   |-- nccs_efile_analysis_variable_mapping.md
+            |   `-- nccs_efile_pipeline.md
+            |-- nccs_efile_analysis_variables.parquet
+            `-- nccs_efile_analysis_geography_metrics.parquet
 ```
+
+## Code references
+
+- Bucket / region defaults: `python/ingest/nccs_990_core/common.py` (`DEFAULT_S3_BUCKET`, `DEFAULT_S3_REGION`)
+- BLS upload key: `python/ingest/BLS/fetchBLS.py` (`bronze/bls/…`)
+- IRS BMF keys: `python/ingest/irs_bmf/common.py`
+- Giving Tuesday: `python/ingest/990_givingtuesday/datamart/common.py`
+- Combined: `python/ingest/combined_990/common.py` (`SILVER_PREFIX`, `METADATA_S3_PREFIX`)
