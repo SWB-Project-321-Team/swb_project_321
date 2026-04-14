@@ -8,7 +8,7 @@
 
 This file is a historical inventory snapshot generated from a recursive S3 listing on `2026-03-22`. S3 does not have real folders, so the "folders" below are key prefixes inferred from object paths.
 
-For the **canonical prefix layout** (including Bronze `bronze/bls/`, IRS BMF metadata, and Silver `analysis/` trees added after this snapshot), see `docs/s3_bucket_tree.md` (repo root: `s3_bucket_tree.md`).
+For the **canonical prefix layout** (including Bronze `bronze/bls/`, `bronze/acs/`, IRS BMF metadata, Silver `analysis/` trees, `silver/acs/`, `silver/bls/`, `silver/usa_spending/`), see `docs/s3_bucket_tree.md` (repo root: `s3_bucket_tree.md`). **2026-04-11 live listing:** 373 objects in bucket (this file remains the 2026-03-22 row-level snapshot).
 
 Important GT note:
 

@@ -2,15 +2,16 @@
 
 - Bucket: `swb-321-irs990-teos` (default; override with env `IRS_990_S3_BUCKET`)
 - Region: `us-east-2` (default; override with `AWS_DEFAULT_REGION`)
-- Documentation sync: `2026-04-11` — layout matches default prefixes in `python/ingest/*/common.py` and upload scripts.
-- Historical object inventory: `docs/s3_bucket_inventory.md` (recursive listing snapshot `2026-03-22`; newer keys such as analysis layers may not appear in that table).
+- **Live verification:** `2026-04-11` — full bucket listing via AWS CLI / boto3 (`list_objects_v2`): **373 objects** (`bronze/` 266, `silver/` 107).
+- **Code vs bucket:** Rows below combine ingest defaults with keys **actually present** in S3. Some families (ACS, USAspending, Silver BLS derivatives) may be produced outside `python/ingest/`; search the repo for those path strings.
+- Older object-level table: `docs/s3_bucket_inventory.md` (snapshot `2026-03-22`, 298 objects; superseded for counts).
 
 ## Default prefix map (from code)
 
 
 | Dataset                 | Bronze                                                        | Silver (curated / filtered)                               | Analysis                                                      |
 | ----------------------- | ------------------------------------------------------------- | --------------------------------------------------------- | ------------------------------------------------------------- |
-| BLS QCEW (nonprofit)    | `bronze/bls/`                                                 | —                                                         | —                                                             |
+| BLS QCEW (nonprofit)    | `bronze/bls/` (raw XLSX)                                      | `silver/bls/` (CSV + QA metadata)                         | —                                                             |
 | Giving Tuesday DataMart | `bronze/givingtuesday_990/datamarts/{raw,metadata,presilver}` | `silver/givingtuesday_990/filing/` (+ `filing/metadata/`) | `silver/givingtuesday_990/analysis/` (+ `analysis/metadata/`) |
 | IRS TEOS 990 XML        | `bronze/irs990/teos_xml/`                                     | —                                                         | —                                                             |
 | IRS EO BMF (state CSVs) | `bronze/irs990/bmf/` (+ `bmf/metadata/`)                      | `silver/irs990/bmf/` (+ `metadata/`, `year=YYYY/`)        | `silver/irs990/bmf/analysis/` (+ `analysis/metadata/`)        |
@@ -20,6 +21,8 @@
 | NCCS BMF                | `bronze/nccs_bmf/`                                            | `silver/nccs_bmf/`                                        | `silver/nccs_bmf/analysis/`                                   |
 | NCCS efile              | `bronze/nccs_efile/`                                          | `silver/nccs_efile/` (+ `comparison/`)                    | `silver/nccs_efile/analysis/`                                 |
 | Combined 990            | —                                                             | `silver/combined_990/`                                    | —                                                             |
+| ACS (Census API pulls)  | `bronze/acs/`                                                 | `silver/acs/` (+ `metadata/`)                             | —                                                             |
+| USAspending (benchmark) | —                                                             | `silver/usa_spending/`                                    | —                                                             |
 
 
 ## Representative tree (illustrative keys)
@@ -29,6 +32,9 @@ Filenames and years vary with pipeline runs. Analysis subtrees follow each famil
 ```text
 swb-321-irs990-teos/
 |-- bronze/
+|   |-- acs/
+|   |   |-- acs5_full_2024.csv
+|   |   `-- acs5_subject_2024.csv
 |   |-- bls/
 |   |   `-- qcew-nonprofits-2022.xlsx
 |   |-- givingtuesday_990/
@@ -46,9 +52,12 @@ swb-321-irs990-teos/
 |   |       |   |-- 2025_08_29_All_Years_990PFStandardFields.csv
 |   |       |   |-- 2025_10_18_All_Years_990StandardFields.csv
 |   |       |   `-- 2025_10_28_All_Years_990EZStandardFields.csv
-|   |       `-- presilver/
-|   |           |-- givingtuesday_990_basic_allforms_presilver.parquet
-|   |           `-- givingtuesday_990_basic_plus_combined_presilver.parquet
+|   |       |-- presilver/
+|   |       |   |-- givingtuesday_990_basic_allforms_presilver.parquet
+|   |       |   `-- givingtuesday_990_basic_plus_combined_presilver.parquet
+|   |       `-- unfiltered/   # legacy intermediate; current pipeline uses presilver/
+|   |           |-- givingtuesday_990_basic_allforms_unfiltered.parquet
+|   |           `-- givingtuesday_990_basic_plus_combined_unfiltered.parquet
 |   |-- irs990/
 |   |   |-- bmf/
 |   |   |   |-- metadata/
@@ -192,6 +201,15 @@ swb-321-irs990-teos/
 |               `-- table=SA-P01-T00-PUBLIC-CHARITY-STATUS/
 |                   `-- SA-P01-T00-PUBLIC-CHARITY-STATUS-2024.CSV
 `-- silver/
+    |-- acs/
+    |   |-- acs_merged_2024.csv
+    |   `-- metadata/
+    |       `-- acs_variable_dictionary.csv
+    |-- bls/
+    |   |-- qcew_nonprofits_2022.csv
+    |   `-- metadata/
+    |       |-- bls_data_dictionary.xlsx
+    |       `-- missing_regions_2022.csv
     |-- combined_990/
     |   |-- metadata/
     |   |   |-- build_summary.json
@@ -304,7 +322,7 @@ swb-321-irs990-teos/
     |       |-- nccs_bmf_analysis_variables.parquet
     |       |-- nccs_bmf_analysis_geography_metrics.parquet
     |       `-- nccs_bmf_analysis_field_metrics.parquet
-    `-- nccs_efile/
+    |-- nccs_efile/
         |-- comparison/
         |   `-- tax_year=2022/
         |       |-- efile_vs_core_conflicts_tax_year=2022.csv
@@ -327,13 +345,17 @@ swb-321-irs990-teos/
             |   `-- nccs_efile_pipeline.md
             |-- nccs_efile_analysis_variables.parquet
             `-- nccs_efile_analysis_geography_metrics.parquet
+    `-- usa_spending/
+        |-- usaspending_benchmark_awards_consolidated.csv
+        `-- usaspending_benchmark_awards_consolidated.parquet
 ```
 
 ## Code references
 
 - Bucket / region defaults: `python/ingest/nccs_990_core/common.py` (`DEFAULT_S3_BUCKET`, `DEFAULT_S3_REGION`)
-- BLS upload key: `python/ingest/BLS/fetchBLS.py` (`bronze/bls/…`)
+- BLS raw upload: `python/ingest/BLS/fetchBLS.py` (`bronze/bls/…`); Silver BLS paths are not defined in that script (search repo for `silver/bls`).
 - IRS BMF keys: `python/ingest/irs_bmf/common.py`
 - Giving Tuesday: `python/ingest/990_givingtuesday/datamart/common.py`
 - Combined: `python/ingest/combined_990/common.py` (`SILVER_PREFIX`, `METADATA_S3_PREFIX`)
+- ACS bronze uploads: `python/ingest/ACS/acs_api.py`. Silver ACS / Silver BLS / USAspending S3 keys are not centralized in `common.py`; see `docs/data_processing/usa_spending.md` and repo search for `usaspending`.
 
