@@ -6,4 +6,4 @@ SQL logic for the project. Runs against data in OneDrive (Parquet/CSV); no datab
 - **curated/** — Build analysis-ready tables from staging (writes to OneDrive/curated).
 - **meta/** — ETL logs, run metadata, and schema documentation.
 
-See `docs/OneDrive_Structure.md` for how SQL fits into the data flow.
+See `docs/onedrive/OneDrive_Structure.md` for how SQL fits into the data flow.

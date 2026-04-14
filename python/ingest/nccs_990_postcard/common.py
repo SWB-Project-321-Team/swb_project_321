@@ -28,6 +28,7 @@ _PYTHON_DIR = _THIS_FILE.parents[2]
 if str(_PYTHON_DIR) not in sys.path:
     sys.path.insert(0, str(_PYTHON_DIR))
 
+from ingest._shared import transfers as shared_transfers  # noqa: E402
 _CORE_COMMON_PATH = _PYTHON_DIR / "ingest" / "nccs_990_core" / "common.py"
 _CORE_COMMON_SPEC = importlib.util.spec_from_file_location("nccs_990_core_common", _CORE_COMMON_PATH)
 if _CORE_COMMON_SPEC is None or _CORE_COMMON_SPEC.loader is None:
@@ -36,7 +37,7 @@ _CORE_COMMON = importlib.util.module_from_spec(_CORE_COMMON_SPEC)
 sys.modules.setdefault("nccs_990_core_common", _CORE_COMMON)
 _CORE_COMMON_SPEC.loader.exec_module(_CORE_COMMON)
 
-from utils.paths import DATA  # noqa: E402
+from utils.paths import DATA, get_base  # noqa: E402
 
 if hasattr(sys.stdout, "reconfigure"):
     sys.stdout.reconfigure(line_buffering=True)
@@ -48,6 +49,8 @@ RAW_ROOT = DATA / "raw" / "nccs_990" / "postcard"
 POSTCARD_RAW_DIR = RAW_ROOT / "raw"
 META_DIR = RAW_ROOT / "metadata"
 STAGING_DIR = DATA / "staging" / "nccs_990" / "postcard"
+DOCS_ANALYSIS_DIR = get_base() / "docs" / "analysis"
+DOCS_DATA_PROCESSING_DIR = get_base() / "docs" / "data_processing"
 
 LATEST_RELEASE_JSON = META_DIR / "latest_release.json"
 POSTCARD_PAGE_SNAPSHOT = META_DIR / "postcard_page.html"
@@ -57,15 +60,24 @@ DEFAULT_S3_REGION = _CORE_COMMON.DEFAULT_S3_REGION
 RAW_PREFIX = "bronze/nccs_990/postcard/raw"
 META_PREFIX = "bronze/nccs_990/postcard/metadata"
 SILVER_PREFIX = "silver/nccs_990/postcard"
+ANALYSIS_PREFIX = f"{SILVER_PREFIX}/analysis"
+ANALYSIS_META_PREFIX = f"{ANALYSIS_PREFIX}/metadata"
 
 GEOID_REFERENCE_CSV = _CORE_COMMON.GEOID_REFERENCE_CSV
 ZIP_TO_COUNTY_CSV = _CORE_COMMON.ZIP_TO_COUNTY_CSV
 
 _TQDM_KW = getattr(_CORE_COMMON, "_TQDM_KW", {})
 _DOWNLOAD_URL_REGEX = re.compile(r"(?P<month>\d{4}-\d{2})-E-POSTCARD\.csv$", re.IGNORECASE)
-DOWNLOAD_WORKERS = int(os.environ.get("NCCS_POSTCARD_DOWNLOAD_WORKERS", "2"))
-UPLOAD_WORKERS = int(os.environ.get("NCCS_POSTCARD_UPLOAD_WORKERS", "2"))
+DOWNLOAD_WORKERS = shared_transfers.DOWNLOAD_WORKERS_DEFAULT
+UPLOAD_WORKERS = shared_transfers.UPLOAD_WORKERS_DEFAULT
 TQDM_KW = _TQDM_KW
+POSTCARD_TAX_YEAR_START_DEFAULT = 2022
+ANALYSIS_TAX_YEAR_MIN = 2022
+ANALYSIS_TAX_YEAR_MAX = 2024
+VERIFY_WORKERS = shared_transfers.VERIFY_WORKERS_DEFAULT
+print_transfer_settings = shared_transfers.print_transfer_settings
+parallel_map = shared_transfers.parallel_map
+batch_s3_object_sizes = shared_transfers.batch_s3_object_sizes
 
 banner = _CORE_COMMON.banner
 print_elapsed = _CORE_COMMON.print_elapsed
@@ -99,6 +111,21 @@ meta_s3_key = _CORE_COMMON.meta_s3_key
 now_utc_iso = _CORE_COMMON.now_utc_iso
 
 
+def load_geoid_state_map(path_csv: Path) -> dict[str, str]:
+    """Load benchmark county -> state mappings from GEOID_reference.csv."""
+    if not path_csv.exists():
+        raise FileNotFoundError(f"GEOID reference CSV not found: {path_csv}")
+    ref = pd.read_csv(path_csv, dtype=str).fillna("")
+    geoid_col = next((c for c in ref.columns if "geoid" in c.lower()), None)
+    state_col = next((c for c in ref.columns if c.lower() == "state"), None)
+    if geoid_col is None or state_col is None:
+        raise RuntimeError("GEOID reference must include GEOID and State columns for postcard state validation.")
+    geoid = ref[geoid_col].astype(str).map(normalize_fips5)
+    state = ref[state_col].astype(str).str.strip().str.upper()
+    valid = geoid.str.len().eq(5) & state.ne("")
+    return dict(zip(geoid[valid], state[valid]))
+
+
 def ensure_work_dirs(
     postcard_raw_dir: Path = POSTCARD_RAW_DIR,
     metadata_dir: Path = META_DIR,
@@ -120,34 +147,14 @@ def download_with_progress(
     desc: str | None = None,
 ) -> int:
     """Download a remote file to disk with a visible byte progress bar."""
-    output_path.parent.mkdir(parents=True, exist_ok=True)
-    with requests.get(url, stream=True, timeout=timeout) as response:
-        response.raise_for_status()
-        total = expected_bytes
-        if total is None:
-            header = response.headers.get("Content-Length")
-            content_encoding = response.headers.get("Content-Encoding", "").lower()
-            if header and header.isdigit() and content_encoding != "gzip":
-                total = int(header)
-        tqdm_kwargs = dict(_TQDM_KW)
-        if position is not None:
-            tqdm_kwargs["position"] = position
-        with tqdm(
-            total=total,
-            unit="B",
-            unit_scale=True,
-            unit_divisor=1024,
-            desc=desc or f"download {output_path.name}",
-            leave=True,
-            **tqdm_kwargs,
-        ) as pbar:
-            with open(output_path, "wb") as f:
-                for chunk in response.iter_content(chunk_size=1024 * 1024):
-                    if not chunk:
-                        continue
-                    f.write(chunk)
-                    pbar.update(len(chunk))
-    return output_path.stat().st_size
+    return shared_transfers.download_with_progress(
+        url,
+        output_path,
+        expected_bytes=expected_bytes,
+        timeout=timeout,
+        position=position,
+        desc=desc,
+    )
 
 
 def upload_file_with_progress(
@@ -161,37 +168,15 @@ def upload_file_with_progress(
     desc: str | None = None,
 ) -> None:
     """Upload one local file to S3 with a visible byte progress bar."""
-    client = _CORE_COMMON.s3_client(region)
-    size = local_path.stat().st_size
-    transfer_config = _CORE_COMMON.s3_transfer_config()
-    print(
-        "[upload-config] "
-        f"threshold={_CORE_COMMON.S3_MULTIPART_THRESHOLD_MB}MB "
-        f"chunk={_CORE_COMMON.S3_MULTIPART_CHUNKSIZE_MB}MB "
-        f"concurrency={_CORE_COMMON.S3_MAX_CONCURRENCY}",
-        flush=True,
+    shared_transfers.upload_file_with_progress(
+        local_path,
+        bucket,
+        key,
+        region,
+        extra_args=extra_args,
+        position=position,
+        desc=desc,
     )
-    tqdm_kwargs = dict(_TQDM_KW)
-    if position is not None:
-        tqdm_kwargs["position"] = position
-    with tqdm(
-        total=size,
-        unit="B",
-        unit_scale=True,
-        unit_divisor=1024,
-        desc=desc or f"upload {local_path.name}",
-        leave=True,
-        **tqdm_kwargs,
-    ) as pbar:
-        callback = _CORE_COMMON._TqdmUpload(pbar)
-        client.upload_file(
-            str(local_path),
-            bucket,
-            key,
-            ExtraArgs=extra_args or {},
-            Callback=callback,
-            Config=transfer_config,
-        )
 
 
 def snapshot_year_raw_dir(postcard_raw_dir: Path, snapshot_year: int) -> Path:
@@ -227,6 +212,67 @@ def filtered_output_path(staging_dir: Path, snapshot_year: int) -> Path:
 def filter_manifest_path(staging_dir: Path, snapshot_year: int) -> Path:
     """Return the postcard filter manifest path."""
     return snapshot_staging_dir(staging_dir, snapshot_year) / f"filter_manifest_snapshot_year={snapshot_year}.csv"
+
+
+def filtered_tax_year_window_output_path(
+    staging_dir: Path,
+    snapshot_year: int,
+    tax_year_start: int = POSTCARD_TAX_YEAR_START_DEFAULT,
+) -> Path:
+    """Return the postcard benchmark derivative filtered to a minimum filing tax year."""
+    return (
+        snapshot_staging_dir(staging_dir, snapshot_year)
+        / f"nccs_990_postcard_benchmark_tax_year_start={tax_year_start}_snapshot_year={snapshot_year}.csv"
+    )
+
+
+def filtered_tax_year_window_parquet_path(
+    staging_dir: Path,
+    snapshot_year: int,
+    tax_year_start: int = POSTCARD_TAX_YEAR_START_DEFAULT,
+) -> Path:
+    """Return the Parquet postcard benchmark derivative filtered to a minimum filing tax year."""
+    return (
+        snapshot_staging_dir(staging_dir, snapshot_year)
+        / f"nccs_990_postcard_benchmark_tax_year_start={tax_year_start}_snapshot_year={snapshot_year}.parquet"
+    )
+
+
+def filtered_tax_year_window_manifest_path(
+    staging_dir: Path,
+    snapshot_year: int,
+    tax_year_start: int = POSTCARD_TAX_YEAR_START_DEFAULT,
+) -> Path:
+    """Return the manifest path for the postcard minimum-tax-year derivative."""
+    return (
+        snapshot_staging_dir(staging_dir, snapshot_year)
+        / f"filter_manifest_snapshot_year={snapshot_year}_tax_year_start={tax_year_start}.csv"
+    )
+
+
+def analysis_variables_output_path(staging_dir: Path = STAGING_DIR) -> Path:
+    """Return the postcard row-level analysis parquet path."""
+    return staging_dir / "nccs_990_postcard_analysis_variables.parquet"
+
+
+def analysis_geography_metrics_output_path(staging_dir: Path = STAGING_DIR) -> Path:
+    """Return the postcard county/region analysis metrics parquet path."""
+    return staging_dir / "nccs_990_postcard_analysis_geography_metrics.parquet"
+
+
+def analysis_variable_coverage_path(metadata_dir: Path = META_DIR) -> Path:
+    """Return the postcard analysis coverage CSV path."""
+    return metadata_dir / "nccs_990_postcard_analysis_variable_coverage.csv"
+
+
+def analysis_variable_mapping_path() -> Path:
+    """Return the postcard analysis mapping Markdown path."""
+    return DOCS_ANALYSIS_DIR / "nccs_990_postcard_analysis_variable_mapping.md"
+
+
+def analysis_data_processing_doc_path() -> Path:
+    """Return the postcard data-processing documentation path."""
+    return DOCS_DATA_PROCESSING_DIR / "nccs_990_postcard_pipeline.md"
 
 
 def raw_s3_key(raw_prefix: str, snapshot_year: int, snapshot_month: str, filename: str) -> str:
@@ -561,6 +607,7 @@ def filter_postcard_year_to_benchmark(
     output_path: Path,
     geoid_reference_set: set[str],
     geoid_to_region: dict[str, str] | None,
+    geoid_to_state: dict[str, str] | None,
     zip_to_county: dict[str, str],
     *,
     chunk_size: int = 100_000,
@@ -570,6 +617,11 @@ def filter_postcard_year_to_benchmark(
 
     Postcard data already contains organization and officer ZIPs, so the benchmark geography
     match is based on ZIP -> county crosswalk rather than the Unified BMF bridge used by Core.
+
+    This function intentionally follows the repo's filter-first combine rule:
+    each monthly file is filtered chunk-by-chunk to benchmark-admitted rows
+    before those retained rows are concatenated and deduped into the annual
+    derivative.
     """
     output_path.parent.mkdir(parents=True, exist_ok=True)
     final_frames: list[pd.DataFrame] = []
@@ -577,6 +629,7 @@ def filter_postcard_year_to_benchmark(
     matched_row_count = 0
     matched_counties: set[str] = set()
     source_counts: Counter[str] = Counter()
+    state_mismatch_rejected_row_count = 0
     original_columns: list[str] | None = None
 
     for asset in tqdm(assets, desc="filter postcard months", unit="file", **_TQDM_KW):
@@ -608,16 +661,32 @@ def filter_postcard_year_to_benchmark(
                     (county_from_org_zip == "") & (county_from_officer_zip != ""),
                     "officer_zip",
                 )
+                organization_state = chunk.get("organization_state", pd.Series("", index=chunk.index)).fillna("").astype(str).str.strip().str.upper()
+                officer_state = chunk.get("officer_state", pd.Series("", index=chunk.index)).fillna("").astype(str).str.strip().str.upper()
+                matched_state = organization_state.where(benchmark_match_source != "officer_zip", officer_state)
 
                 chunk["county_fips"] = county_fips.map(normalize_fips5)
                 if geoid_to_region:
                     chunk["region"] = chunk["county_fips"].map(geoid_to_region).fillna("")
                 else:
                     chunk["region"] = ""
+                benchmark_state = chunk["county_fips"].map(geoid_to_state or {}).fillna("")
                 chunk["benchmark_match_source"] = benchmark_match_source.fillna("")
                 chunk["snapshot_month"] = snapshot_month
                 chunk["snapshot_year"] = int(asset["snapshot_year"])
-                chunk["is_benchmark_county"] = chunk["county_fips"].isin(geoid_reference_set) & chunk["region"].astype(str).str.strip().ne("")
+                state_match_mask = matched_state.eq("") | benchmark_state.eq("") | matched_state.eq(benchmark_state)
+                chunk["is_benchmark_county"] = (
+                    chunk["county_fips"].isin(geoid_reference_set)
+                    & chunk["region"].astype(str).str.strip().ne("")
+                    & state_match_mask
+                )
+                state_mismatch_rejected_row_count += int(
+                    (
+                        chunk["county_fips"].isin(geoid_reference_set)
+                        & chunk["region"].astype(str).str.strip().ne("")
+                        & ~state_match_mask
+                    ).sum()
+                )
 
                 filtered = chunk[chunk["is_benchmark_county"] == True].copy()  # noqa: E712
                 if filtered.empty:
@@ -668,8 +737,13 @@ def filter_postcard_year_to_benchmark(
             "deduped_ein_count": 0,
             "matched_county_fips_count": 0,
             "zip_match_source_counts": {},
+            "state_mismatch_rejected_row_count": state_mismatch_rejected_row_count,
         }
 
+    print(
+        f"[filter] Combining only retained benchmark postcard rows across months: {matched_row_count:,}",
+        flush=True,
+    )
     combined = pd.concat(final_frames, ignore_index=True)
     combined["__ein_norm"] = _normalize_series_ein9(combined["ein"])
     combined["__snapshot_month_sort"] = combined["snapshot_month"].astype(str)
@@ -716,4 +790,47 @@ def filter_postcard_year_to_benchmark(
         "deduped_ein_count": deduped_ein_count,
         "matched_county_fips_count": len(matched_counties),
         "zip_match_source_counts": dict(source_counts),
+        "state_mismatch_rejected_row_count": state_mismatch_rejected_row_count,
+    }
+
+
+def build_tax_year_window_derivative(
+    source_output_path: Path,
+    output_csv_path: Path,
+    *,
+    output_parquet_path: Path | None = None,
+    tax_year_start: int = POSTCARD_TAX_YEAR_START_DEFAULT,
+) -> dict[str, Any]:
+    """
+    Derive a second postcard benchmark artifact restricted to `tax_year >= tax_year_start`.
+
+    This derivative intentionally starts from the already-built snapshot-year output so the
+    pipeline does not reprocess the raw monthly postcard files a second time.
+    """
+    if not source_output_path.exists():
+        raise FileNotFoundError(f"Source postcard benchmark CSV not found: {source_output_path}")
+
+    print(f"[postcard-window] Reading combined postcard benchmark output: {source_output_path}", flush=True)
+    df = pd.read_csv(source_output_path, dtype=str, low_memory=False).fillna("")
+    input_row_count = int(len(df))
+    tax_year_numeric = pd.to_numeric(df.get("tax_year", pd.Series("", index=df.index)), errors="coerce")
+    filtered = df.loc[tax_year_numeric >= int(tax_year_start)].copy()
+    output_csv_path.parent.mkdir(parents=True, exist_ok=True)
+    filtered.to_csv(output_csv_path, index=False)
+    if output_parquet_path is not None:
+        output_parquet_path.parent.mkdir(parents=True, exist_ok=True)
+        filtered.to_parquet(output_parquet_path, index=False)
+
+    nonblank_tax_years = filtered.get("tax_year", pd.Series(dtype=str)).astype(str).str.strip()
+    nonblank_tax_years = nonblank_tax_years[nonblank_tax_years.ne("")]
+    min_tax_year = nonblank_tax_years.min() if not nonblank_tax_years.empty else ""
+    max_tax_year = nonblank_tax_years.max() if not nonblank_tax_years.empty else ""
+    return {
+        "tax_year_start": int(tax_year_start),
+        "input_row_count": input_row_count,
+        "output_row_count": int(len(filtered)),
+        "min_tax_year_in_output": min_tax_year,
+        "max_tax_year_in_output": max_tax_year,
+        "window_output_csv_path": str(output_csv_path),
+        "window_output_parquet_path": "" if output_parquet_path is None else str(output_parquet_path),
     }

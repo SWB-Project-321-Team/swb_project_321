@@ -1,5 +1,5 @@
 """
-Run the combined filtered 990 source-union pipeline in order: 01 -> 03.
+Run the combined filtered 990 union + master pipeline in order: 01 -> 03.
 """
 
 from __future__ import annotations
@@ -24,9 +24,10 @@ def _append_arg(cmd: list[str], flag: str, value: object | None) -> None:
 
 
 def main() -> None:
-    parser = argparse.ArgumentParser(description="Run the combined filtered 990 source-union pipeline (01 -> 03).")
+    parser = argparse.ArgumentParser(description="Run the combined filtered 990 union + master pipeline (01 -> 03).")
     parser.add_argument("--staging-dir", default=None)
     parser.add_argument("--output", default=None)
+    parser.add_argument("--master-output", default=None)
     parser.add_argument("--bucket", default=None)
     parser.add_argument("--region", default=None)
     parser.add_argument("--silver-prefix", default=None)
@@ -43,6 +44,7 @@ def main() -> None:
     for flag, value in (
         ("--staging-dir", args.staging_dir),
         ("--output", args.output),
+        ("--master-output", args.master_output),
         ("--compression", args.compression),
     ):
         _append_arg(step_01_args, flag, value)
@@ -55,6 +57,7 @@ def main() -> None:
     step_02_args: list[str] = []
     for flag, value in (
         ("--output", args.output),
+        ("--master-output", args.master_output),
         ("--bucket", args.bucket),
         ("--region", args.region),
         ("--silver-prefix", args.silver_prefix),
@@ -68,6 +71,7 @@ def main() -> None:
     step_03_args: list[str] = []
     for flag, value in (
         ("--output", args.output),
+        ("--master-output", args.master_output),
         ("--bucket", args.bucket),
         ("--region", args.region),
         ("--silver-prefix", args.silver_prefix),
@@ -83,7 +87,7 @@ def main() -> None:
         if rc != 0:
             raise SystemExit(rc)
 
-    print("Combined filtered 990 source-union pipeline (01 -> 03) completed.", flush=True)
+    print("Combined filtered 990 union + master pipeline (01 -> 03) completed.", flush=True)
 
 
 if __name__ == "__main__":

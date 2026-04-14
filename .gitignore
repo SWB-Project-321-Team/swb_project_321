@@ -15,10 +15,9 @@ secrets/*
 !secrets/README.md
 !secrets/.env.example
 
-# AWS setup package – ignore credential files in distribution folder
-aws_setup/secrets/*
-!aws_setup/secrets/.gitkeep
-!aws_setup/secrets/.env.example
+# AWS helpers
+aws_setup/
+aws_sso/
 
 # Python
 __pycache__/

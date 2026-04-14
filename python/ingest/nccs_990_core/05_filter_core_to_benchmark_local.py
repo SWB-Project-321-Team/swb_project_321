@@ -8,6 +8,8 @@ import argparse
 import time
 from pathlib import Path
 
+import pandas as pd
+
 from common import (
     BRIDGE_BMF_DIR,
     CORE_RAW_DIR,
@@ -17,13 +19,14 @@ from common import (
     STAGING_DIR,
     ZIP_TO_COUNTY_CSV,
     banner,
+    combined_filtered_output_path,
     filter_core_file_to_benchmark,
     filter_manifest_path,
     filtered_output_path,
     filtered_s3_key,
+    load_benchmark_zip_to_county_map,
     load_env_from_secrets,
     load_geoid_reference_set,
-    load_zip_to_county_map,
     local_asset_path,
     prepare_bmf_bridge_dataframe,
     print_elapsed,
@@ -33,6 +36,32 @@ from common import (
     write_csv,
     year_staging_dir,
 )
+
+
+def _build_combined_filtered_parquet(
+    *,
+    release: dict[str, object],
+    staging_dir: Path,
+    tax_year: int,
+    source_types: str | None,
+) -> Path:
+    combined_path = combined_filtered_output_path(staging_dir, tax_year)
+    frames: list[pd.DataFrame] = []
+    for asset in selected_core_csv_assets(release, source_types):
+        local_path = filtered_output_path(staging_dir, tax_year, str(asset["filename"]))
+        frame = pd.read_csv(local_path, dtype=str, low_memory=False)
+        frame["core_family"] = str(asset["family"])
+        frame["core_scope"] = str(asset["scope"])
+        frame["core_source_file"] = local_path.name
+        frame["core_source_variant"] = str(asset["asset_type"])
+        frames.append(frame)
+    combined_df = pd.concat(frames, ignore_index=True, sort=False).copy()
+    combined_df.to_parquet(combined_path, index=False)
+    print(
+        f"[filter] Wrote combined filtered parquet: {combined_path} | rows={len(combined_df):,} | columns={len(combined_df.columns):,}",
+        flush=True,
+    )
+    return combined_path
 
 
 def main() -> None:
@@ -79,9 +108,9 @@ def main() -> None:
     release_staging_dir.mkdir(parents=True, exist_ok=True)
 
     geoid_reference_set, geoid_to_region = load_geoid_reference_set(args.geoid_reference)
-    zip_to_county = load_zip_to_county_map(args.zip_to_county)
+    benchmark_zip_to_county = load_benchmark_zip_to_county_map(args.geoid_reference, args.zip_to_county)
     print(f"[filter] Benchmark counties loaded: {len(geoid_reference_set)}", flush=True)
-    print(f"[filter] ZIP crosswalk rows loaded: {len(zip_to_county)}", flush=True)
+    print(f"[filter] Benchmark ZIP rows loaded: {len(benchmark_zip_to_county)}", flush=True)
 
     local_bmf_paths: list[Path] = []
     for asset in selected_bmf_assets(release):
@@ -92,7 +121,7 @@ def main() -> None:
         local_bmf_paths.append(local_path)
 
     bridge_start = time.perf_counter()
-    bridge_df = prepare_bmf_bridge_dataframe(local_bmf_paths, geoid_reference_set, geoid_to_region, zip_to_county)
+    bridge_df = prepare_bmf_bridge_dataframe(local_bmf_paths, geoid_reference_set, geoid_to_region, benchmark_zip_to_county)
     print(f"[filter] Prepared bridge rows: {len(bridge_df):,}", flush=True)
     print_elapsed(bridge_start, "prepare Unified BMF bridge")
 
@@ -163,6 +192,12 @@ def main() -> None:
         "size_match",
     ]
     write_csv(manifest_path, manifest_rows, fieldnames)
+    _build_combined_filtered_parquet(
+        release=release,
+        staging_dir=args.staging_dir,
+        tax_year=tax_year,
+        source_types=args.source_types,
+    )
     print(f"[filter] Filtered outputs written: {len(manifest_rows)}", flush=True)
     print_elapsed(start, "Step 05")
 

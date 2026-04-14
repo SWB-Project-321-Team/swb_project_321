@@ -17,8 +17,10 @@ from common import (
     START_YEAR_DEFAULT,
     ZIP_TO_COUNTY_CSV,
     banner,
+    build_bmf_exact_year_lookup,
     filter_bmf_file_to_benchmark,
     filter_manifest_path,
+    exact_year_lookup_output_path,
     filtered_output_path,
     filtered_s3_key,
     load_env_from_secrets,
@@ -61,9 +63,12 @@ def main() -> None:
             raise FileNotFoundError(f"Local BMF file not found: {local_source_path}. Run step 02 first.")
 
         output_path = filtered_output_path(args.staging_dir, int(asset["snapshot_year"]))
+        lookup_output_path = exact_year_lookup_output_path(args.staging_dir, int(asset["snapshot_year"]))
         s3_key = filtered_s3_key(args.silver_prefix, int(asset["snapshot_year"]), output_path.name)
+        lookup_s3_key = filtered_s3_key(args.silver_prefix, int(asset["snapshot_year"]), lookup_output_path.name)
         print(f"[filter] Source file: {local_source_path}", flush=True)
         print(f"[filter] Output file: {output_path}", flush=True)
+        print(f"[lookup] Output file: {lookup_output_path}", flush=True)
 
         file_start = time.perf_counter()
         result = filter_bmf_file_to_benchmark(
@@ -74,9 +79,17 @@ def main() -> None:
             zip_to_county_path=args.zip_to_county,
         )
         output_bytes = output_path.stat().st_size
+        lookup_result = build_bmf_exact_year_lookup(
+            asset=asset,
+            local_bmf_path=local_source_path,
+            output_path=lookup_output_path,
+        )
+        lookup_bytes = lookup_output_path.stat().st_size
         print(
             f"[filter] Wrote {output_path} | input_rows={result['input_row_count']:,} | "
-            f"output_rows={result['output_row_count']:,} | matched_counties={result['matched_county_fips_count']:,}",
+            f"rows_after_zip_geography={result['rows_after_zip_geography_filter']:,} | "
+            f"output_rows={result['output_row_count']:,} | matched_counties={result['matched_county_fips_count']:,} | "
+            f"state_mismatch_dropped={result['state_mismatch_dropped_count']:,}",
             flush=True,
         )
         print_elapsed(file_start, f"filter {local_source_path.name}")
@@ -89,16 +102,25 @@ def main() -> None:
                 "year_basis": asset["year_basis"],
                 "source_csv": str(local_source_path),
                 "input_row_count": result["input_row_count"],
+                "rows_after_zip_geography_filter": result["rows_after_zip_geography_filter"],
                 "output_row_count": result["output_row_count"],
                 "matched_county_fips_count": result["matched_county_fips_count"],
                 "schema_variant": result["schema_variant"],
                 "zip_column_used": result["zip_column_used"],
+                "state_validation_applied": result["state_validation_applied"],
+                "state_mismatch_dropped_count": result["state_mismatch_dropped_count"],
                 "geoid_reference_path": result["geoid_reference_path"],
                 "zip_to_county_path": result["zip_to_county_path"],
                 "local_filtered_path": str(output_path),
                 "local_filtered_bytes": output_bytes,
+                "lookup_output_row_count": lookup_result["lookup_output_row_count"],
+                "lookup_duplicate_group_count": lookup_result["lookup_duplicate_group_count"],
+                "lookup_source_variant": lookup_result["lookup_source_variant"],
+                "local_lookup_path": str(lookup_output_path),
+                "local_lookup_bytes": lookup_bytes,
                 "s3_bucket": "",
                 "s3_key": s3_key,
+                "lookup_s3_key": lookup_s3_key,
                 "s3_bytes": "",
                 "size_match": "",
             }
@@ -112,16 +134,25 @@ def main() -> None:
         "year_basis",
         "source_csv",
         "input_row_count",
+        "rows_after_zip_geography_filter",
         "output_row_count",
         "matched_county_fips_count",
         "schema_variant",
         "zip_column_used",
+        "state_validation_applied",
+        "state_mismatch_dropped_count",
         "geoid_reference_path",
         "zip_to_county_path",
         "local_filtered_path",
         "local_filtered_bytes",
+        "lookup_output_row_count",
+        "lookup_duplicate_group_count",
+        "lookup_source_variant",
+        "local_lookup_path",
+        "local_lookup_bytes",
         "s3_bucket",
         "s3_key",
+        "lookup_s3_key",
         "s3_bytes",
         "size_match",
     ]

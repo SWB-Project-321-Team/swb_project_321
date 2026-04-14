@@ -29,12 +29,13 @@ _PYTHON_DIR = _THIS_FILE.parents[2]
 if str(_PYTHON_DIR) not in sys.path:
     sys.path.insert(0, str(_PYTHON_DIR))
 
+from ingest._shared import transfers as shared_transfers  # noqa: E402
 from utils.paths import DATA, get_base  # noqa: E402
 
 if hasattr(sys.stdout, "reconfigure"):
     sys.stdout.reconfigure(line_buffering=True)
 
-_TQDM_KW = {"file": sys.stdout} if sys.platform == "win32" else {}
+_TQDM_KW = shared_transfers.TQDM_KW
 
 CORE_CATALOG_URL = "https://nccs.urban.org/nccs/catalogs/catalog-core.html"
 BMF_CATALOG_URL = "https://nccs.urban.org/nccs/catalogs/catalog-bmf.html"
@@ -44,6 +45,8 @@ CORE_RAW_DIR = RAW_ROOT / "raw"
 BRIDGE_BMF_DIR = RAW_ROOT / "bridge_bmf"
 META_DIR = RAW_ROOT / "metadata"
 STAGING_DIR = DATA / "staging" / "nccs_990" / "core"
+DOCS_ANALYSIS_DIR = get_base() / "docs" / "analysis"
+DOCS_DATA_PROCESSING_DIR = get_base() / "docs" / "data_processing"
 
 LATEST_RELEASE_JSON = META_DIR / "latest_release.json"
 CORE_CATALOG_SNAPSHOT = META_DIR / "catalog_core.html"
@@ -55,13 +58,19 @@ RAW_PREFIX = "bronze/nccs_990/core/raw"
 BRIDGE_PREFIX = "bronze/nccs_990/core/bridge_bmf"
 META_PREFIX = "bronze/nccs_990/core/metadata"
 SILVER_PREFIX = "silver/nccs_990/core"
+ANALYSIS_PREFIX = f"{SILVER_PREFIX}/analysis"
+ANALYSIS_META_PREFIX = f"{ANALYSIS_PREFIX}/metadata"
 
 GEOID_REFERENCE_CSV = DATA / "reference" / "GEOID_reference.csv"
 ZIP_TO_COUNTY_CSV = DATA / "reference" / "zip_to_county_fips.csv"
 
-S3_MULTIPART_THRESHOLD_MB = int(os.environ.get("NCCS_CORE_S3_MULTIPART_THRESHOLD_MB", "5"))
-S3_MULTIPART_CHUNKSIZE_MB = int(os.environ.get("NCCS_CORE_S3_MULTIPART_CHUNKSIZE_MB", "5"))
-S3_MAX_CONCURRENCY = int(os.environ.get("NCCS_CORE_S3_MAX_CONCURRENCY", "16"))
+_TRANSFER_SETTINGS = shared_transfers.transfer_settings()
+S3_MULTIPART_THRESHOLD_MB = _TRANSFER_SETTINGS.s3_multipart_threshold_mb
+S3_MULTIPART_CHUNKSIZE_MB = _TRANSFER_SETTINGS.s3_multipart_chunksize_mb
+S3_MAX_CONCURRENCY = _TRANSFER_SETTINGS.s3_max_concurrency
+DOWNLOAD_WORKERS = shared_transfers.DOWNLOAD_WORKERS_DEFAULT
+UPLOAD_WORKERS = shared_transfers.UPLOAD_WORKERS_DEFAULT
+VERIFY_WORKERS = shared_transfers.VERIFY_WORKERS_DEFAULT
 
 CORE_GROUP_SPECS = {
     "501c3_charities_pz": {
@@ -262,6 +271,11 @@ def banner(title: str) -> None:
     print("=" * 88, flush=True)
 
 
+print_transfer_settings = shared_transfers.print_transfer_settings
+parallel_map = shared_transfers.parallel_map
+batch_s3_object_sizes = shared_transfers.batch_s3_object_sizes
+
+
 def print_elapsed(start_ts: float, label: str) -> None:
     """Print elapsed wall-clock time for a stage or operation."""
     elapsed = time.perf_counter() - start_ts
@@ -339,6 +353,11 @@ def filtered_output_path(staging_dir: Path, tax_year: int, filename: str) -> Pat
     return year_staging_dir(staging_dir, tax_year) / f"{stem}__benchmark.csv"
 
 
+def combined_filtered_output_path(staging_dir: Path, tax_year: int) -> Path:
+    """Return the combined filtered Core parquet path for one year."""
+    return year_staging_dir(staging_dir, tax_year) / f"nccs_990_core_combined_filtered_year={tax_year}.parquet"
+
+
 def raw_s3_key(raw_prefix: str, tax_year: int, filename: str) -> str:
     """Return the S3 key for one Core raw CSV."""
     return f"{raw_prefix.rstrip('/')}/year={tax_year}/{filename}"
@@ -357,6 +376,41 @@ def meta_s3_key(meta_prefix: str, filename: str) -> str:
 def filtered_s3_key(silver_prefix: str, tax_year: int, filename: str) -> str:
     """Return the S3 key for one filtered benchmark output."""
     return f"{silver_prefix.rstrip('/')}/year={tax_year}/{filename}"
+
+
+def analysis_variables_output_path(staging_dir: Path = STAGING_DIR) -> Path:
+    """Return the harmonized NCCS Core analysis row-level parquet path."""
+    return staging_dir / "nccs_990_core_analysis_variables.parquet"
+
+
+def analysis_geography_metrics_output_path(staging_dir: Path = STAGING_DIR) -> Path:
+    """Return the region-level NCCS Core analysis metrics parquet path."""
+    return staging_dir / "nccs_990_core_analysis_geography_metrics.parquet"
+
+
+def analysis_variable_coverage_path(metadata_dir: Path = META_DIR) -> Path:
+    """Return the NCCS Core analysis coverage CSV path."""
+    return metadata_dir / "nccs_990_core_analysis_variable_coverage.csv"
+
+
+def analysis_variable_mapping_path() -> Path:
+    """Return the NCCS Core analysis mapping Markdown path."""
+    return DOCS_ANALYSIS_DIR / "nccs_990_core_analysis_variable_mapping.md"
+
+
+def analysis_data_processing_doc_path() -> Path:
+    """Return the NCCS Core pipeline data-processing doc path."""
+    return DOCS_DATA_PROCESSING_DIR / "nccs_990_core_pipeline.md"
+
+
+def analysis_s3_key(analysis_prefix: str, filename: str) -> str:
+    """Return the S3 key for one NCCS Core analysis artifact."""
+    return f"{analysis_prefix.rstrip('/')}/{filename}"
+
+
+def analysis_meta_s3_key(analysis_meta_prefix: str, filename: str) -> str:
+    """Return the S3 key for one NCCS Core analysis metadata artifact."""
+    return f"{analysis_meta_prefix.rstrip('/')}/{filename}"
 
 
 def basename(url: str) -> str:
@@ -524,9 +578,10 @@ def cache_source_size(
 
 def fetch_text(url: str, timeout: int = 60) -> str:
     """GET one HTML/text page and return the decoded body."""
-    response = requests.get(url, timeout=timeout)
-    response.raise_for_status()
-    return response.text
+    response = shared_transfers.managed_requests("GET", url, timeout=timeout)
+    with response:
+        response.raise_for_status()
+        return response.text
 
 
 def collect_links(html: str) -> list[dict[str, str]]:
@@ -538,7 +593,8 @@ def collect_links(html: str) -> list[dict[str, str]]:
 
 def _probe_with_get(url: str, timeout: int = 60) -> dict[str, Any]:
     """Fallback header probe when HEAD is unavailable or incomplete."""
-    with requests.get(url, stream=True, timeout=timeout) as response:
+    response = shared_transfers.managed_requests("GET", url, stream=True, timeout=timeout)
+    with response:
         response.raise_for_status()
         headers = response.headers
         content_length = headers.get("Content-Length")
@@ -558,21 +614,22 @@ def _probe_with_get(url: str, timeout: int = 60) -> dict[str, Any]:
 def probe_url_head(url: str, timeout: int = 60) -> dict[str, Any]:
     """Probe a remote URL for size/last-modified metadata."""
     try:
-        response = requests.head(url, allow_redirects=True, timeout=timeout)
-        response.raise_for_status()
-        headers = response.headers
-        content_length = headers.get("Content-Length")
-        content_encoding = headers.get("Content-Encoding", "").lower()
-        return {
-            "status_code": response.status_code,
-            "content_length": (
-                int(content_length)
-                if content_length and content_length.isdigit() and content_encoding != "gzip"
-                else None
-            ),
-            "last_modified": headers.get("Last-Modified"),
-            "content_type": headers.get("Content-Type"),
-        }
+        response = shared_transfers.managed_requests("HEAD", url, allow_redirects=True, timeout=timeout)
+        with response:
+            response.raise_for_status()
+            headers = response.headers
+            content_length = headers.get("Content-Length")
+            content_encoding = headers.get("Content-Encoding", "").lower()
+            return {
+                "status_code": response.status_code,
+                "content_length": (
+                    int(content_length)
+                    if content_length and content_length.isdigit() and content_encoding != "gzip"
+                    else None
+                ),
+                "last_modified": headers.get("Last-Modified"),
+                "content_type": headers.get("Content-Type"),
+            }
     except requests.RequestException:
         return _probe_with_get(url, timeout=timeout)
 
@@ -704,6 +761,14 @@ def derive_benchmark_states(geoid_reference_path: Path) -> list[str]:
 
 def load_geoid_reference_set(csv_path: Path) -> tuple[set[str], dict[str, str] | None]:
     """Load benchmark county GEOIDs and their region labels from GEOID_reference.csv."""
+    ref = load_geoid_reference_frame(csv_path)
+    geoid_set = set(ref["county_fips"].tolist())
+    geoid_to_region = dict(zip(ref["county_fips"], ref["region"]))
+    return geoid_set, geoid_to_region
+
+
+def load_geoid_reference_frame(csv_path: Path) -> pd.DataFrame:
+    """Load benchmark county GEOIDs plus normalized region and state labels."""
     if not csv_path.exists():
         raise FileNotFoundError(f"GEOID reference not found: {csv_path}")
     df = pd.read_csv(csv_path)
@@ -713,12 +778,24 @@ def load_geoid_reference_set(csv_path: Path) -> tuple[set[str], dict[str, str] |
 
     geoid_norm = df[geoid_col].astype(str).str.strip().str.zfill(5)
     valid = geoid_norm.str.len() == 5
-    geoid_set = set(geoid_norm[valid].unique())
     region_col = _find_region_column_geoid(df)
-    geoid_to_region = None
-    if region_col:
-        geoid_to_region = dict(zip(geoid_norm[valid], df.loc[valid, region_col].astype(str).str.strip()))
-    return geoid_set, geoid_to_region
+    if region_col is None:
+        raise ValueError(f"GEOID reference missing region/cluster column: {csv_path}")
+    state_col = next((c for c in df.columns if str(c).lower() == "state"), None)
+    state_series = (
+        df.loc[valid, state_col].astype(str).str.strip().str.upper()
+        if state_col is not None
+        else pd.Series([""] * int(valid.sum()), index=df.index[valid], dtype=object)
+    )
+    ref = pd.DataFrame(
+        {
+            "county_fips": geoid_norm[valid],
+            "region": df.loc[valid, region_col].astype(str).str.strip(),
+            "benchmark_state": state_series,
+        }
+    )
+    ref = ref[(ref["county_fips"] != "") & (ref["region"] != "")].drop_duplicates(subset=["county_fips"], keep="first").copy()
+    return ref
 
 
 def normalize_zip5(value: Any) -> str:
@@ -781,6 +858,18 @@ def iter_csv_chunks(path: Path, chunk_size: int) -> Any:
 
 def load_zip_to_county_map(path: Path) -> dict[str, str]:
     """Load ZIP->county FIPS map from CSV into a normalized dictionary."""
+    frame = load_zip_to_county_frame(path)
+    out: dict[str, str] = {}
+    for _, row in frame.iterrows():
+        zip5 = str(row["zip5"])
+        county_fips = str(row["county_fips"])
+        if zip5 not in out:
+            out[zip5] = county_fips
+    return out
+
+
+def load_zip_to_county_frame(path: Path) -> pd.DataFrame:
+    """Load normalized ZIP/county pairs from the crosswalk without collapsing benchmark ZIPs."""
     if not path.exists():
         raise FileNotFoundError(f"ZIP-to-county file not found: {path}")
     df = pd.read_csv(path, dtype=str)
@@ -788,13 +877,42 @@ def load_zip_to_county_map(path: Path) -> dict[str, str]:
     fips_col = next((c for c in df.columns if "fips" in str(c).lower()), df.columns[1] if len(df.columns) > 1 else None)
     if fips_col is None:
         raise ValueError(f"ZIP-to-county CSV missing FIPS column: {path}")
-    out: dict[str, str] = {}
-    for _, row in df.iterrows():
-        zip5 = normalize_zip5(row.get(zip_col, ""))
-        county_fips = normalize_fips5(row.get(fips_col, ""))
-        if zip5 and county_fips and zip5 not in out:
-            out[zip5] = county_fips
+    out = pd.DataFrame(
+        {
+            "zip5": df[zip_col].fillna("").astype(str).map(normalize_zip5),
+            "county_fips": df[fips_col].fillna("").astype(str).map(normalize_fips5),
+        }
+    )
+    out = out[(out["zip5"] != "") & (out["county_fips"] != "")].drop_duplicates(subset=["zip5", "county_fips"], keep="first").copy()
     return out
+
+
+def build_benchmark_zip_frame(geoid_reference_path: Path, zip_to_county_path: Path) -> pd.DataFrame:
+    """
+    Return the explicit benchmark ZIP map derived from benchmark counties.
+
+    This avoids relying on a generic one-ZIP/one-county collapse when the actual
+    filtering question is whether a ZIP belongs to one of the benchmark counties.
+    """
+    geoid_ref = load_geoid_reference_frame(geoid_reference_path)
+    zip_frame = load_zip_to_county_frame(zip_to_county_path)
+    benchmark = zip_frame.merge(geoid_ref, on="county_fips", how="inner")
+    benchmark = benchmark.drop_duplicates(subset=["zip5", "county_fips"], keep="first").copy()
+    ambiguous = benchmark.groupby("zip5")["county_fips"].nunique()
+    ambiguous = ambiguous[ambiguous > 1]
+    if not ambiguous.empty:
+        zip_list = ", ".join(sorted(ambiguous.index.tolist())[:10])
+        raise ValueError(
+            "Benchmark ZIP map is ambiguous: at least one ZIP maps to multiple benchmark counties. "
+            f"Examples: {zip_list}"
+        )
+    return benchmark.drop_duplicates(subset=["zip5"], keep="first").copy()
+
+
+def load_benchmark_zip_to_county_map(geoid_reference_path: Path, zip_to_county_path: Path) -> dict[str, str]:
+    """Load the explicit benchmark ZIP->county map."""
+    benchmark = build_benchmark_zip_frame(geoid_reference_path, zip_to_county_path)
+    return dict(zip(benchmark["zip5"], benchmark["county_fips"]))
 
 
 def _normalize_series_ein9(series: pd.Series) -> pd.Series:
@@ -834,7 +952,7 @@ def prepare_bmf_bridge_dataframe(
     local_bmf_paths: list[Path],
     geoid_reference_set: set[str],
     geoid_to_region: dict[str, str] | None,
-    zip_to_county: dict[str, str],
+    benchmark_zip_to_county: dict[str, str],
 ) -> pd.DataFrame:
     """
     Build the benchmark-county Unified BMF bridge used for Core filtering.
@@ -856,7 +974,7 @@ def prepare_bmf_bridge_dataframe(
         join_ein = _normalize_series_ein9(join_source)
         block_fips = _normalize_series_fips5(df["CENSUS_BLOCK_FIPS"]) if "CENSUS_BLOCK_FIPS" in df.columns else pd.Series("", index=df.index)
         zip5 = _normalize_series_zip5(df["F990_ORG_ADDR_ZIP"]) if "F990_ORG_ADDR_ZIP" in df.columns else pd.Series("", index=df.index)
-        county_from_zip = zip5.map(lambda value: zip_to_county.get(value, ""))
+        county_from_zip = zip5.map(lambda value: benchmark_zip_to_county.get(value, ""))
 
         county_fips = block_fips.where(block_fips != "", county_from_zip)
         benchmark_match_source = pd.Series("", index=df.index, dtype=object)
@@ -1154,57 +1272,27 @@ def asset_s3_key(
 
 def s3_client(region: str) -> Any:
     """Build an S3 client for a specific target region."""
-    return boto3.Session(region_name=region).client("s3")
+    return shared_transfers.s3_client(region)
 
 
 def s3_transfer_config() -> TransferConfig:
     """Build the custom managed-transfer config used for NCCS uploads."""
-    return TransferConfig(
-        multipart_threshold=S3_MULTIPART_THRESHOLD_MB * 1024 * 1024,
-        multipart_chunksize=S3_MULTIPART_CHUNKSIZE_MB * 1024 * 1024,
-        max_concurrency=S3_MAX_CONCURRENCY,
-        use_threads=True,
-    )
+    return shared_transfers.s3_transfer_config()
 
 
 def download_with_progress(url: str, output_path: Path, expected_bytes: int | None = None, timeout: int = 120) -> int:
     """Download a remote file to disk with a visible byte progress bar."""
-    output_path.parent.mkdir(parents=True, exist_ok=True)
-    with requests.get(url, stream=True, timeout=timeout) as response:
-        response.raise_for_status()
-        total = expected_bytes
-        if total is None:
-            header = response.headers.get("Content-Length")
-            content_encoding = response.headers.get("Content-Encoding", "").lower()
-            if header and header.isdigit() and content_encoding != "gzip":
-                total = int(header)
-        with tqdm(
-            total=total,
-            unit="B",
-            unit_scale=True,
-            unit_divisor=1024,
-            desc=f"download {output_path.name}",
-            **_TQDM_KW,
-        ) as pbar:
-            with open(output_path, "wb") as f:
-                for chunk in response.iter_content(chunk_size=1024 * 1024):
-                    if not chunk:
-                        continue
-                    f.write(chunk)
-                    pbar.update(len(chunk))
-    return output_path.stat().st_size
+    return shared_transfers.download_with_progress(
+        url,
+        output_path,
+        expected_bytes=expected_bytes,
+        timeout=timeout,
+    )
 
 
 def measure_remote_streamed_bytes(url: str, timeout: int = 120) -> int:
     """Stream a remote asset and return the number of decoded bytes delivered."""
-    total = 0
-    with requests.get(url, stream=True, timeout=timeout) as response:
-        response.raise_for_status()
-        for chunk in response.iter_content(chunk_size=1024 * 1024):
-            if not chunk:
-                continue
-            total += len(chunk)
-    return total
+    return shared_transfers.measure_remote_streamed_bytes(url, timeout=timeout)
 
 
 def upload_file_with_progress(
@@ -1215,54 +1303,23 @@ def upload_file_with_progress(
     extra_args: dict[str, Any] | None = None,
 ) -> None:
     """Upload one local file to S3 with a visible byte progress bar."""
-    client = s3_client(region)
-    size = local_path.stat().st_size
-    transfer_config = s3_transfer_config()
-    print(
-        "[upload-config] "
-        f"threshold={S3_MULTIPART_THRESHOLD_MB}MB "
-        f"chunk={S3_MULTIPART_CHUNKSIZE_MB}MB "
-        f"concurrency={S3_MAX_CONCURRENCY}",
-        flush=True,
+    shared_transfers.upload_file_with_progress(
+        local_path,
+        bucket,
+        key,
+        region,
+        extra_args=extra_args,
     )
-    with tqdm(
-        total=size,
-        unit="B",
-        unit_scale=True,
-        unit_divisor=1024,
-        desc=f"upload {local_path.name}",
-        **_TQDM_KW,
-    ) as pbar:
-        callback = _TqdmUpload(pbar)
-        client.upload_file(
-            str(local_path),
-            bucket,
-            key,
-            ExtraArgs=extra_args or {},
-            Callback=callback,
-            Config=transfer_config,
-        )
 
 
 def s3_object_size(bucket: str, key: str, region: str) -> int | None:
     """Return the S3 ContentLength for one object, or None when missing."""
-    client = s3_client(region)
-    try:
-        response = client.head_object(Bucket=bucket, Key=key)
-        return int(response.get("ContentLength", 0))
-    except ClientError:
-        return None
+    return shared_transfers.s3_object_size(bucket, key, region)
 
 
 def should_skip_upload(local_path: Path, bucket: str, key: str, region: str, overwrite: bool) -> bool:
     """True when an upload can be skipped because the S3 object already matches local bytes."""
-    if overwrite:
-        return False
-    existing_size = s3_object_size(bucket, key, region)
-    if existing_size is None:
-        return False
-    local_size = local_path.stat().st_size
-    return existing_size == local_size
+    return shared_transfers.should_skip_upload(local_path, bucket, key, region, overwrite)
 
 
 def compute_size_match(source_bytes: int | None, local_bytes: int | None, s3_bytes: int | None) -> bool:

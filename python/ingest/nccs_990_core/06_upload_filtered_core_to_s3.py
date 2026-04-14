@@ -9,6 +9,7 @@ import time
 from pathlib import Path
 
 from common import (
+    combined_filtered_output_path,
     DEFAULT_S3_BUCKET,
     DEFAULT_S3_REGION,
     META_DIR,
@@ -134,6 +135,29 @@ def main() -> None:
             args.region,
             extra_args={"ContentType": "text/csv"},
         )
+
+    combined_path = combined_filtered_output_path(args.staging_dir, tax_year)
+    if not combined_path.exists():
+        raise FileNotFoundError(f"Combined filtered Core parquet not found: {combined_path}. Run step 05 first.")
+    combined_key = filtered_s3_key(args.silver_prefix, tax_year, combined_path.name)
+    print(f"[upload] Combined filtered parquet: {combined_path} -> s3://{args.bucket}/{combined_key}", flush=True)
+    if should_skip_upload(combined_path, args.bucket, combined_key, args.region, args.overwrite):
+        print(f"[upload] Skip unchanged combined parquet object: s3://{args.bucket}/{combined_key}", flush=True)
+    else:
+        upload_file_with_progress(
+            combined_path,
+            args.bucket,
+            combined_key,
+            args.region,
+            extra_args={"ContentType": guess_content_type(combined_path)},
+        )
+    combined_local_bytes = combined_path.stat().st_size
+    combined_s3_bytes = s3_object_size(args.bucket, combined_key, args.region)
+    print(
+        f"[upload] Combined parquet size check local={combined_local_bytes:,} remote={combined_s3_bytes:,} "
+        f"match={compute_local_s3_match(combined_local_bytes, combined_s3_bytes)}",
+        flush=True,
+    )
 
     print(f"[upload] Uploaded filtered CSVs: {uploaded}", flush=True)
     print(f"[upload] Skipped filtered CSVs: {skipped}", flush=True)

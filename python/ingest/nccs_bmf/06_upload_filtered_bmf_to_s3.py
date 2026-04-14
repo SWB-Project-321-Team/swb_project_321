@@ -16,6 +16,7 @@ from common import (
     STAGING_DIR,
     START_YEAR_DEFAULT,
     banner,
+    exact_year_lookup_output_path,
     filter_manifest_path,
     filtered_output_path,
     filtered_s3_key,
@@ -55,23 +56,43 @@ def main() -> None:
     skipped_outputs = 0
     for asset in selected_assets(release):
         output_path = filtered_output_path(args.staging_dir, int(asset["snapshot_year"]))
+        lookup_path = exact_year_lookup_output_path(args.staging_dir, int(asset["snapshot_year"]))
         if not output_path.exists():
             raise FileNotFoundError(f"Filtered output not found: {output_path}. Run step 05 first.")
+        if not lookup_path.exists():
+            raise FileNotFoundError(f"Exact-year lookup output not found: {lookup_path}. Run step 05 first.")
         s3_key = filtered_s3_key(args.silver_prefix, int(asset["snapshot_year"]), output_path.name)
+        lookup_s3_key = filtered_s3_key(args.silver_prefix, int(asset["snapshot_year"]), lookup_path.name)
         print(f"[upload] Filtered output: {output_path} -> s3://{args.bucket}/{s3_key}", flush=True)
         if should_skip_upload(output_path, args.bucket, s3_key, args.region, args.overwrite):
             print(f"[upload] Skip unchanged S3 object: s3://{args.bucket}/{s3_key}", flush=True)
             skipped_outputs += 1
+        else:
+            file_start = time.perf_counter()
+            upload_file_with_progress(
+                output_path,
+                args.bucket,
+                s3_key,
+                args.region,
+                extra_args={"ContentType": guess_content_type(output_path)},
+            )
+            print_elapsed(file_start, f"upload {output_path.name}")
+            uploaded_outputs += 1
+
+        print(f"[upload] Exact-year lookup: {lookup_path} -> s3://{args.bucket}/{lookup_s3_key}", flush=True)
+        if should_skip_upload(lookup_path, args.bucket, lookup_s3_key, args.region, args.overwrite):
+            print(f"[upload] Skip unchanged S3 object: s3://{args.bucket}/{lookup_s3_key}", flush=True)
+            skipped_outputs += 1
             continue
         file_start = time.perf_counter()
         upload_file_with_progress(
-            output_path,
+            lookup_path,
             args.bucket,
-            s3_key,
+            lookup_s3_key,
             args.region,
-            extra_args={"ContentType": guess_content_type(output_path)},
+            extra_args={"ContentType": guess_content_type(lookup_path)},
         )
-        print_elapsed(file_start, f"upload {output_path.name}")
+        print_elapsed(file_start, f"upload {lookup_path.name}")
         uploaded_outputs += 1
 
     manifest_path = filter_manifest_path(args.staging_dir, args.start_year)

@@ -26,17 +26,23 @@ from common import (
     DEFAULT_S3_REGION,
     META_DIR,
     RAW_DIR,
+    RAW_VERIFY_STATE_JSON,
     SIZE_REPORT_CSV,
     banner,
+    batch_s3_object_sizes,
+    build_input_signature,
     ensure_dirs,
     load_catalog_rows,
     load_env_from_secrets,
+    manifest_matches_expectation,
     print_elapsed,
+    print_transfer_settings,
     probe_url_head,
-    s3_object_size,
     select_required_datasets,
     upload_file_with_progress,
     url_basename,
+    read_json,
+    write_json,
 )
 
 
@@ -49,19 +55,58 @@ def main() -> None:
     parser.add_argument("--raw-prefix", default=BRONZE_RAW_PREFIX, help="Bronze raw prefix")
     parser.add_argument("--meta-prefix", default=BRONZE_META_PREFIX, help="Bronze metadata prefix")
     parser.add_argument("--report-csv", default=str(SIZE_REPORT_CSV), help="Output report CSV")
+    parser.add_argument("--state-json", default=str(RAW_VERIFY_STATE_JSON), help="Cached raw-verify state JSON path")
+    parser.add_argument(
+        "--skip-if-unchanged",
+        action=argparse.BooleanOptionalAction,
+        default=True,
+        help="Skip the verify pass when cached inputs and outputs still match",
+    )
+    parser.add_argument("--force-rebuild", action="store_true", help="Ignore cached verify state and rerun the step")
     args = parser.parse_args()
 
     start = time.perf_counter()
     banner("STEP 05 - VERIFY SOURCE/LOCAL/S3 SIZE MATCH")
     load_env_from_secrets()
     ensure_dirs()
+    print_transfer_settings(label="gt_verify_raw")
 
     raw_dir = Path(args.raw_dir)
     report_path = Path(args.report_csv)
+    state_path = Path(args.state_json)
 
     rows = load_catalog_rows(Path(args.catalog_csv))
     required = select_required_datasets(rows)
     print(f"[verify] Required datasets: {len(required)}", flush=True)
+    print(f"[verify] Skip if unchanged: {args.skip_if_unchanged}", flush=True)
+    print(f"[verify] Force rebuild: {args.force_rebuild}", flush=True)
+
+    required_local_paths = {f"raw::{url_basename(row.get('download_url', ''))}": raw_dir / url_basename(row.get("download_url", "")) for row in required}
+    input_signature = build_input_signature({"catalog_csv": Path(args.catalog_csv), **required_local_paths})
+    build_options = {
+        "bucket": args.bucket,
+        "region": args.region,
+        "raw_prefix": args.raw_prefix,
+        "meta_prefix": args.meta_prefix,
+        "required_dataset_count": len(required),
+    }
+    if args.skip_if_unchanged and not args.force_rebuild and manifest_matches_expectation(
+        state_path,
+        expected_input_signature=input_signature,
+        expected_options=build_options,
+        required_outputs=[report_path],
+    ):
+        cached = read_json(state_path)
+        print("[verify] Inputs and report match cached verify state; skipping step.", flush=True)
+        print(f"[verify] Cached failure count: {cached.get('failures', '')}", flush=True)
+        print_elapsed(start, "Step 05")
+        return
+
+    path_to_s3_key = {
+        str(raw_dir / url_basename(row.get("download_url", ""))): f"{args.raw_prefix.rstrip('/')}/{url_basename(row.get('download_url', ''))}"
+        for row in required
+    }
+    s3_sizes = batch_s3_object_sizes(args.bucket, path_to_s3_key, args.region)
 
     report_rows: list[dict[str, str]] = []
     failures = 0
@@ -85,7 +130,7 @@ def main() -> None:
             source_status = status_text if status is not None else "probe_error"
 
         local_bytes = local_path.stat().st_size if local_path.exists() else None
-        s3_bytes = s3_object_size(args.bucket, s3_key, args.region)
+        s3_bytes = s3_sizes.get(str(local_path))
 
         is_match = (
             source_bytes is not None
@@ -146,6 +191,18 @@ def main() -> None:
     report_s3_key = f"{args.meta_prefix.rstrip('/')}/{report_path.name}"
     upload_file_with_progress(report_path, args.bucket, report_s3_key, args.region, extra_args={"ContentType": "text/csv"})
     print(f"[verify] Uploaded report to s3://{args.bucket}/{report_s3_key}", flush=True)
+    write_json(
+        state_path,
+        {
+            "created_at_utc": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()),
+            "input_signature": input_signature,
+            "build_options": build_options,
+            "failures": failures,
+            "verified_dataset_count": len(required),
+            "report_csv": str(report_path),
+        },
+    )
+    print(f"[verify] Wrote cached verify state: {state_path}", flush=True)
 
     print(f"[verify] Failures: {failures}", flush=True)
     print_elapsed(start, "Step 05")
@@ -155,4 +212,3 @@ def main() -> None:
 
 if __name__ == "__main__":
     main()
-

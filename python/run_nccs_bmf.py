@@ -1,5 +1,5 @@
 """
-Run the NCCS BMF pipeline in order: 01 -> 06.
+Run the NCCS BMF pipeline in order: 01 -> 08.
 """
 
 from __future__ import annotations
@@ -18,6 +18,8 @@ STEP_03 = INGEST / "03_upload_bmf_release_to_s3.py"
 STEP_04 = INGEST / "04_verify_bmf_source_local_s3.py"
 STEP_05 = INGEST / "05_filter_bmf_to_benchmark_local.py"
 STEP_06 = INGEST / "06_upload_filtered_bmf_to_s3.py"
+STEP_07 = INGEST / "07_extract_analysis_variables_local.py"
+STEP_08 = INGEST / "08_upload_analysis_outputs.py"
 
 
 def _append_arg(cmd: list[str], flag: str, value: object | None) -> None:
@@ -27,7 +29,7 @@ def _append_arg(cmd: list[str], flag: str, value: object | None) -> None:
 
 
 def main() -> None:
-    parser = argparse.ArgumentParser(description="Run the NCCS BMF pipeline (01 -> 06).")
+    parser = argparse.ArgumentParser(description="Run the NCCS BMF pipeline (01 -> 08).")
     parser.add_argument("--start-year", default=None)
     parser.add_argument("--bucket", default=None)
     parser.add_argument("--region", default=None)
@@ -37,6 +39,8 @@ def main() -> None:
     parser.add_argument("--raw-prefix", default=None)
     parser.add_argument("--meta-prefix", default=None)
     parser.add_argument("--silver-prefix", default=None)
+    parser.add_argument("--analysis-prefix", default=None)
+    parser.add_argument("--analysis-meta-prefix", default=None)
     parser.add_argument("--geoid-reference", default=None)
     parser.add_argument("--zip-to-county", default=None)
     parser.add_argument("--overwrite", action="store_true")
@@ -118,6 +122,32 @@ def main() -> None:
         step_06_args.append("--overwrite")
     steps.append(("06_upload_filtered_bmf_to_s3", STEP_06, step_06_args))
 
+    step_07_args: list[str] = []
+    for flag, value in (
+        ("--metadata-dir", args.metadata_dir),
+        ("--staging-dir", args.staging_dir),
+        ("--bucket", args.bucket),
+        ("--region", args.region),
+        ("--analysis-prefix", args.analysis_prefix),
+        ("--analysis-meta-prefix", args.analysis_meta_prefix),
+    ):
+        _append_arg(step_07_args, flag, value)
+    steps.append(("07_extract_analysis_variables_local", STEP_07, step_07_args))
+
+    step_08_args: list[str] = []
+    for flag, value in (
+        ("--bucket", args.bucket),
+        ("--region", args.region),
+        ("--metadata-dir", args.metadata_dir),
+        ("--staging-dir", args.staging_dir),
+        ("--analysis-prefix", args.analysis_prefix),
+        ("--analysis-meta-prefix", args.analysis_meta_prefix),
+    ):
+        _append_arg(step_08_args, flag, value)
+    if args.overwrite:
+        step_08_args.append("--overwrite")
+    steps.append(("08_upload_analysis_outputs", STEP_08, step_08_args))
+
     for step_name, script_path, script_args in steps:
         cmd = [sys.executable, str(script_path), *script_args]
         print(f"Running {step_name}...", flush=True)
@@ -125,7 +155,7 @@ def main() -> None:
         if rc != 0:
             raise SystemExit(rc)
 
-    print("NCCS BMF pipeline (01 -> 06) completed.", flush=True)
+    print("NCCS BMF pipeline (01 -> 08) completed.", flush=True)
 
 
 if __name__ == "__main__":
