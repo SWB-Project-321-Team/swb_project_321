@@ -53,6 +53,17 @@ missing_regions = set(ref_geoid['GEOID']) - set(df_filtered['fips'])
 missing_regions_df = ref_geoid.loc[ref_geoid['GEOID'].isin(missing_regions),
                                   ['County', 'State', 'Cluster_name', 'GEOID']].reset_index(drop=True)
 
+# add MSAs to the filtered dataframe. 
+fips_msa = ['04362', # Sioux Falls 
+            '01374', # Billings
+            '02238', #Flagstaff
+            '03354', # Missoula
+            '03966' # Rapid city
+            ]
+df_msa = df[(df['fips'].isin(fips_msa)) & (df['naics']==naics_code)]
+
+df_filtered = pd.concat([df_filtered, df_msa], ignore_index=True) 
+
 # Save the filtered DataFrame back to S3 as a CSV file
 df_filtered.to_csv(f"s3://{bucket_name}/silver/bls/qcew_nonprofits_2022.csv", index=False)
 missing_regions_df.to_csv(f"s3://{bucket_name}/silver/bls/metadata/missing_regions_2022.csv", index=False)
