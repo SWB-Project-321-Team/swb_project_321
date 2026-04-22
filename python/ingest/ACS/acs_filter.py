@@ -25,10 +25,12 @@ ref_geoid = pd.read_csv(REF_GEOID_CSV, dtype={"GEOID": str})
 bucket_name='swb-321-irs990-teos'
 key_full = 'bronze/acs/acs5_full_2024.csv'
 key='bronze/acs/acs5_subject_2024.csv'
+key_profile = 'bronze/acs/acs5_profile_2024.csv'
 output_key = '/silver/acs/'
 
 df_full = pd.read_csv(f"s3://{bucket_name}/{key_full}")
 df_subject = pd.read_csv(f"s3://{bucket_name}/{key}")
+df_profile = pd.read_csv(f"s3://{bucket_name}/{key_profile}")
 
 df_dict_full = pd.DataFrame({
     "variable":df_full.columns, 
@@ -38,26 +40,39 @@ df_dict_subject = pd.DataFrame({
     "variable":df_subject.columns, 
     "description":df_subject.iloc[0].values
 })
+df_dict_profile = pd.DataFrame({
+    "variable":df_profile.columns, 
+    "description":df_profile.iloc[0].values
+})
 
-df_dict = (pd.concat([df_dict_full, df_dict_subject], ignore_index=True).
+df_dict = (pd.concat([df_dict_full, df_dict_subject, df_dict_profile], ignore_index=True).
            drop_duplicates())
 
 df_dict.to_csv(f"s3://{bucket_name}{output_key}metadata/acs_variable_dictionary.csv", index=False)
 
 df_full = df_full.drop(index=0)
 df_subject = df_subject.drop(index=0)
+df_profile = df_profile.drop(index=0)
 df_full["fips"] = df_full["state"] + df_full["county"]
 df_subject["fips"] = df_subject["state"] + df_subject["county"]
+df_profile["fips"] = df_profile["state"] + df_profile["county"]
 
 df_full["fips"] = df_full["fips"].astype(str)
 df_subject["fips"] = df_subject["fips"].astype(str)
+df_profile["fips"] = df_profile["fips"].astype(str)
 df_full_filtered = df_full[df_full["fips"].isin(ref_geoid["GEOID"])]
 df_subject_filtered = df_subject[df_subject["fips"].isin(ref_geoid["GEOID"])]   
+df_profile_filtered = df_profile[df_profile["fips"].isin(ref_geoid["GEOID"])]
 
 df_merged = df_full_filtered.merge(df_subject_filtered, 
                                    on=["fips", "NAME"], 
                                    suffixes=("", "_drop")
-                                   ).loc[:, lambda x: ~x.columns.str.endswith("_drop")]
+                                   ) \
+                            .merge(df_profile_filtered, 
+                                   on = ["fips", "NAME"],
+                                   suffixes=("", "_drop")) \
+                                    .loc[:, lambda x: ~x.columns.str.endswith("_drop")]
+
 
 # reorder state, county, fips columns to the front
 cols = df_merged.columns.tolist()
