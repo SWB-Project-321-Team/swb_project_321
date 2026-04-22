@@ -1,0 +1,43 @@
+# Data and credentials (per README – no raw/curated data in repo)
+data/
+*.csv
+!docs/990/sample_parsed_irs_990_10.csv
+tests/sample_990_api_output/
+*.parquet
+*.xlsx
+*.xls
+.env
+.env.*
+*.pem
+# Secrets folder – ignore contents, keep folder in repo
+secrets/*
+!secrets/.gitkeep
+!secrets/README.md
+!secrets/.env.example
+
+# AWS helpers
+aws_setup/
+aws_sso/
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+.venv/
+venv/
+.env
+.Python
+*.egg-info/
+.eggs/
+dist/
+build/
+
+# Jupyter
+.ipynb_checkpoints/
+*/.ipynb_checkpoints/
+
+# IDE / OS
+.idea/
+.vscode/
+.DS_Store
+Thumbs.db
