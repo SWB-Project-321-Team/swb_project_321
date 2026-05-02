@@ -6,9 +6,9 @@
 - Total object count: `298`
 - Total discovered folder-prefix count: `97`
 
-This file is a historical inventory snapshot generated from a recursive S3 listing on `2026-03-22`. S3 does not have real folders, so the "folders" below are key prefixes inferred from object paths.
+This file is a historical inventory snapshot generated from a recursive S3 listing on `2026-03-22`. S3 does not have real folders, so the "folders" below are key prefixes inferred from object paths. Do not use this file for current object counts.
 
-For the **canonical prefix layout** (including Bronze `bronze/bls/`, `bronze/acs/`, IRS BMF metadata, Silver `analysis/` trees, `silver/acs/`, `silver/bls/`, `silver/usa_spending/`), see `docs/s3_bucket_tree.md` (repo root: `s3_bucket_tree.md`). **2026-04-11 live listing:** 373 objects in bucket (this file remains the 2026-03-22 row-level snapshot).
+For the **canonical prefix layout**, see `s3_bucket_tree.md`. **2026-05-02 live listing** (`aws s3 ls s3://swb-321-irs990-teos --recursive --summarize --region us-east-2`): **489** objects and **35,711,714,691** bytes in bucket (matches `s3_bucket_tree.md`). Current classified inventory: `docs/audit/s3_object_inventory_classification_2026-05-02.csv`. Current final preprocessing documentation package: `documentation/final_preprocessing_docs/`. This file remains the 2026-03-22 row-level snapshot.
 
 Important GT note:
 
@@ -420,5 +420,3 @@ Prefixes present in code but **not** represented in the folder list below (often
 | `silver/nccs_efile/tax_year=2023/nccs_efile_benchmark_tax_year=2023.parquet`                                           | 274085                                                      | 2026-03-22T22:43:22+00:00 |
 | `silver/nccs_efile/tax_year=2024/filter_manifest_tax_year=2024.csv`                                                    | 1511                                                        | 2026-03-22T22:43:25+00:00 |
 | `silver/nccs_efile/tax_year=2024/nccs_efile_benchmark_tax_year=2024.parquet`                                           | 103581                                                      | 2026-03-22T22:43:24+00:00 |
-
-

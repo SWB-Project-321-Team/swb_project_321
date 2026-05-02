@@ -21,7 +21,13 @@ _REPO_ROOT = _FILE_DIR.parent.parent
 _NCCS_DIR = _REPO_ROOT / "python" / "ingest" / "nccs_990_core"
 if str(_NCCS_DIR) not in sys.path:
     sys.path.insert(0, str(_NCCS_DIR))
-import common as nccs_common  # noqa: E402
+_COMMON_PATH = _NCCS_DIR / "common.py"
+_COMMON_SPEC = importlib.util.spec_from_file_location("nccs_core_common_for_tests", _COMMON_PATH)
+if _COMMON_SPEC is None or _COMMON_SPEC.loader is None:
+    raise ImportError(f"Unable to load Core common module from {_COMMON_PATH}")
+nccs_common = importlib.util.module_from_spec(_COMMON_SPEC)
+sys.modules.setdefault("nccs_core_common_for_tests", nccs_common)
+_COMMON_SPEC.loader.exec_module(nccs_common)
 
 _ANALYSIS_STEP_PATH = _NCCS_DIR / "07_extract_analysis_variables_local.py"
 _ANALYSIS_SPEC = importlib.util.spec_from_file_location("nccs_core_analysis_step", _ANALYSIS_STEP_PATH)

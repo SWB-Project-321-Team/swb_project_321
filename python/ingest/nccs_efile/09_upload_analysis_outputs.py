@@ -9,8 +9,10 @@ import time
 from pathlib import Path
 
 from common import (
-    ANALYSIS_META_PREFIX,
+    ANALYSIS_COVERAGE_PREFIX,
+    ANALYSIS_DOCUMENTATION_PREFIX,
     ANALYSIS_PREFIX,
+    ANALYSIS_VARIABLE_MAPPING_PREFIX,
     DEFAULT_S3_BUCKET,
     DEFAULT_S3_REGION,
     META_DIR,
@@ -70,7 +72,9 @@ def main() -> None:
     parser.add_argument("--metadata-dir", type=Path, default=META_DIR, help="Local metadata directory")
     parser.add_argument("--staging-dir", type=Path, default=STAGING_DIR, help="Local staging directory")
     parser.add_argument("--analysis-prefix", default=ANALYSIS_PREFIX, help="S3 analysis prefix")
-    parser.add_argument("--analysis-meta-prefix", default=ANALYSIS_META_PREFIX, help="S3 analysis metadata prefix")
+    parser.add_argument("--analysis-documentation-prefix", default=ANALYSIS_DOCUMENTATION_PREFIX, help="S3 analysis documentation prefix")
+    parser.add_argument("--analysis-variable-mapping-prefix", default=ANALYSIS_VARIABLE_MAPPING_PREFIX, help="S3 analysis variable mapping prefix")
+    parser.add_argument("--analysis-coverage-prefix", default=ANALYSIS_COVERAGE_PREFIX, help="S3 analysis coverage prefix")
     parser.add_argument("--overwrite", action="store_true", help="Upload even when the remote object already matches local bytes")
     args = parser.parse_args()
 
@@ -80,14 +84,16 @@ def main() -> None:
     print(f"[upload] Bucket: {args.bucket}", flush=True)
     print(f"[upload] Region: {args.region}", flush=True)
     print(f"[upload] Analysis prefix: {args.analysis_prefix}", flush=True)
-    print(f"[upload] Analysis metadata prefix: {args.analysis_meta_prefix}", flush=True)
+    print(f"[upload] Analysis documentation prefix: {args.analysis_documentation_prefix}", flush=True)
+    print(f"[upload] Analysis variable mapping prefix: {args.analysis_variable_mapping_prefix}", flush=True)
+    print(f"[upload] Analysis coverage prefix: {args.analysis_coverage_prefix}", flush=True)
 
     uploads = [
         (analysis_variables_output_path(args.staging_dir), f"{args.analysis_prefix.rstrip('/')}/{analysis_variables_output_path(args.staging_dir).name}"),
         (analysis_geography_metrics_output_path(args.staging_dir), f"{args.analysis_prefix.rstrip('/')}/{analysis_geography_metrics_output_path(args.staging_dir).name}"),
-        (analysis_variable_coverage_path(args.metadata_dir), f"{args.analysis_meta_prefix.rstrip('/')}/{analysis_variable_coverage_path(args.metadata_dir).name}"),
-        (analysis_variable_mapping_path(), f"{args.analysis_meta_prefix.rstrip('/')}/{analysis_variable_mapping_path().name}"),
-        (analysis_data_processing_doc_path(), f"{args.analysis_meta_prefix.rstrip('/')}/{analysis_data_processing_doc_path().name}"),
+        (analysis_variable_coverage_path(args.metadata_dir), f"{args.analysis_coverage_prefix.rstrip('/')}/{analysis_variable_coverage_path(args.metadata_dir).name}"),
+        (analysis_variable_mapping_path(), f"{args.analysis_variable_mapping_prefix.rstrip('/')}/{analysis_variable_mapping_path().name}"),
+        (analysis_data_processing_doc_path(), f"{args.analysis_documentation_prefix.rstrip('/')}/{analysis_data_processing_doc_path().name}"),
     ]
 
     uploaded_count = 0

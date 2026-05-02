@@ -9,8 +9,10 @@ import time
 from pathlib import Path
 
 from common import (
-    ANALYSIS_META_PREFIX,
+    ANALYSIS_COVERAGE_PREFIX,
+    ANALYSIS_DOCUMENTATION_PREFIX,
     ANALYSIS_PREFIX,
+    ANALYSIS_VARIABLE_MAPPING_PREFIX,
     DEFAULT_S3_BUCKET,
     DEFAULT_S3_REGION,
     META_DIR,
@@ -59,7 +61,9 @@ def main() -> None:
     parser.add_argument("--metadata-dir", type=Path, default=META_DIR, help="Local IRS EO BMF metadata directory")
     parser.add_argument("--staging-dir", type=Path, default=STAGING_DIR, help="Local IRS EO BMF staging directory")
     parser.add_argument("--analysis-prefix", default=ANALYSIS_PREFIX, help="S3 analysis prefix")
-    parser.add_argument("--analysis-meta-prefix", default=ANALYSIS_META_PREFIX, help="S3 analysis metadata prefix")
+    parser.add_argument("--analysis-documentation-prefix", default=ANALYSIS_DOCUMENTATION_PREFIX, help="S3 analysis documentation prefix")
+    parser.add_argument("--analysis-variable-mapping-prefix", default=ANALYSIS_VARIABLE_MAPPING_PREFIX, help="S3 analysis variable mapping prefix")
+    parser.add_argument("--analysis-coverage-prefix", default=ANALYSIS_COVERAGE_PREFIX, help="S3 analysis coverage prefix")
     parser.add_argument("--overwrite", action="store_true", help="Upload even when remote bytes already match")
     args = parser.parse_args()
 
@@ -70,9 +74,9 @@ def main() -> None:
         (analysis_variables_output_path(args.staging_dir), f"{args.analysis_prefix.rstrip('/')}/{analysis_variables_output_path(args.staging_dir).name}"),
         (analysis_geography_metrics_output_path(args.staging_dir), f"{args.analysis_prefix.rstrip('/')}/{analysis_geography_metrics_output_path(args.staging_dir).name}"),
         (analysis_field_metrics_output_path(args.staging_dir), f"{args.analysis_prefix.rstrip('/')}/{analysis_field_metrics_output_path(args.staging_dir).name}"),
-        (analysis_variable_coverage_path(args.metadata_dir), f"{args.analysis_meta_prefix.rstrip('/')}/{analysis_variable_coverage_path(args.metadata_dir).name}"),
-        (analysis_variable_mapping_path(), f"{args.analysis_meta_prefix.rstrip('/')}/{analysis_variable_mapping_path().name}"),
-        (analysis_data_processing_doc_path(), f"{args.analysis_meta_prefix.rstrip('/')}/{analysis_data_processing_doc_path().name}"),
+        (analysis_variable_coverage_path(args.metadata_dir), f"{args.analysis_coverage_prefix.rstrip('/')}/{analysis_variable_coverage_path(args.metadata_dir).name}"),
+        (analysis_variable_mapping_path(), f"{args.analysis_variable_mapping_prefix.rstrip('/')}/{analysis_variable_mapping_path().name}"),
+        (analysis_data_processing_doc_path(), f"{args.analysis_documentation_prefix.rstrip('/')}/{analysis_data_processing_doc_path().name}"),
     ]
     for local_path, s3_key in uploads:
         _upload_one(local_path, args.bucket, args.region, s3_key, args.overwrite)

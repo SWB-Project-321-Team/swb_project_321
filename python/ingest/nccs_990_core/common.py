@@ -45,8 +45,10 @@ CORE_RAW_DIR = RAW_ROOT / "raw"
 BRIDGE_BMF_DIR = RAW_ROOT / "bridge_bmf"
 META_DIR = RAW_ROOT / "metadata"
 STAGING_DIR = DATA / "staging" / "nccs_990" / "core"
-DOCS_ANALYSIS_DIR = get_base() / "docs" / "analysis"
-DOCS_DATA_PROCESSING_DIR = get_base() / "docs" / "data_processing"
+DOCS_PACKAGE_DIR = get_base() / "docs" / "final_preprocessing_docs"
+DOCS_TECHNICAL_DIR = DOCS_PACKAGE_DIR / "technical_docs"
+DOCS_ANALYSIS_DIR = DOCS_TECHNICAL_DIR / "analysis_variable_mappings"
+DOCS_DATA_PROCESSING_DIR = DOCS_TECHNICAL_DIR / "pipeline_docs"
 
 LATEST_RELEASE_JSON = META_DIR / "latest_release.json"
 CORE_CATALOG_SNAPSHOT = META_DIR / "catalog_core.html"
@@ -59,7 +61,9 @@ BRIDGE_PREFIX = "bronze/nccs_990/core/bridge_bmf"
 META_PREFIX = "bronze/nccs_990/core/metadata"
 SILVER_PREFIX = "silver/nccs_990/core"
 ANALYSIS_PREFIX = f"{SILVER_PREFIX}/analysis"
-ANALYSIS_META_PREFIX = f"{ANALYSIS_PREFIX}/metadata"
+ANALYSIS_DOCUMENTATION_PREFIX = f"{ANALYSIS_PREFIX}/documentation"
+ANALYSIS_VARIABLE_MAPPING_PREFIX = f"{ANALYSIS_PREFIX}/variable_mappings"
+ANALYSIS_COVERAGE_PREFIX = f"{ANALYSIS_PREFIX}/quality/coverage"
 
 GEOID_REFERENCE_CSV = DATA / "reference" / "GEOID_reference.csv"
 ZIP_TO_COUNTY_CSV = DATA / "reference" / "zip_to_county_fips.csv"
@@ -408,9 +412,9 @@ def analysis_s3_key(analysis_prefix: str, filename: str) -> str:
     return f"{analysis_prefix.rstrip('/')}/{filename}"
 
 
-def analysis_meta_s3_key(analysis_meta_prefix: str, filename: str) -> str:
-    """Return the S3 key for one NCCS Core analysis metadata artifact."""
-    return f"{analysis_meta_prefix.rstrip('/')}/{filename}"
+def analysis_auxiliary_s3_key(prefix: str, filename: str) -> str:
+    """Return the S3 key for one NCCS Core analysis documentation or quality artifact."""
+    return f"{prefix.rstrip('/')}/{filename}"
 
 
 def basename(url: str) -> str:

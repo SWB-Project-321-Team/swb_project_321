@@ -9,15 +9,17 @@ import time
 from pathlib import Path
 
 from common import (
-    ANALYSIS_META_PREFIX,
+    ANALYSIS_COVERAGE_PREFIX,
+    ANALYSIS_DOCUMENTATION_PREFIX,
     ANALYSIS_PREFIX,
+    ANALYSIS_VARIABLE_MAPPING_PREFIX,
     DEFAULT_S3_BUCKET,
     DEFAULT_S3_REGION,
     META_DIR,
     STAGING_DIR,
     analysis_data_processing_doc_path,
     analysis_geography_metrics_output_path,
-    analysis_meta_s3_key,
+    analysis_auxiliary_s3_key,
     analysis_s3_key,
     analysis_variable_coverage_path,
     analysis_variable_mapping_path,
@@ -64,7 +66,9 @@ def main() -> None:
     parser.add_argument("--metadata-dir", type=Path, default=META_DIR)
     parser.add_argument("--staging-dir", type=Path, default=STAGING_DIR)
     parser.add_argument("--analysis-prefix", default=ANALYSIS_PREFIX)
-    parser.add_argument("--analysis-meta-prefix", default=ANALYSIS_META_PREFIX)
+    parser.add_argument("--analysis-documentation-prefix", default=ANALYSIS_DOCUMENTATION_PREFIX)
+    parser.add_argument("--analysis-variable-mapping-prefix", default=ANALYSIS_VARIABLE_MAPPING_PREFIX)
+    parser.add_argument("--analysis-coverage-prefix", default=ANALYSIS_COVERAGE_PREFIX)
     parser.add_argument("--overwrite", action="store_true")
     args = parser.parse_args()
 
@@ -74,14 +78,16 @@ def main() -> None:
     print(f"[upload] Bucket: {args.bucket}", flush=True)
     print(f"[upload] Region: {args.region}", flush=True)
     print(f"[upload] Analysis prefix: {args.analysis_prefix}", flush=True)
-    print(f"[upload] Analysis metadata prefix: {args.analysis_meta_prefix}", flush=True)
+    print(f"[upload] Analysis documentation prefix: {args.analysis_documentation_prefix}", flush=True)
+    print(f"[upload] Analysis variable mapping prefix: {args.analysis_variable_mapping_prefix}", flush=True)
+    print(f"[upload] Analysis coverage prefix: {args.analysis_coverage_prefix}", flush=True)
 
     uploads = [
         (analysis_variables_output_path(args.staging_dir), analysis_s3_key(args.analysis_prefix, analysis_variables_output_path(args.staging_dir).name)),
         (analysis_geography_metrics_output_path(args.staging_dir), analysis_s3_key(args.analysis_prefix, analysis_geography_metrics_output_path(args.staging_dir).name)),
-        (analysis_variable_coverage_path(args.metadata_dir), analysis_meta_s3_key(args.analysis_meta_prefix, analysis_variable_coverage_path(args.metadata_dir).name)),
-        (analysis_variable_mapping_path(), analysis_meta_s3_key(args.analysis_meta_prefix, analysis_variable_mapping_path().name)),
-        (analysis_data_processing_doc_path(), analysis_meta_s3_key(args.analysis_meta_prefix, analysis_data_processing_doc_path().name)),
+        (analysis_variable_coverage_path(args.metadata_dir), analysis_auxiliary_s3_key(args.analysis_coverage_prefix, analysis_variable_coverage_path(args.metadata_dir).name)),
+        (analysis_variable_mapping_path(), analysis_auxiliary_s3_key(args.analysis_variable_mapping_prefix, analysis_variable_mapping_path().name)),
+        (analysis_data_processing_doc_path(), analysis_auxiliary_s3_key(args.analysis_documentation_prefix, analysis_data_processing_doc_path().name)),
     ]
 
     uploaded_count = 0

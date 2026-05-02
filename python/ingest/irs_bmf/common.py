@@ -40,8 +40,10 @@ RAW_DIR = DATA / "raw" / "irs_bmf"
 META_DIR = RAW_DIR / "metadata"
 STAGING_DIR = DATA / "staging" / "irs_bmf"
 LEGACY_STAGING_ORG_DIR = DATA / "staging" / "org"
-DOCS_ANALYSIS_DIR = get_base() / "docs" / "analysis"
-DOCS_DATA_PROCESSING_DIR = get_base() / "docs" / "data_processing"
+DOCS_PACKAGE_DIR = get_base() / "docs" / "final_preprocessing_docs"
+DOCS_TECHNICAL_DIR = DOCS_PACKAGE_DIR / "technical_docs"
+DOCS_ANALYSIS_DIR = DOCS_TECHNICAL_DIR / "analysis_variable_mappings"
+DOCS_DATA_PROCESSING_DIR = DOCS_TECHNICAL_DIR / "pipeline_docs"
 
 RAW_MANIFEST_PATH = META_DIR / "irs_bmf_raw_manifest.csv"
 RAW_SIZE_VERIFICATION_PATH = META_DIR / "irs_bmf_raw_size_verification.csv"
@@ -55,7 +57,9 @@ RAW_META_PREFIX = f"{RAW_PREFIX}/metadata"
 SILVER_PREFIX = "silver/irs990/bmf"
 SILVER_META_PREFIX = f"{SILVER_PREFIX}/metadata"
 ANALYSIS_PREFIX = f"{SILVER_PREFIX}/analysis"
-ANALYSIS_META_PREFIX = f"{ANALYSIS_PREFIX}/metadata"
+ANALYSIS_DOCUMENTATION_PREFIX = f"{ANALYSIS_PREFIX}/documentation"
+ANALYSIS_VARIABLE_MAPPING_PREFIX = f"{ANALYSIS_PREFIX}/variable_mappings"
+ANALYSIS_COVERAGE_PREFIX = f"{ANALYSIS_PREFIX}/quality/coverage"
 
 ANALYSIS_TAX_YEAR_MIN = 2022
 ANALYSIS_TAX_YEAR_MAX = 2024

@@ -1,0 +1,1572 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.3.450">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+
+<title>NCCS ‘Core’ Data Catalog</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+</style>
+
+
+<script src="catalog-core_files/libs/clipboard/clipboard.min.js"></script>
+<script src="catalog-core_files/libs/quarto-html/quarto.js"></script>
+<script src="catalog-core_files/libs/quarto-html/popper.min.js"></script>
+<script src="catalog-core_files/libs/quarto-html/tippy.umd.min.js"></script>
+<script src="catalog-core_files/libs/quarto-html/anchor.min.js"></script>
+<link href="catalog-core_files/libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="catalog-core_files/libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="catalog-core_files/libs/bootstrap/bootstrap.min.js"></script>
+<link href="catalog-core_files/libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="catalog-core_files/libs/bootstrap/bootstrap.min.css" rel="stylesheet" id="quarto-bootstrap" data-mode="light">
+
+<script src="catalog-core_files/libs/kePrint-0.0.1/kePrint.js"></script>
+<link href="catalog-core_files/libs/lightable-0.0.1/lightable.css" rel="stylesheet">
+
+
+</head>
+
+<body class="fullcontent">
+
+<div id="quarto-content" class="page-columns page-rows-contents page-layout-article">
+
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<h1 class="title">NCCS ‘Core’ Data Catalog</h1>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    
+  
+    
+  </div>
+  
+
+</header>
+
+<p><br></p>
+<hr>
+<p><br></p>
+<p>Files are organized as follows:</p>
+<p><strong>Tax Exempt Type (tscope)</strong></p>
+<ul>
+<li>CHARITIES - 501c3 nonprofit organizations</li>
+<li>NONPROFITS - All other 501c type organizations besides 501c3</li>
+<li>PRIVATE FOUNDATIONS - 501c3 private foundations</li>
+</ul>
+<p><strong>IRS 990 Form Scope (fscope)</strong></p>
+<p>Nonprofits can file Form 990, 990EZ, 990PF, or 990N.</p>
+<p>Private foundations must file Form 990PF. Small nonprofits can file form 990EZ, which is a shorter version of the full form. Organizations with more than $250k in revenues must file full Form 990.</p>
+<p>Very small nonprofits (revenues less than $50k annually) can file Form 990N (the postcard form). Since they disclose no finances or organizational activities form 990N filers are not included in the Core Data Series.</p>
+<p>Form scope describes which types of filers are included in each data set:</p>
+<ul>
+<li><strong>PZ</strong>: 990 + 990EZ filers</li>
+<li><strong>PC</strong>: 990 filers only</li>
+<li><strong>PF</strong>: 990PF private foundations</li>
+</ul>
+<p>Note that scope PZ datasets include a large number of organizations but a smaller number of variables since Form 990EZ has a more limited set of disclosures.</p>
+<p><strong>Year</strong></p>
+<p>Files for form scopes PZ and PC are organized by <strong>tax year</strong>. While PF files are organized by <strong>filing year</strong> See the Research Handbook for details on the differences.</p>
+<p><strong>Data Dictionary for PC and PZ Datasets</strong></p>
+<table class="table">
+<colgroup>
+<col style="width: 23%">
+<col style="width: 36%">
+<col style="width: 40%">
+</colgroup>
+<thead>
+<tr class="header">
+<th style="text-align: center;">Column</th>
+<th style="text-align: center;">Description</th>
+<th style="text-align: center;">Details</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: center;">variable_name</td>
+<td style="text-align: center;">Name of variable in CORE data set</td>
+<td style="text-align: center;"></td>
+</tr>
+<tr class="even">
+<td style="text-align: center;">variable_description</td>
+<td style="text-align: center;">Variable description taken from concordance</td>
+<td style="text-align: center;"></td>
+</tr>
+<tr class="odd">
+<td style="text-align: center;">variable_source</td>
+<td style="text-align: center;">Variable Source</td>
+<td style="text-align: center;">HD: Header, PC: Form 990, PZ: Form 990 + 990-EZ</td>
+</tr>
+<tr class="even">
+<td style="text-align: center;">form_location</td>
+<td style="text-align: center;">Location on Form 990</td>
+<td style="text-align: center;"></td>
+</tr>
+<tr class="odd">
+<td style="text-align: center;">variable_coverage</td>
+<td style="text-align: center;">Tax Years Where Variable Is Present</td>
+<td style="text-align: center;"></td>
+</tr>
+<tr class="even">
+<td style="text-align: center;">variable_datatype</td>
+<td style="text-align: center;">Data Type</td>
+<td style="text-align: center;"></td>
+</tr>
+</tbody>
+</table>
+<p><a href="https://nccsdata.s3.amazonaws.com/harmonized/core/CORE-HRMN_dd.csv" class="button3">Download PC/PZ Dictionary</a></p>
+<p><strong>Data Dictionary for PF Datasets</strong></p>
+<table class="table">
+<colgroup>
+<col style="width: 23%">
+<col style="width: 36%">
+<col style="width: 40%">
+</colgroup>
+<thead>
+<tr class="header">
+<th style="text-align: center;">Column</th>
+<th style="text-align: center;">Description</th>
+<th style="text-align: center;">Details</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: center;">VAR_NAME_NEW</td>
+<td style="text-align: center;">Name of variable in PF data set</td>
+<td style="text-align: center;"></td>
+</tr>
+<tr class="even">
+<td style="text-align: center;">VAR_DATA_TYPE</td>
+<td style="text-align: center;">Variable datatype from SQL Database</td>
+<td style="text-align: center;"></td>
+</tr>
+<tr class="odd">
+<td style="text-align: center;">VAR_NA_PERCENT</td>
+<td style="text-align: center;">Percentage of values that are NA</td>
+<td style="text-align: center;"></td>
+</tr>
+<tr class="even">
+<td style="text-align: center;">VAR_COVERAGE</td>
+<td style="text-align: center;">Tax Years Where Variable Is Present</td>
+<td style="text-align: center;"></td>
+</tr>
+<tr class="odd">
+<td style="text-align: center;">VAR_CARDINALITY_PERCENT</td>
+<td style="text-align: center;">Percentage of values that are Cardinal</td>
+<td style="text-align: center;">Percentage of values that are distinct</td>
+</tr>
+<tr class="even">
+<td style="text-align: center;">LABEL</td>
+<td style="text-align: center;">Variable Label from Concordance</td>
+<td style="text-align: center;"></td>
+</tr>
+<tr class="odd">
+<td style="text-align: center;">DESCRIPTION</td>
+<td style="text-align: center;">Variable Description from Concordance</td>
+<td style="text-align: center;"></td>
+</tr>
+<tr class="even">
+<td style="text-align: center;">FORM_TYPE</td>
+<td style="text-align: center;">Variable Source from Form 990s</td>
+<td style="text-align: center;"></td>
+</tr>
+<tr class="odd">
+<td style="text-align: center;">FORM_PART</td>
+<td style="text-align: center;">990PF Form Part from Concordance</td>
+<td style="text-align: center;"></td>
+</tr>
+<tr class="even">
+<td style="text-align: center;">FORM_LINE_Number</td>
+<td style="text-align: center;">Form Line Number from Concordance</td>
+<td style="text-align: center;"></td>
+</tr>
+</tbody>
+</table>
+<p><a href="https://nccsdata.s3.us-east-1.amazonaws.com/harmonized/core/501c3-pf/dd/DD-PF-HRMN-V0.csv" class="button3">Download PF Dictionary</a></p>
+<p><br></p>
+<hr>
+<p><br></p>
+<section id="c3-charities" class="level4">
+<h4 class="anchored" data-anchor-id="c3-charities">501(c)(3) Charities</h4>
+</section>
+<section id="scope-pz" class="level3">
+<h3 class="anchored" data-anchor-id="scope-pz">Scope: PZ</h3>
+<div class="cell">
+<div class="cell-output-display">
+<table class="table table-sm table-striped small" data-quarto-postprocess="true">
+<thead>
+<tr class="header">
+<th style="text-align: left;" data-quarto-table-cell-role="th">Download Link</th>
+<th style="text-align: left;" data-quarto-table-cell-role="th">Size</th>
+<th style="text-align: left;" data-quarto-table-cell-role="th">Year</th>
+<th style="text-align: left;" data-quarto-table-cell-role="th">Nonprofit Type</th>
+<th style="text-align: left;" data-quarto-table-cell-role="th">Form Scope</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;"><a href="https://nccsdata.s3.amazonaws.com/harmonized/core/501c3-pz/CORE-1989-501C3-CHARITIES-PZ-HRMN.csv" class="button">DOWNLOAD</a></td>
+<td style="text-align: left;">37.2 mb</td>
+<td style="text-align: left;">1989</td>
+<td style="text-align: left;">501C3-CHARITIES</td>
+<td style="text-align: left;">PZ</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"><a href="https://nccsdata.s3.amazonaws.com/harmonized/core/501c3-pz/CORE-1990-501C3-CHARITIES-PZ-HRMN.csv" class="button">DOWNLOAD</a></td>
+<td style="text-align: left;">38.2 mb</td>
+<td style="text-align: left;">1990</td>
+<td style="text-align: left;">501C3-CHARITIES</td>
+<td style="text-align: left;">PZ</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;"><a href="https://nccsdata.s3.amazonaws.com/harmonized/core/501c3-pz/CORE-1991-501C3-CHARITIES-PZ-HRMN.csv" class="button">DOWNLOAD</a></td>
+<td style="text-align: left;">38.2 mb</td>
+<td style="text-align: left;">1991</td>
+<td style="text-align: left;">501C3-CHARITIES</td>
+<td style="text-align: left;">PZ</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"><a href="https://nccsdata.s3.amazonaws.com/harmonized/core/501c3-pz/CORE-1992-501C3-CHARITIES-PZ-HRMN.csv" class="button">DOWNLOAD</a></td>
+<td style="text-align: left;">40.1 mb</td>
+<td style="text-align: left;">1992</td>
+<td style="text-align: left;">501C3-CHARITIES</td>
+<td style="text-align: left;">PZ</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;"><a href="https://nccsdata.s3.amazonaws.com/harmonized/core/501c3-pz/CORE-1993-501C3-CHARITIES-PZ-HRMN.csv" class="button">DOWNLOAD</a></td>
+<td style="text-align: left;">42.4 mb</td>
+<td style="text-align: left;">1993</td>
+<td style="text-align: left;">501C3-CHARITIES</td>
+<td style="text-align: left;">PZ</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"><a href="https://nccsdata.s3.amazonaws.com/harmonized/core/501c3-pz/CORE-1994-501C3-CHARITIES-PZ-HRMN.csv" class="button">DOWNLOAD</a></td>
+<td style="text-align: left;">45.5 mb</td>
+<td style="text-align: left;">1994</td>
+<td style="text-align: left;">501C3-CHARITIES</td>
+<td style="text-align: left;">PZ</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;"><a href="https://nccsdata.s3.amazonaws.com/harmonized/core/501c3-pz/CORE-1995-501C3-CHARITIES-PZ-HRMN.csv" class="button">DOWNLOAD</a></td>
+<td style="text-align: left;">58.6 mb</td>
+<td style="text-align: left;">1995</td>
+<td style="text-align: left;">501C3-CHARITIES</td>
+<td style="text-align: left;">PZ</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"><a href="https://nccsdata.s3.amazonaws.com/harmonized/core/501c3-pz/CORE-1996-501C3-CHARITIES-PZ-HRMN.csv" class="button">DOWNLOAD</a></td>
+<td style="text-align: left;">88.3 mb</td>
+<td style="text-align: left;">1996</td>
+<td style="text-align: left;">501C3-CHARITIES</td>
+<td style="text-align: left;">PZ</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;"><a href="https://nccsdata.s3.amazonaws.com/harmonized/core/501c3-pz/CORE-1997-501C3-CHARITIES-PZ-HRMN.csv" class="button">DOWNLOAD</a></td>
+<td style="text-align: left;">92.2 mb</td>
+<td style="text-align: left;">1997</td>
+<td style="text-align: left;">501C3-CHARITIES</td>
+<td style="text-align: left;">PZ</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"><a href="https://nccsdata.s3.amazonaws.com/harmonized/core/501c3-pz/CORE-1998-501C3-CHARITIES-PZ-HRMN.csv" class="button">DOWNLOAD</a></td>
+<td style="text-align: left;">97.4 mb</td>
+<td style="text-align: left;">1998</td>
+<td style="text-align: left;">501C3-CHARITIES</td>
+<td style="text-align: left;">PZ</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;"><a href="https://nccsdata.s3.amazonaws.com/harmonized/core/501c3-pz/CORE-1999-501C3-CHARITIES-PZ-HRMN.csv" class="button">DOWNLOAD</a></td>
+<td style="text-align: left;">97.8 mb</td>
+<td style="text-align: left;">1999</td>
+<td style="text-align: left;">501C3-CHARITIES</td>
+<td style="text-align: left;">PZ</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"><a href="https://nccsdata.s3.amazonaws.com/harmonized/core/501c3-pz/CORE-2000-501C3-CHARITIES-PZ-HRMN.csv" class="button">DOWNLOAD</a></td>
+<td style="text-align: left;">94.8 mb</td>
+<td style="text-align: left;">2000</td>
+<td style="text-align: left;">501C3-CHARITIES</td>
+<td style="text-align: left;">PZ</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;"><a href="https://nccsdata.s3.amazonaws.com/harmonized/core/501c3-pz/CORE-2001-501C3-CHARITIES-PZ-HRMN.csv" class="button">DOWNLOAD</a></td>
+<td style="text-align: left;">96.6 mb</td>
+<td style="text-align: left;">2001</td>
+<td style="text-align: left;">501C3-CHARITIES</td>
+<td style="text-align: left;">PZ</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"><a href="https://nccsdata.s3.amazonaws.com/harmonized/core/501c3-pz/CORE-2002-501C3-CHARITIES-PZ-HRMN.csv" class="button">DOWNLOAD</a></td>
+<td style="text-align: left;">108.1 mb</td>
+<td style="text-align: left;">2002</td>
+<td style="text-align: left;">501C3-CHARITIES</td>
+<td style="text-align: left;">PZ</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;"><a href="https://nccsdata.s3.amazonaws.com/harmonized/core/501c3-pz/CORE-2003-501C3-CHARITIES-PZ-HRMN.csv" class="button">DOWNLOAD</a></td>
+<td style="text-align: left;">114.8 mb</td>
+<td style="text-align: left;">2003</td>
+<td style="text-align: left;">501C3-CHARITIES</td>
+<td style="text-align: left;">PZ</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"><a href="https://nccsdata.s3.amazonaws.com/harmonized/core/501c3-pz/CORE-2004-501C3-CHARITIES-PZ-HRMN.csv" class="button">DOWNLOAD</a></td>
+<td style="text-align: left;">124 mb</td>
+<td style="text-align: left;">2004</td>
+<td style="text-align: left;">501C3-CHARITIES</td>
+<td style="text-align: left;">PZ</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;"><a href="https://nccsdata.s3.amazonaws.com/harmonized/core/501c3-pz/CORE-2005-501C3-CHARITIES-PZ-HRMN.csv" class="button">DOWNLOAD</a></td>
+<td style="text-align: left;">132.1 mb</td>
+<td style="text-align: left;">2005</td>
+<td style="text-align: left;">501C3-CHARITIES</td>
+<td style="text-align: left;">PZ</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"><a href="https://nccsdata.s3.amazonaws.com/harmonized/core/501c3-pz/CORE-2006-501C3-CHARITIES-PZ-HRMN.csv" class="button">DOWNLOAD</a></td>
+<td style="text-align: left;">136.4 mb</td>
+<td style="text-align: left;">2006</td>
+<td style="text-align: left;">501C3-CHARITIES</td>
+<td style="text-align: left;">PZ</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;"><a href="https://nccsdata.s3.amazonaws.com/harmonized/core/501c3-pz/CORE-2007-501C3-CHARITIES-PZ-HRMN.csv" class="button">DOWNLOAD</a></td>
+<td style="text-align: left;">153.7 mb</td>
+<td style="text-align: left;">2007</td>
+<td style="text-align: left;">501C3-CHARITIES</td>
+<td style="text-align: left;">PZ</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"><a href="https://nccsdata.s3.amazonaws.com/harmonized/core/501c3-pz/CORE-2008-501C3-CHARITIES-PZ-HRMN.csv" class="button">DOWNLOAD</a></td>
+<td style="text-align: left;">133.9 mb</td>
+<td style="text-align: left;">2008</td>
+<td style="text-align: left;">501C3-CHARITIES</td>
+<td style="text-align: left;">PZ</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;"><a href="https://nccsdata.s3.amazonaws.com/harmonized/core/501c3-pz/CORE-2009-501C3-CHARITIES-PZ-HRMN.csv" class="button">DOWNLOAD</a></td>
+<td style="text-align: left;">158.4 mb</td>
+<td style="text-align: left;">2009</td>
+<td style="text-align: left;">501C3-CHARITIES</td>
+<td style="text-align: left;">PZ</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"><a href="https://nccsdata.s3.amazonaws.com/harmonized/core/501c3-pz/CORE-2010-501C3-CHARITIES-PZ-HRMN.csv" class="button">DOWNLOAD</a></td>
+<td style="text-align: left;">143 mb</td>
+<td style="text-align: left;">2010</td>
+<td style="text-align: left;">501C3-CHARITIES</td>
+<td style="text-align: left;">PZ</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;"><a href="https://nccsdata.s3.amazonaws.com/harmonized/core/501c3-pz/CORE-2011-501C3-CHARITIES-PZ-HRMN.csv" class="button">DOWNLOAD</a></td>
+<td style="text-align: left;">147.9 mb</td>
+<td style="text-align: left;">2011</td>
+<td style="text-align: left;">501C3-CHARITIES</td>
+<td style="text-align: left;">PZ</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"><a href="https://nccsdata.s3.amazonaws.com/harmonized/core/501c3-pz/CORE-2012-501C3-CHARITIES-PZ-HRMN.csv" class="button">DOWNLOAD</a></td>
+<td style="text-align: left;">287 mb</td>
+<td style="text-align: left;">2012</td>
+<td style="text-align: left;">501C3-CHARITIES</td>
+<td style="text-align: left;">PZ</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;"><a href="https://nccsdata.s3.amazonaws.com/harmonized/core/501c3-pz/CORE-2013-501C3-CHARITIES-PZ-HRMN.csv" class="button">DOWNLOAD</a></td>
+<td style="text-align: left;">307.1 mb</td>
+<td style="text-align: left;">2013</td>
+<td style="text-align: left;">501C3-CHARITIES</td>
+<td style="text-align: left;">PZ</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"><a href="https://nccsdata.s3.amazonaws.com/harmonized/core/501c3-pz/CORE-2014-501C3-CHARITIES-PZ-HRMN.csv" class="button">DOWNLOAD</a></td>
+<td style="text-align: left;">263.3 mb</td>
+<td style="text-align: left;">2014</td>
+<td style="text-align: left;">501C3-CHARITIES</td>
+<td style="text-align: left;">PZ</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;"><a href="https://nccsdata.s3.amazonaws.com/harmonized/core/501c3-pz/CORE-2015-501C3-CHARITIES-PZ-HRMN.csv" class="button">DOWNLOAD</a></td>
+<td style="text-align: left;">270.9 mb</td>
+<td style="text-align: left;">2015</td>
+<td style="text-align: left;">501C3-CHARITIES</td>
+<td style="text-align: left;">PZ</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"><a href="https://nccsdata.s3.amazonaws.com/harmonized/core/501c3-pz/CORE-2016-501C3-CHARITIES-PZ-HRMN.csv" class="button">DOWNLOAD</a></td>
+<td style="text-align: left;">275 mb</td>
+<td style="text-align: left;">2016</td>
+<td style="text-align: left;">501C3-CHARITIES</td>
+<td style="text-align: left;">PZ</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;"><a href="https://nccsdata.s3.amazonaws.com/harmonized/core/501c3-pz/CORE-2017-501C3-CHARITIES-PZ-HRMN.csv" class="button">DOWNLOAD</a></td>
+<td style="text-align: left;">294.6 mb</td>
+<td style="text-align: left;">2017</td>
+<td style="text-align: left;">501C3-CHARITIES</td>
+<td style="text-align: left;">PZ</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"><a href="https://nccsdata.s3.amazonaws.com/harmonized/core/501c3-pz/CORE-2018-501C3-CHARITIES-PZ-HRMN.csv" class="button">DOWNLOAD</a></td>
+<td style="text-align: left;">300.3 mb</td>
+<td style="text-align: left;">2018</td>
+<td style="text-align: left;">501C3-CHARITIES</td>
+<td style="text-align: left;">PZ</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;"><a href="https://nccsdata.s3.amazonaws.com/harmonized/core/501c3-pz/CORE-2019-501C3-CHARITIES-PZ-HRMN.csv" class="button">DOWNLOAD</a></td>
+<td style="text-align: left;">287.7 mb</td>
+<td style="text-align: left;">2019</td>
+<td style="text-align: left;">501C3-CHARITIES</td>
+<td style="text-align: left;">PZ</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"><a href="https://nccsdata.s3.amazonaws.com/harmonized/core/501c3-pz/CORE-2020-501C3-CHARITIES-PZ-HRMN.csv" class="button">DOWNLOAD</a></td>
+<td style="text-align: left;">257.6 mb</td>
+<td style="text-align: left;">2020</td>
+<td style="text-align: left;">501C3-CHARITIES</td>
+<td style="text-align: left;">PZ</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;"><a href="https://nccsdata.s3.amazonaws.com/harmonized/core/501c3-pz/CORE-2021-501C3-CHARITIES-PZ-HRMN.csv" class="button">DOWNLOAD</a></td>
+<td style="text-align: left;">252 mb</td>
+<td style="text-align: left;">2021</td>
+<td style="text-align: left;">501C3-CHARITIES</td>
+<td style="text-align: left;">PZ</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"><a href="https://nccsdata.s3.amazonaws.com/harmonized/core/501c3-pz/CORE-2022-501C3-CHARITIES-PZ-HRMN.csv" class="button">DOWNLOAD</a></td>
+<td style="text-align: left;">33.2 mb</td>
+<td style="text-align: left;">2022</td>
+<td style="text-align: left;">501C3-CHARITIES</td>
+<td style="text-align: left;">PZ</td>
+</tr>
+</tbody>
+</table>
+
+
+</div>
+</div>
+<p><br></p>
+<hr>
+<p><br></p>
+<section id="c3-charities-1" class="level4">
+<h4 class="anchored" data-anchor-id="c3-charities-1">501(c)(3) Charities</h4>
+</section>
+</section>
+<section id="scope-pc" class="level3">
+<h3 class="anchored" data-anchor-id="scope-pc">Scope: PC</h3>
+<div class="cell">
+<div class="cell-output-display">
+<table class="table table-sm table-striped small" data-quarto-postprocess="true">
+<thead>
+<tr class="header">
+<th style="text-align: left;" data-quarto-table-cell-role="th">Download Link</th>
+<th style="text-align: left;" data-quarto-table-cell-role="th">Size</th>
+<th style="text-align: left;" data-quarto-table-cell-role="th">Year</th>
+<th style="text-align: left;" data-quarto-table-cell-role="th">Nonprofit Type</th>
+<th style="text-align: left;" data-quarto-table-cell-role="th">Form Scope</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;"><a href="https://nccsdata.s3.amazonaws.com/harmonized/core/501c3-pc/CORE-2012-501C3-CHARITIES-PC-HRMN.csv" class="button">DOWNLOAD</a></td>
+<td style="text-align: left;">171.8 mb</td>
+<td style="text-align: left;">2012</td>
+<td style="text-align: left;">501C3-CHARITIES</td>
+<td style="text-align: left;">PC</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"><a href="https://nccsdata.s3.amazonaws.com/harmonized/core/501c3-pc/CORE-2013-501C3-CHARITIES-PC-HRMN.csv" class="button">DOWNLOAD</a></td>
+<td style="text-align: left;">171.5 mb</td>
+<td style="text-align: left;">2013</td>
+<td style="text-align: left;">501C3-CHARITIES</td>
+<td style="text-align: left;">PC</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;"><a href="https://nccsdata.s3.amazonaws.com/harmonized/core/501c3-pc/CORE-2014-501C3-CHARITIES-PC-HRMN.csv" class="button">DOWNLOAD</a></td>
+<td style="text-align: left;">155.7 mb</td>
+<td style="text-align: left;">2014</td>
+<td style="text-align: left;">501C3-CHARITIES</td>
+<td style="text-align: left;">PC</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"><a href="https://nccsdata.s3.amazonaws.com/harmonized/core/501c3-pc/CORE-2015-501C3-CHARITIES-PC-HRMN.csv" class="button">DOWNLOAD</a></td>
+<td style="text-align: left;">157.5 mb</td>
+<td style="text-align: left;">2015</td>
+<td style="text-align: left;">501C3-CHARITIES</td>
+<td style="text-align: left;">PC</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;"><a href="https://nccsdata.s3.amazonaws.com/harmonized/core/501c3-pc/CORE-2016-501C3-CHARITIES-PC-HRMN.csv" class="button">DOWNLOAD</a></td>
+<td style="text-align: left;">159.2 mb</td>
+<td style="text-align: left;">2016</td>
+<td style="text-align: left;">501C3-CHARITIES</td>
+<td style="text-align: left;">PC</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"><a href="https://nccsdata.s3.amazonaws.com/harmonized/core/501c3-pc/CORE-2017-501C3-CHARITIES-PC-HRMN.csv" class="button">DOWNLOAD</a></td>
+<td style="text-align: left;">167.5 mb</td>
+<td style="text-align: left;">2017</td>
+<td style="text-align: left;">501C3-CHARITIES</td>
+<td style="text-align: left;">PC</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;"><a href="https://nccsdata.s3.amazonaws.com/harmonized/core/501c3-pc/CORE-2018-501C3-CHARITIES-PC-HRMN.csv" class="button">DOWNLOAD</a></td>
+<td style="text-align: left;">176.2 mb</td>
+<td style="text-align: left;">2018</td>
+<td style="text-align: left;">501C3-CHARITIES</td>
+<td style="text-align: left;">PC</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"><a href="https://nccsdata.s3.amazonaws.com/harmonized/core/501c3-pc/CORE-2019-501C3-CHARITIES-PC-HRMN.csv" class="button">DOWNLOAD</a></td>
+<td style="text-align: left;">178.1 mb</td>
+<td style="text-align: left;">2019</td>
+<td style="text-align: left;">501C3-CHARITIES</td>
+<td style="text-align: left;">PC</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;"><a href="https://nccsdata.s3.amazonaws.com/harmonized/core/501c3-pc/CORE-2020-501C3-CHARITIES-PC-HRMN.csv" class="button">DOWNLOAD</a></td>
+<td style="text-align: left;">163.5 mb</td>
+<td style="text-align: left;">2020</td>
+<td style="text-align: left;">501C3-CHARITIES</td>
+<td style="text-align: left;">PC</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"><a href="https://nccsdata.s3.amazonaws.com/harmonized/core/501c3-pc/CORE-2021-501C3-CHARITIES-PC-HRMN.csv" class="button">DOWNLOAD</a></td>
+<td style="text-align: left;">167.8 mb</td>
+<td style="text-align: left;">2021</td>
+<td style="text-align: left;">501C3-CHARITIES</td>
+<td style="text-align: left;">PC</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;"><a href="https://nccsdata.s3.amazonaws.com/harmonized/core/501c3-pc/CORE-2022-501C3-CHARITIES-PC-HRMN.csv" class="button">DOWNLOAD</a></td>
+<td style="text-align: left;">19.2 mb</td>
+<td style="text-align: left;">2022</td>
+<td style="text-align: left;">501C3-CHARITIES</td>
+<td style="text-align: left;">PC</td>
+</tr>
+</tbody>
+</table>
+
+
+</div>
+</div>
+<p><br></p>
+<hr>
+<p><br></p>
+<section id="all-other-501c-nonprofits" class="level4">
+<h4 class="anchored" data-anchor-id="all-other-501c-nonprofits">All Other 501(c) Nonprofits</h4>
+</section>
+</section>
+<section id="scope-pz-1" class="level3">
+<h3 class="anchored" data-anchor-id="scope-pz-1">Scope: PZ</h3>
+<div class="cell">
+<div class="cell-output-display">
+<table class="table table-sm table-striped small" data-quarto-postprocess="true">
+<thead>
+<tr class="header">
+<th style="text-align: left;" data-quarto-table-cell-role="th">Download Link</th>
+<th style="text-align: left;" data-quarto-table-cell-role="th">Size</th>
+<th style="text-align: left;" data-quarto-table-cell-role="th">Year</th>
+<th style="text-align: left;" data-quarto-table-cell-role="th">Nonprofit Type</th>
+<th style="text-align: left;" data-quarto-table-cell-role="th">Form Scope</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;"><a href="https://nccsdata.s3.amazonaws.com/harmonized/core/501ce-pz/CORE-1989-501CE-NONPROFIT-PZ-HRMN.csv" class="button">DOWNLOAD</a></td>
+<td style="text-align: left;">48.4 mb</td>
+<td style="text-align: left;">1989</td>
+<td style="text-align: left;">501CE-NONPROFIT</td>
+<td style="text-align: left;">PZ</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"><a href="https://nccsdata.s3.amazonaws.com/harmonized/core/501ce-pz/CORE-1990-501CE-NONPROFIT-PZ-HRMN.csv" class="button">DOWNLOAD</a></td>
+<td style="text-align: left;">47.4 mb</td>
+<td style="text-align: left;">1990</td>
+<td style="text-align: left;">501CE-NONPROFIT</td>
+<td style="text-align: left;">PZ</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;"><a href="https://nccsdata.s3.amazonaws.com/harmonized/core/501ce-pz/CORE-1991-501CE-NONPROFIT-PZ-HRMN.csv" class="button">DOWNLOAD</a></td>
+<td style="text-align: left;">49.4 mb</td>
+<td style="text-align: left;">1991</td>
+<td style="text-align: left;">501CE-NONPROFIT</td>
+<td style="text-align: left;">PZ</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"><a href="https://nccsdata.s3.amazonaws.com/harmonized/core/501ce-pz/CORE-1992-501CE-NONPROFIT-PZ-HRMN.csv" class="button">DOWNLOAD</a></td>
+<td style="text-align: left;">51.6 mb</td>
+<td style="text-align: left;">1992</td>
+<td style="text-align: left;">501CE-NONPROFIT</td>
+<td style="text-align: left;">PZ</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;"><a href="https://nccsdata.s3.amazonaws.com/harmonized/core/501ce-pz/CORE-1993-501CE-NONPROFIT-PZ-HRMN.csv" class="button">DOWNLOAD</a></td>
+<td style="text-align: left;">47.2 mb</td>
+<td style="text-align: left;">1993</td>
+<td style="text-align: left;">501CE-NONPROFIT</td>
+<td style="text-align: left;">PZ</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"><a href="https://nccsdata.s3.amazonaws.com/harmonized/core/501ce-pz/CORE-1994-501CE-NONPROFIT-PZ-HRMN.csv" class="button">DOWNLOAD</a></td>
+<td style="text-align: left;">46.5 mb</td>
+<td style="text-align: left;">1994</td>
+<td style="text-align: left;">501CE-NONPROFIT</td>
+<td style="text-align: left;">PZ</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;"><a href="https://nccsdata.s3.amazonaws.com/harmonized/core/501ce-pz/CORE-1995-501CE-NONPROFIT-PZ-HRMN.csv" class="button">DOWNLOAD</a></td>
+<td style="text-align: left;">47 mb</td>
+<td style="text-align: left;">1995</td>
+<td style="text-align: left;">501CE-NONPROFIT</td>
+<td style="text-align: left;">PZ</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"><a href="https://nccsdata.s3.amazonaws.com/harmonized/core/501ce-pz/CORE-1996-501CE-NONPROFIT-PZ-HRMN.csv" class="button">DOWNLOAD</a></td>
+<td style="text-align: left;">43.8 mb</td>
+<td style="text-align: left;">1996</td>
+<td style="text-align: left;">501CE-NONPROFIT</td>
+<td style="text-align: left;">PZ</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;"><a href="https://nccsdata.s3.amazonaws.com/harmonized/core/501ce-pz/CORE-1997-501CE-NONPROFIT-PZ-HRMN.csv" class="button">DOWNLOAD</a></td>
+<td style="text-align: left;">32.5 mb</td>
+<td style="text-align: left;">1997</td>
+<td style="text-align: left;">501CE-NONPROFIT</td>
+<td style="text-align: left;">PZ</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"><a href="https://nccsdata.s3.amazonaws.com/harmonized/core/501ce-pz/CORE-1998-501CE-NONPROFIT-PZ-HRMN.csv" class="button">DOWNLOAD</a></td>
+<td style="text-align: left;">49.3 mb</td>
+<td style="text-align: left;">1998</td>
+<td style="text-align: left;">501CE-NONPROFIT</td>
+<td style="text-align: left;">PZ</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;"><a href="https://nccsdata.s3.amazonaws.com/harmonized/core/501ce-pz/CORE-1999-501CE-NONPROFIT-PZ-HRMN.csv" class="button">DOWNLOAD</a></td>
+<td style="text-align: left;">43.6 mb</td>
+<td style="text-align: left;">1999</td>
+<td style="text-align: left;">501CE-NONPROFIT</td>
+<td style="text-align: left;">PZ</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"><a href="https://nccsdata.s3.amazonaws.com/harmonized/core/501ce-pz/CORE-2000-501CE-NONPROFIT-PZ-HRMN.csv" class="button">DOWNLOAD</a></td>
+<td style="text-align: left;">47.4 mb</td>
+<td style="text-align: left;">2000</td>
+<td style="text-align: left;">501CE-NONPROFIT</td>
+<td style="text-align: left;">PZ</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;"><a href="https://nccsdata.s3.amazonaws.com/harmonized/core/501ce-pz/CORE-2001-501CE-NONPROFIT-PZ-HRMN.csv" class="button">DOWNLOAD</a></td>
+<td style="text-align: left;">54.3 mb</td>
+<td style="text-align: left;">2001</td>
+<td style="text-align: left;">501CE-NONPROFIT</td>
+<td style="text-align: left;">PZ</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"><a href="https://nccsdata.s3.amazonaws.com/harmonized/core/501ce-pz/CORE-2002-501CE-NONPROFIT-PZ-HRMN.csv" class="button">DOWNLOAD</a></td>
+<td style="text-align: left;">46.7 mb</td>
+<td style="text-align: left;">2002</td>
+<td style="text-align: left;">501CE-NONPROFIT</td>
+<td style="text-align: left;">PZ</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;"><a href="https://nccsdata.s3.amazonaws.com/harmonized/core/501ce-pz/CORE-2003-501CE-NONPROFIT-PZ-HRMN.csv" class="button">DOWNLOAD</a></td>
+<td style="text-align: left;">48.8 mb</td>
+<td style="text-align: left;">2003</td>
+<td style="text-align: left;">501CE-NONPROFIT</td>
+<td style="text-align: left;">PZ</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"><a href="https://nccsdata.s3.amazonaws.com/harmonized/core/501ce-pz/CORE-2004-501CE-NONPROFIT-PZ-HRMN.csv" class="button">DOWNLOAD</a></td>
+<td style="text-align: left;">57 mb</td>
+<td style="text-align: left;">2004</td>
+<td style="text-align: left;">501CE-NONPROFIT</td>
+<td style="text-align: left;">PZ</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;"><a href="https://nccsdata.s3.amazonaws.com/harmonized/core/501ce-pz/CORE-2005-501CE-NONPROFIT-PZ-HRMN.csv" class="button">DOWNLOAD</a></td>
+<td style="text-align: left;">55.7 mb</td>
+<td style="text-align: left;">2005</td>
+<td style="text-align: left;">501CE-NONPROFIT</td>
+<td style="text-align: left;">PZ</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"><a href="https://nccsdata.s3.amazonaws.com/harmonized/core/501ce-pz/CORE-2006-501CE-NONPROFIT-PZ-HRMN.csv" class="button">DOWNLOAD</a></td>
+<td style="text-align: left;">49.3 mb</td>
+<td style="text-align: left;">2006</td>
+<td style="text-align: left;">501CE-NONPROFIT</td>
+<td style="text-align: left;">PZ</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;"><a href="https://nccsdata.s3.amazonaws.com/harmonized/core/501ce-pz/CORE-2007-501CE-NONPROFIT-PZ-HRMN.csv" class="button">DOWNLOAD</a></td>
+<td style="text-align: left;">56.2 mb</td>
+<td style="text-align: left;">2007</td>
+<td style="text-align: left;">501CE-NONPROFIT</td>
+<td style="text-align: left;">PZ</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"><a href="https://nccsdata.s3.amazonaws.com/harmonized/core/501ce-pz/CORE-2008-501CE-NONPROFIT-PZ-HRMN.csv" class="button">DOWNLOAD</a></td>
+<td style="text-align: left;">56.1 mb</td>
+<td style="text-align: left;">2008</td>
+<td style="text-align: left;">501CE-NONPROFIT</td>
+<td style="text-align: left;">PZ</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;"><a href="https://nccsdata.s3.amazonaws.com/harmonized/core/501ce-pz/CORE-2009-501CE-NONPROFIT-PZ-HRMN.csv" class="button">DOWNLOAD</a></td>
+<td style="text-align: left;">65.8 mb</td>
+<td style="text-align: left;">2009</td>
+<td style="text-align: left;">501CE-NONPROFIT</td>
+<td style="text-align: left;">PZ</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"><a href="https://nccsdata.s3.amazonaws.com/harmonized/core/501ce-pz/CORE-2010-501CE-NONPROFIT-PZ-HRMN.csv" class="button">DOWNLOAD</a></td>
+<td style="text-align: left;">57.1 mb</td>
+<td style="text-align: left;">2010</td>
+<td style="text-align: left;">501CE-NONPROFIT</td>
+<td style="text-align: left;">PZ</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;"><a href="https://nccsdata.s3.amazonaws.com/harmonized/core/501ce-pz/CORE-2011-501CE-NONPROFIT-PZ-HRMN.csv" class="button">DOWNLOAD</a></td>
+<td style="text-align: left;">52.3 mb</td>
+<td style="text-align: left;">2011</td>
+<td style="text-align: left;">501CE-NONPROFIT</td>
+<td style="text-align: left;">PZ</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"><a href="https://nccsdata.s3.amazonaws.com/harmonized/core/501ce-pz/CORE-2012-501CE-NONPROFIT-PZ-HRMN.csv" class="button">DOWNLOAD</a></td>
+<td style="text-align: left;">97.5 mb</td>
+<td style="text-align: left;">2012</td>
+<td style="text-align: left;">501CE-NONPROFIT</td>
+<td style="text-align: left;">PZ</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;"><a href="https://nccsdata.s3.amazonaws.com/harmonized/core/501ce-pz/CORE-2013-501CE-NONPROFIT-PZ-HRMN.csv" class="button">DOWNLOAD</a></td>
+<td style="text-align: left;">104.8 mb</td>
+<td style="text-align: left;">2013</td>
+<td style="text-align: left;">501CE-NONPROFIT</td>
+<td style="text-align: left;">PZ</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"><a href="https://nccsdata.s3.amazonaws.com/harmonized/core/501ce-pz/CORE-2014-501CE-NONPROFIT-PZ-HRMN.csv" class="button">DOWNLOAD</a></td>
+<td style="text-align: left;">92 mb</td>
+<td style="text-align: left;">2014</td>
+<td style="text-align: left;">501CE-NONPROFIT</td>
+<td style="text-align: left;">PZ</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;"><a href="https://nccsdata.s3.amazonaws.com/harmonized/core/501ce-pz/CORE-2015-501CE-NONPROFIT-PZ-HRMN.csv" class="button">DOWNLOAD</a></td>
+<td style="text-align: left;">92.2 mb</td>
+<td style="text-align: left;">2015</td>
+<td style="text-align: left;">501CE-NONPROFIT</td>
+<td style="text-align: left;">PZ</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"><a href="https://nccsdata.s3.amazonaws.com/harmonized/core/501ce-pz/CORE-2016-501CE-NONPROFIT-PZ-HRMN.csv" class="button">DOWNLOAD</a></td>
+<td style="text-align: left;">90.8 mb</td>
+<td style="text-align: left;">2016</td>
+<td style="text-align: left;">501CE-NONPROFIT</td>
+<td style="text-align: left;">PZ</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;"><a href="https://nccsdata.s3.amazonaws.com/harmonized/core/501ce-pz/CORE-2017-501CE-NONPROFIT-PZ-HRMN.csv" class="button">DOWNLOAD</a></td>
+<td style="text-align: left;">97.3 mb</td>
+<td style="text-align: left;">2017</td>
+<td style="text-align: left;">501CE-NONPROFIT</td>
+<td style="text-align: left;">PZ</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"><a href="https://nccsdata.s3.amazonaws.com/harmonized/core/501ce-pz/CORE-2018-501CE-NONPROFIT-PZ-HRMN.csv" class="button">DOWNLOAD</a></td>
+<td style="text-align: left;">94.1 mb</td>
+<td style="text-align: left;">2018</td>
+<td style="text-align: left;">501CE-NONPROFIT</td>
+<td style="text-align: left;">PZ</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;"><a href="https://nccsdata.s3.amazonaws.com/harmonized/core/501ce-pz/CORE-2019-501CE-NONPROFIT-PZ-HRMN.csv" class="button">DOWNLOAD</a></td>
+<td style="text-align: left;">87.9 mb</td>
+<td style="text-align: left;">2019</td>
+<td style="text-align: left;">501CE-NONPROFIT</td>
+<td style="text-align: left;">PZ</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"><a href="https://nccsdata.s3.amazonaws.com/harmonized/core/501ce-pz/CORE-2020-501CE-NONPROFIT-PZ-HRMN.csv" class="button">DOWNLOAD</a></td>
+<td style="text-align: left;">75.6 mb</td>
+<td style="text-align: left;">2020</td>
+<td style="text-align: left;">501CE-NONPROFIT</td>
+<td style="text-align: left;">PZ</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;"><a href="https://nccsdata.s3.amazonaws.com/harmonized/core/501ce-pz/CORE-2021-501CE-NONPROFIT-PZ-HRMN.csv" class="button">DOWNLOAD</a></td>
+<td style="text-align: left;">72 mb</td>
+<td style="text-align: left;">2021</td>
+<td style="text-align: left;">501CE-NONPROFIT</td>
+<td style="text-align: left;">PZ</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"><a href="https://nccsdata.s3.amazonaws.com/harmonized/core/501ce-pz/CORE-2022-501CE-NONPROFIT-PZ-HRMN.csv" class="button">DOWNLOAD</a></td>
+<td style="text-align: left;">12.5 mb</td>
+<td style="text-align: left;">2022</td>
+<td style="text-align: left;">501CE-NONPROFIT</td>
+<td style="text-align: left;">PZ</td>
+</tr>
+</tbody>
+</table>
+
+
+</div>
+</div>
+<p><br></p>
+<hr>
+<p><br></p>
+<section id="all-other-501c-nonprofits-1" class="level4">
+<h4 class="anchored" data-anchor-id="all-other-501c-nonprofits-1">All Other 501(c) Nonprofits</h4>
+</section>
+</section>
+<section id="scope-pc-1" class="level3">
+<h3 class="anchored" data-anchor-id="scope-pc-1">Scope: PC</h3>
+<div class="cell">
+<div class="cell-output-display">
+<table class="table table-sm table-striped small" data-quarto-postprocess="true">
+<thead>
+<tr class="header">
+<th style="text-align: left;" data-quarto-table-cell-role="th">Download Link</th>
+<th style="text-align: left;" data-quarto-table-cell-role="th">Size</th>
+<th style="text-align: left;" data-quarto-table-cell-role="th">Year</th>
+<th style="text-align: left;" data-quarto-table-cell-role="th">Nonprofit Type</th>
+<th style="text-align: left;" data-quarto-table-cell-role="th">Form Scope</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;"><a href="https://nccsdata.s3.amazonaws.com/harmonized/core/501ce-pc/CORE-2012-501CE-NONPROFIT-PC-HRMN.csv" class="button">DOWNLOAD</a></td>
+<td style="text-align: left;">58.7 mb</td>
+<td style="text-align: left;">2012</td>
+<td style="text-align: left;">501CE-NONPROFIT</td>
+<td style="text-align: left;">PC</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"><a href="https://nccsdata.s3.amazonaws.com/harmonized/core/501ce-pc/CORE-2013-501CE-NONPROFIT-PC-HRMN.csv" class="button">DOWNLOAD</a></td>
+<td style="text-align: left;">58.2 mb</td>
+<td style="text-align: left;">2013</td>
+<td style="text-align: left;">501CE-NONPROFIT</td>
+<td style="text-align: left;">PC</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;"><a href="https://nccsdata.s3.amazonaws.com/harmonized/core/501ce-pc/CORE-2014-501CE-NONPROFIT-PC-HRMN.csv" class="button">DOWNLOAD</a></td>
+<td style="text-align: left;">52 mb</td>
+<td style="text-align: left;">2014</td>
+<td style="text-align: left;">501CE-NONPROFIT</td>
+<td style="text-align: left;">PC</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"><a href="https://nccsdata.s3.amazonaws.com/harmonized/core/501ce-pc/CORE-2015-501CE-NONPROFIT-PC-HRMN.csv" class="button">DOWNLOAD</a></td>
+<td style="text-align: left;">51.7 mb</td>
+<td style="text-align: left;">2015</td>
+<td style="text-align: left;">501CE-NONPROFIT</td>
+<td style="text-align: left;">PC</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;"><a href="https://nccsdata.s3.amazonaws.com/harmonized/core/501ce-pc/CORE-2016-501CE-NONPROFIT-PC-HRMN.csv" class="button">DOWNLOAD</a></td>
+<td style="text-align: left;">51.2 mb</td>
+<td style="text-align: left;">2016</td>
+<td style="text-align: left;">501CE-NONPROFIT</td>
+<td style="text-align: left;">PC</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"><a href="https://nccsdata.s3.amazonaws.com/harmonized/core/501ce-pc/CORE-2017-501CE-NONPROFIT-PC-HRMN.csv" class="button">DOWNLOAD</a></td>
+<td style="text-align: left;">52.8 mb</td>
+<td style="text-align: left;">2017</td>
+<td style="text-align: left;">501CE-NONPROFIT</td>
+<td style="text-align: left;">PC</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;"><a href="https://nccsdata.s3.amazonaws.com/harmonized/core/501ce-pc/CORE-2018-501CE-NONPROFIT-PC-HRMN.csv" class="button">DOWNLOAD</a></td>
+<td style="text-align: left;">54.1 mb</td>
+<td style="text-align: left;">2018</td>
+<td style="text-align: left;">501CE-NONPROFIT</td>
+<td style="text-align: left;">PC</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"><a href="https://nccsdata.s3.amazonaws.com/harmonized/core/501ce-pc/CORE-2019-501CE-NONPROFIT-PC-HRMN.csv" class="button">DOWNLOAD</a></td>
+<td style="text-align: left;">54 mb</td>
+<td style="text-align: left;">2019</td>
+<td style="text-align: left;">501CE-NONPROFIT</td>
+<td style="text-align: left;">PC</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;"><a href="https://nccsdata.s3.amazonaws.com/harmonized/core/501ce-pc/CORE-2020-501CE-NONPROFIT-PC-HRMN.csv" class="button">DOWNLOAD</a></td>
+<td style="text-align: left;">47.8 mb</td>
+<td style="text-align: left;">2020</td>
+<td style="text-align: left;">501CE-NONPROFIT</td>
+<td style="text-align: left;">PC</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"><a href="https://nccsdata.s3.amazonaws.com/harmonized/core/501ce-pc/CORE-2021-501CE-NONPROFIT-PC-HRMN.csv" class="button">DOWNLOAD</a></td>
+<td style="text-align: left;">48 mb</td>
+<td style="text-align: left;">2021</td>
+<td style="text-align: left;">501CE-NONPROFIT</td>
+<td style="text-align: left;">PC</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;"><a href="https://nccsdata.s3.amazonaws.com/harmonized/core/501ce-pc/CORE-2022-501CE-NONPROFIT-PC-HRMN.csv" class="button">DOWNLOAD</a></td>
+<td style="text-align: left;">7.6 mb</td>
+<td style="text-align: left;">2022</td>
+<td style="text-align: left;">501CE-NONPROFIT</td>
+<td style="text-align: left;">PC</td>
+</tr>
+</tbody>
+</table>
+
+
+</div>
+</div>
+<p><br></p>
+<hr>
+<p><br></p>
+<section id="private-foundations" class="level4">
+<h4 class="anchored" data-anchor-id="private-foundations">Private Foundations</h4>
+</section>
+</section>
+<section id="scope-pf" class="level3">
+<h3 class="anchored" data-anchor-id="scope-pf">Scope: PF</h3>
+<div class="cell">
+<div class="cell-output-display">
+<table class="table table-sm table-striped small" data-quarto-postprocess="true">
+<thead>
+<tr class="header">
+<th style="text-align: left;" data-quarto-table-cell-role="th">Download Link</th>
+<th style="text-align: left;" data-quarto-table-cell-role="th">Size</th>
+<th style="text-align: left;" data-quarto-table-cell-role="th">Year</th>
+<th style="text-align: left;" data-quarto-table-cell-role="th">Nonprofit Type</th>
+<th style="text-align: left;" data-quarto-table-cell-role="th">Form Scope</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;"><a href="https://nccsdata.s3.amazonaws.com/harmonized/core/501c3-pf/marts/CORE-1987-501C3-PRIVFOUND-PF-HRMN-V0.csv" class="button">DOWNLOAD</a></td>
+<td style="text-align: left;">0.7 mb</td>
+<td style="text-align: left;">1987</td>
+<td style="text-align: left;">501C3-PRIVFOUND</td>
+<td style="text-align: left;">PF</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"><a href="https://nccsdata.s3.amazonaws.com/harmonized/core/501c3-pf/marts/CORE-1988-501C3-PRIVFOUND-PF-HRMN-V0.csv" class="button">DOWNLOAD</a></td>
+<td style="text-align: left;">3 mb</td>
+<td style="text-align: left;">1988</td>
+<td style="text-align: left;">501C3-PRIVFOUND</td>
+<td style="text-align: left;">PF</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;"><a href="https://nccsdata.s3.amazonaws.com/harmonized/core/501c3-pf/marts/CORE-1989-501C3-PRIVFOUND-PF-HRMN-V0.csv" class="button">DOWNLOAD</a></td>
+<td style="text-align: left;">20.8 mb</td>
+<td style="text-align: left;">1989</td>
+<td style="text-align: left;">501C3-PRIVFOUND</td>
+<td style="text-align: left;">PF</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"><a href="https://nccsdata.s3.amazonaws.com/harmonized/core/501c3-pf/marts/CORE-1990-501C3-PRIVFOUND-PF-HRMN-V0.csv" class="button">DOWNLOAD</a></td>
+<td style="text-align: left;">24.5 mb</td>
+<td style="text-align: left;">1990</td>
+<td style="text-align: left;">501C3-PRIVFOUND</td>
+<td style="text-align: left;">PF</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;"><a href="https://nccsdata.s3.amazonaws.com/harmonized/core/501c3-pf/marts/CORE-1991-501C3-PRIVFOUND-PF-HRMN-V0.csv" class="button">DOWNLOAD</a></td>
+<td style="text-align: left;">24.5 mb</td>
+<td style="text-align: left;">1991</td>
+<td style="text-align: left;">501C3-PRIVFOUND</td>
+<td style="text-align: left;">PF</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"><a href="https://nccsdata.s3.amazonaws.com/harmonized/core/501c3-pf/marts/CORE-1992-501C3-PRIVFOUND-PF-HRMN-V0.csv" class="button">DOWNLOAD</a></td>
+<td style="text-align: left;">25.1 mb</td>
+<td style="text-align: left;">1992</td>
+<td style="text-align: left;">501C3-PRIVFOUND</td>
+<td style="text-align: left;">PF</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;"><a href="https://nccsdata.s3.amazonaws.com/harmonized/core/501c3-pf/marts/CORE-1993-501C3-PRIVFOUND-PF-HRMN-V0.csv" class="button">DOWNLOAD</a></td>
+<td style="text-align: left;">6.5 mb</td>
+<td style="text-align: left;">1993</td>
+<td style="text-align: left;">501C3-PRIVFOUND</td>
+<td style="text-align: left;">PF</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"><a href="https://nccsdata.s3.amazonaws.com/harmonized/core/501c3-pf/marts/CORE-1994-501C3-PRIVFOUND-PF-HRMN-V0.csv" class="button">DOWNLOAD</a></td>
+<td style="text-align: left;">23.5 mb</td>
+<td style="text-align: left;">1994</td>
+<td style="text-align: left;">501C3-PRIVFOUND</td>
+<td style="text-align: left;">PF</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;"><a href="https://nccsdata.s3.amazonaws.com/harmonized/core/501c3-pf/marts/CORE-1995-501C3-PRIVFOUND-PF-HRMN-V0.csv" class="button">DOWNLOAD</a></td>
+<td style="text-align: left;">28.9 mb</td>
+<td style="text-align: left;">1995</td>
+<td style="text-align: left;">501C3-PRIVFOUND</td>
+<td style="text-align: left;">PF</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"><a href="https://nccsdata.s3.amazonaws.com/harmonized/core/501c3-pf/marts/CORE-1996-501C3-PRIVFOUND-PF-HRMN-V0.csv" class="button">DOWNLOAD</a></td>
+<td style="text-align: left;">32.5 mb</td>
+<td style="text-align: left;">1996</td>
+<td style="text-align: left;">501C3-PRIVFOUND</td>
+<td style="text-align: left;">PF</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;"><a href="https://nccsdata.s3.amazonaws.com/harmonized/core/501c3-pf/marts/CORE-1997-501C3-PRIVFOUND-PF-HRMN-V0.csv" class="button">DOWNLOAD</a></td>
+<td style="text-align: left;">41.3 mb</td>
+<td style="text-align: left;">1997</td>
+<td style="text-align: left;">501C3-PRIVFOUND</td>
+<td style="text-align: left;">PF</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"><a href="https://nccsdata.s3.amazonaws.com/harmonized/core/501c3-pf/marts/CORE-1998-501C3-PRIVFOUND-PF-HRMN-V0.csv" class="button">DOWNLOAD</a></td>
+<td style="text-align: left;">48.5 mb</td>
+<td style="text-align: left;">1998</td>
+<td style="text-align: left;">501C3-PRIVFOUND</td>
+<td style="text-align: left;">PF</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;"><a href="https://nccsdata.s3.amazonaws.com/harmonized/core/501c3-pf/marts/CORE-1999-501C3-PRIVFOUND-PF-HRMN-V0.csv" class="button">DOWNLOAD</a></td>
+<td style="text-align: left;">48.1 mb</td>
+<td style="text-align: left;">1999</td>
+<td style="text-align: left;">501C3-PRIVFOUND</td>
+<td style="text-align: left;">PF</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"><a href="https://nccsdata.s3.amazonaws.com/harmonized/core/501c3-pf/marts/CORE-2000-501C3-PRIVFOUND-PF-HRMN-V0.csv" class="button">DOWNLOAD</a></td>
+<td style="text-align: left;">52.5 mb</td>
+<td style="text-align: left;">2000</td>
+<td style="text-align: left;">501C3-PRIVFOUND</td>
+<td style="text-align: left;">PF</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;"><a href="https://nccsdata.s3.amazonaws.com/harmonized/core/501c3-pf/marts/CORE-2001-501C3-PRIVFOUND-PF-HRMN-V0.csv" class="button">DOWNLOAD</a></td>
+<td style="text-align: left;">54.3 mb</td>
+<td style="text-align: left;">2001</td>
+<td style="text-align: left;">501C3-PRIVFOUND</td>
+<td style="text-align: left;">PF</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"><a href="https://nccsdata.s3.amazonaws.com/harmonized/core/501c3-pf/marts/CORE-2002-501C3-PRIVFOUND-PF-HRMN-V0.csv" class="button">DOWNLOAD</a></td>
+<td style="text-align: left;">56.3 mb</td>
+<td style="text-align: left;">2002</td>
+<td style="text-align: left;">501C3-PRIVFOUND</td>
+<td style="text-align: left;">PF</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;"><a href="https://nccsdata.s3.amazonaws.com/harmonized/core/501c3-pf/marts/CORE-2003-501C3-PRIVFOUND-PF-HRMN-V0.csv" class="button">DOWNLOAD</a></td>
+<td style="text-align: left;">58.6 mb</td>
+<td style="text-align: left;">2003</td>
+<td style="text-align: left;">501C3-PRIVFOUND</td>
+<td style="text-align: left;">PF</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"><a href="https://nccsdata.s3.amazonaws.com/harmonized/core/501c3-pf/marts/CORE-2004-501C3-PRIVFOUND-PF-HRMN-V0.csv" class="button">DOWNLOAD</a></td>
+<td style="text-align: left;">61.1 mb</td>
+<td style="text-align: left;">2004</td>
+<td style="text-align: left;">501C3-PRIVFOUND</td>
+<td style="text-align: left;">PF</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;"><a href="https://nccsdata.s3.amazonaws.com/harmonized/core/501c3-pf/marts/CORE-2005-501C3-PRIVFOUND-PF-HRMN-V0.csv" class="button">DOWNLOAD</a></td>
+<td style="text-align: left;">70 mb</td>
+<td style="text-align: left;">2005</td>
+<td style="text-align: left;">501C3-PRIVFOUND</td>
+<td style="text-align: left;">PF</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"><a href="https://nccsdata.s3.amazonaws.com/harmonized/core/501c3-pf/marts/CORE-2006-501C3-PRIVFOUND-PF-HRMN-V0.csv" class="button">DOWNLOAD</a></td>
+<td style="text-align: left;">69 mb</td>
+<td style="text-align: left;">2006</td>
+<td style="text-align: left;">501C3-PRIVFOUND</td>
+<td style="text-align: left;">PF</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;"><a href="https://nccsdata.s3.amazonaws.com/harmonized/core/501c3-pf/marts/CORE-2007-501C3-PRIVFOUND-PF-HRMN-V0.csv" class="button">DOWNLOAD</a></td>
+<td style="text-align: left;">67.4 mb</td>
+<td style="text-align: left;">2007</td>
+<td style="text-align: left;">501C3-PRIVFOUND</td>
+<td style="text-align: left;">PF</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"><a href="https://nccsdata.s3.amazonaws.com/harmonized/core/501c3-pf/marts/CORE-2008-501C3-PRIVFOUND-PF-HRMN-V0.csv" class="button">DOWNLOAD</a></td>
+<td style="text-align: left;">70.9 mb</td>
+<td style="text-align: left;">2008</td>
+<td style="text-align: left;">501C3-PRIVFOUND</td>
+<td style="text-align: left;">PF</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;"><a href="https://nccsdata.s3.amazonaws.com/harmonized/core/501c3-pf/marts/CORE-2009-501C3-PRIVFOUND-PF-HRMN-V0.csv" class="button">DOWNLOAD</a></td>
+<td style="text-align: left;">76.7 mb</td>
+<td style="text-align: left;">2009</td>
+<td style="text-align: left;">501C3-PRIVFOUND</td>
+<td style="text-align: left;">PF</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"><a href="https://nccsdata.s3.amazonaws.com/harmonized/core/501c3-pf/marts/CORE-2010-501C3-PRIVFOUND-PF-HRMN-V0.csv" class="button">DOWNLOAD</a></td>
+<td style="text-align: left;">81.8 mb</td>
+<td style="text-align: left;">2010</td>
+<td style="text-align: left;">501C3-PRIVFOUND</td>
+<td style="text-align: left;">PF</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;"><a href="https://nccsdata.s3.amazonaws.com/harmonized/core/501c3-pf/marts/CORE-2011-501C3-PRIVFOUND-PF-HRMN-V0.csv" class="button">DOWNLOAD</a></td>
+<td style="text-align: left;">131.2 mb</td>
+<td style="text-align: left;">2011</td>
+<td style="text-align: left;">501C3-PRIVFOUND</td>
+<td style="text-align: left;">PF</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"><a href="https://nccsdata.s3.amazonaws.com/harmonized/core/501c3-pf/marts/CORE-2012-501C3-PRIVFOUND-PF-HRMN-V0.csv" class="button">DOWNLOAD</a></td>
+<td style="text-align: left;">147.7 mb</td>
+<td style="text-align: left;">2012</td>
+<td style="text-align: left;">501C3-PRIVFOUND</td>
+<td style="text-align: left;">PF</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;"><a href="https://nccsdata.s3.amazonaws.com/harmonized/core/501c3-pf/marts/CORE-2013-501C3-PRIVFOUND-PF-HRMN-V0.csv" class="button">DOWNLOAD</a></td>
+<td style="text-align: left;">154.9 mb</td>
+<td style="text-align: left;">2013</td>
+<td style="text-align: left;">501C3-PRIVFOUND</td>
+<td style="text-align: left;">PF</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"><a href="https://nccsdata.s3.amazonaws.com/harmonized/core/501c3-pf/marts/CORE-2014-501C3-PRIVFOUND-PF-HRMN-V0.csv" class="button">DOWNLOAD</a></td>
+<td style="text-align: left;">153 mb</td>
+<td style="text-align: left;">2014</td>
+<td style="text-align: left;">501C3-PRIVFOUND</td>
+<td style="text-align: left;">PF</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;"><a href="https://nccsdata.s3.amazonaws.com/harmonized/core/501c3-pf/marts/CORE-2015-501C3-PRIVFOUND-PF-HRMN-V0.csv" class="button">DOWNLOAD</a></td>
+<td style="text-align: left;">150.5 mb</td>
+<td style="text-align: left;">2015</td>
+<td style="text-align: left;">501C3-PRIVFOUND</td>
+<td style="text-align: left;">PF</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"><a href="https://nccsdata.s3.amazonaws.com/harmonized/core/501c3-pf/marts/CORE-2016-501C3-PRIVFOUND-PF-HRMN-V0.csv" class="button">DOWNLOAD</a></td>
+<td style="text-align: left;">17.6 mb</td>
+<td style="text-align: left;">2016</td>
+<td style="text-align: left;">501C3-PRIVFOUND</td>
+<td style="text-align: left;">PF</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;"><a href="https://nccsdata.s3.amazonaws.com/harmonized/core/501c3-pf/marts/CORE-2017-501C3-PRIVFOUND-PF-HRMN-V0.csv" class="button">DOWNLOAD</a></td>
+<td style="text-align: left;">0.4 mb</td>
+<td style="text-align: left;">2017</td>
+<td style="text-align: left;">501C3-PRIVFOUND</td>
+<td style="text-align: left;">PF</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"><a href="https://nccsdata.s3.amazonaws.com/harmonized/core/501c3-pf/marts/CORE-2018-501C3-PRIVFOUND-PF-HRMN-V0.csv" class="button">DOWNLOAD</a></td>
+<td style="text-align: left;">2.7 mb</td>
+<td style="text-align: left;">2018</td>
+<td style="text-align: left;">501C3-PRIVFOUND</td>
+<td style="text-align: left;">PF</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;"><a href="https://nccsdata.s3.amazonaws.com/harmonized/core/501c3-pf/marts/CORE-2019-501C3-PRIVFOUND-PF-HRMN-V0.csv" class="button">DOWNLOAD</a></td>
+<td style="text-align: left;">135 mb</td>
+<td style="text-align: left;">2019</td>
+<td style="text-align: left;">501C3-PRIVFOUND</td>
+<td style="text-align: left;">PF</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"><a href="https://nccsdata.s3.amazonaws.com/harmonized/core/501c3-pf/marts/CORE-2020-501C3-PRIVFOUND-PF-HRMN-V0.csv" class="button">DOWNLOAD</a></td>
+<td style="text-align: left;">90.9 mb</td>
+<td style="text-align: left;">2020</td>
+<td style="text-align: left;">501C3-PRIVFOUND</td>
+<td style="text-align: left;">PF</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;"><a href="https://nccsdata.s3.amazonaws.com/harmonized/core/501c3-pf/marts/CORE-2021-501C3-PRIVFOUND-PF-HRMN-V0.csv" class="button">DOWNLOAD</a></td>
+<td style="text-align: left;">85.8 mb</td>
+<td style="text-align: left;">2021</td>
+<td style="text-align: left;">501C3-PRIVFOUND</td>
+<td style="text-align: left;">PF</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"><a href="https://nccsdata.s3.amazonaws.com/harmonized/core/501c3-pf/marts/CORE-2022-501C3-PRIVFOUND-PF-HRMN-V0.csv" class="button">DOWNLOAD</a></td>
+<td style="text-align: left;">85.3 mb</td>
+<td style="text-align: left;">2022</td>
+<td style="text-align: left;">501C3-PRIVFOUND</td>
+<td style="text-align: left;">PF</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;"><a href="https://nccsdata.s3.amazonaws.com/harmonized/core/501c3-pf/marts/CORE-2023-501C3-PRIVFOUND-PF-HRMN-V0.csv" class="button">DOWNLOAD</a></td>
+<td style="text-align: left;">8.2 mb</td>
+<td style="text-align: left;">2023</td>
+<td style="text-align: left;">501C3-PRIVFOUND</td>
+<td style="text-align: left;">PF</td>
+</tr>
+</tbody>
+</table>
+
+
+</div>
+</div>
+<p><br></p>
+<hr>
+<p><br></p>
+
+<style>
+
+
+h1.title {
+ font-size: 60px;
+ color: #0a4c6a;
+}
+
+
+h4, .h4 {
+    font-size: 40px;
+    color: #1696d2;
+    margin-bottom: 50px;
+}
+
+
+
+.button {
+  background-color: white;
+  color:  #12719e;
+  border: 2px solid  #12719e;   /* #008CBA; */
+  padding: 5px 10px;
+  text-align: center;
+  text-decoration: none;
+  display: inline-block;
+  font-size: 14px;
+  border-radius: 12px;
+  width: 150px;
+}
+ 
+.button {
+  transition-duration: 0.4s;
+}
+
+.button:hover {
+  background-color: #1696d2; 
+  color: white;
+  border: 2px solid #12719e;
+}
+
+
+.button2 {
+  background-color: white;
+  color: #12719e;
+  border: 2px solid #9d9d9d;   /* #008CBA; */
+  padding: 5px 10px;
+  text-align: center;
+  text-decoration: none;
+  display: inline-block;
+  font-size: 14px;
+  border-radius: 12px;
+  width: 150px;
+}
+
+.button2 {
+  transition-duration: 0.4s;
+}
+
+.button2:hover {
+  background-color: #fff2cf; 
+  color: #1696d2;
+  font-weight: bold;
+  border: 2px solid #1696d2;
+}
+
+
+.center {text-align: center;}
+
+table td {
+  vertical-align: middle;
+}
+
+blockquote {
+    border-left: 4px solid #1696d2;
+    margin-left: 10px;
+    margin-inline-start: 0px;
+    margin-inline-end: 0px;
+    padding: 15px;
+}
+
+.button3 {
+  background-color: #0a4c6a;
+  color: white;
+  border: 2px solid #0a4c6a;   
+  text-align: center;
+  text-decoration: none;
+  display: inline-block;
+  font-size: 20px;
+  border-radius: 4px;
+  width: 200px;
+  display: grid;
+  margin: auto;
+}
+</style>
+</section>
+
+</main>
+<!-- /main column -->
+<script id="quarto-html-after-body" type="application/javascript">
+window.document.addEventListener("DOMContentLoaded", function (event) {
+  const toggleBodyColorMode = (bsSheetEl) => {
+    const mode = bsSheetEl.getAttribute("data-mode");
+    const bodyEl = window.document.querySelector("body");
+    if (mode === "dark") {
+      bodyEl.classList.add("quarto-dark");
+      bodyEl.classList.remove("quarto-light");
+    } else {
+      bodyEl.classList.add("quarto-light");
+      bodyEl.classList.remove("quarto-dark");
+    }
+  }
+  const toggleBodyColorPrimary = () => {
+    const bsSheetEl = window.document.querySelector("link#quarto-bootstrap");
+    if (bsSheetEl) {
+      toggleBodyColorMode(bsSheetEl);
+    }
+  }
+  toggleBodyColorPrimary();  
+  const icon = "";
+  const anchorJS = new window.AnchorJS();
+  anchorJS.options = {
+    placement: 'right',
+    icon: icon
+  };
+  anchorJS.add('.anchored');
+  const isCodeAnnotation = (el) => {
+    for (const clz of el.classList) {
+      if (clz.startsWith('code-annotation-')) {                     
+        return true;
+      }
+    }
+    return false;
+  }
+  const clipboard = new window.ClipboardJS('.code-copy-button', {
+    text: function(trigger) {
+      const codeEl = trigger.previousElementSibling.cloneNode(true);
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+  });
+  clipboard.on('success', function(e) {
+    // button target
+    const button = e.trigger;
+    // don't keep focus
+    button.blur();
+    // flash "checked"
+    button.classList.add('code-copy-button-checked');
+    var currentTitle = button.getAttribute("title");
+    button.setAttribute("title", "Copied!");
+    let tooltip;
+    if (window.bootstrap) {
+      button.setAttribute("data-bs-toggle", "tooltip");
+      button.setAttribute("data-bs-placement", "left");
+      button.setAttribute("data-bs-title", "Copied!");
+      tooltip = new bootstrap.Tooltip(button, 
+        { trigger: "manual", 
+          customClass: "code-copy-button-tooltip",
+          offset: [0, -8]});
+      tooltip.show();    
+    }
+    setTimeout(function() {
+      if (tooltip) {
+        tooltip.hide();
+        button.removeAttribute("data-bs-title");
+        button.removeAttribute("data-bs-toggle");
+        button.removeAttribute("data-bs-placement");
+      }
+      button.setAttribute("title", currentTitle);
+      button.classList.remove('code-copy-button-checked');
+    }, 1000);
+    // clear code selection
+    e.clearSelection();
+  });
+  function tippyHover(el, contentFn) {
+    const config = {
+      allowHTML: true,
+      content: contentFn,
+      maxWidth: 500,
+      delay: 100,
+      arrow: false,
+      appendTo: function(el) {
+          return el.parentElement;
+      },
+      interactive: true,
+      interactiveBorder: 10,
+      theme: 'quarto',
+      placement: 'bottom-start'
+    };
+    window.tippy(el, config); 
+  }
+  const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+  for (var i=0; i<noterefs.length; i++) {
+    const ref = noterefs[i];
+    tippyHover(ref, function() {
+      // use id or data attribute instead here
+      let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+      try { href = new URL(href).hash; } catch {}
+      const id = href.replace(/^#\/?/, "");
+      const note = window.document.getElementById(id);
+      return note.innerHTML;
+    });
+  }
+      let selectedAnnoteEl;
+      const selectorForAnnotation = ( cell, annotation) => {
+        let cellAttr = 'data-code-cell="' + cell + '"';
+        let lineAttr = 'data-code-annotation="' +  annotation + '"';
+        const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+        return selector;
+      }
+      const selectCodeLines = (annoteEl) => {
+        const doc = window.document;
+        const targetCell = annoteEl.getAttribute("data-target-cell");
+        const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+        const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+        const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+        const lineIds = lines.map((line) => {
+          return targetCell + "-" + line;
+        })
+        let top = null;
+        let height = null;
+        let parent = null;
+        if (lineIds.length > 0) {
+            //compute the position of the single el (top and bottom and make a div)
+            const el = window.document.getElementById(lineIds[0]);
+            top = el.offsetTop;
+            height = el.offsetHeight;
+            parent = el.parentElement.parentElement;
+          if (lineIds.length > 1) {
+            const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+            const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+            height = bottom - top;
+          }
+          if (top !== null && height !== null && parent !== null) {
+            // cook up a div (if necessary) and position it 
+            let div = window.document.getElementById("code-annotation-line-highlight");
+            if (div === null) {
+              div = window.document.createElement("div");
+              div.setAttribute("id", "code-annotation-line-highlight");
+              div.style.position = 'absolute';
+              parent.appendChild(div);
+            }
+            div.style.top = top - 2 + "px";
+            div.style.height = height + 4 + "px";
+            let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+            if (gutterDiv === null) {
+              gutterDiv = window.document.createElement("div");
+              gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+              gutterDiv.style.position = 'absolute';
+              const codeCell = window.document.getElementById(targetCell);
+              const gutter = codeCell.querySelector('.code-annotation-gutter');
+              gutter.appendChild(gutterDiv);
+            }
+            gutterDiv.style.top = top - 2 + "px";
+            gutterDiv.style.height = height + 4 + "px";
+          }
+          selectedAnnoteEl = annoteEl;
+        }
+      };
+      const unselectCodeLines = () => {
+        const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+        elementsIds.forEach((elId) => {
+          const div = window.document.getElementById(elId);
+          if (div) {
+            div.remove();
+          }
+        });
+        selectedAnnoteEl = undefined;
+      };
+      // Attach click handler to the DT
+      const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+      for (const annoteDlNode of annoteDls) {
+        annoteDlNode.addEventListener('click', (event) => {
+          const clickedEl = event.target;
+          if (clickedEl !== selectedAnnoteEl) {
+            unselectCodeLines();
+            const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+            if (activeEl) {
+              activeEl.classList.remove('code-annotation-active');
+            }
+            selectCodeLines(clickedEl);
+            clickedEl.classList.add('code-annotation-active');
+          } else {
+            // Unselect the line
+            unselectCodeLines();
+            clickedEl.classList.remove('code-annotation-active');
+          }
+        });
+      }
+  const findCites = (el) => {
+    const parentEl = el.parentElement;
+    if (parentEl) {
+      const cites = parentEl.dataset.cites;
+      if (cites) {
+        return {
+          el,
+          cites: cites.split(' ')
+        };
+      } else {
+        return findCites(el.parentElement)
+      }
+    } else {
+      return undefined;
+    }
+  };
+  var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+  for (var i=0; i<bibliorefs.length; i++) {
+    const ref = bibliorefs[i];
+    const citeInfo = findCites(ref);
+    if (citeInfo) {
+      tippyHover(citeInfo.el, function() {
+        var popup = window.document.createElement('div');
+        citeInfo.cites.forEach(function(cite) {
+          var citeDiv = window.document.createElement('div');
+          citeDiv.classList.add('hanging-indent');
+          citeDiv.classList.add('csl-entry');
+          var biblioDiv = window.document.getElementById('ref-' + cite);
+          if (biblioDiv) {
+            citeDiv.innerHTML = biblioDiv.innerHTML;
+          }
+          popup.appendChild(citeDiv);
+        });
+        return popup.innerHTML;
+      });
+    }
+  }
+});
+</script>
+</div> <!-- /content -->
+
+
+
+<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'9df839e82ec33210',t:'MTc3NDA0NjUwNg=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script><script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'9df839e6bace7867',t:'MTc3NDA0NjUwNg=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body></html>

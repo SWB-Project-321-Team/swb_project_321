@@ -1,0 +1,38 @@
+{
+  "bucket": "swb-321-irs990-teos",
+  "created_at_utc": "2026-03-28T19:55:15Z",
+  "elapsed_seconds": 2397.202,
+  "emit": "both",
+  "force_rebuild": false,
+  "manifests": {
+    "manifest_basic_allforms_filtered.json": {
+      "columns_output": "",
+      "output_path": "C:\\Users\\eilke\\Desktop\\Github Repo\\swb_project_321\\data\\321_Black_Hills_Area_Community_Foundation_2025_08\\01_data\\staging\\filing\\givingtuesday_990_basic_allforms_benchmark.parquet",
+      "rows_output": 6306
+    },
+    "manifest_basic_allforms_unfiltered.json": {
+      "columns_output": 290,
+      "output_path": "C:\\Users\\eilke\\Desktop\\Github Repo\\swb_project_321\\data\\321_Black_Hills_Area_Community_Foundation_2025_08\\01_data\\staging\\filing\\givingtuesday_990_basic_allforms_unfiltered.parquet",
+      "rows_output": 6684976
+    },
+    "manifest_basic_plus_combined_unfiltered.json": {
+      "columns_output": 293,
+      "output_path": "C:\\Users\\eilke\\Desktop\\Github Repo\\swb_project_321\\data\\321_Black_Hills_Area_Community_Foundation_2025_08\\01_data\\staging\\filing\\givingtuesday_990_basic_plus_combined_unfiltered.parquet",
+      "rows_output": 8022627
+    },
+    "manifest_filtered.json": {
+      "columns_output": "",
+      "output_path": "C:\\Users\\eilke\\Desktop\\Github Repo\\swb_project_321\\data\\321_Black_Hills_Area_Community_Foundation_2025_08\\01_data\\staging\\filing\\givingtuesday_990_filings_benchmark.parquet",
+      "rows_output": 6255
+    }
+  },
+  "overwrite_download": false,
+  "overwrite_uploads": false,
+  "refresh_catalog": false,
+  "region": "us-east-2",
+  "step_range": [
+    1,
+    11
+  ],
+  "tax_year_min": 2021
+}

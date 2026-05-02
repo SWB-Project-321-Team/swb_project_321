@@ -1,0 +1,20 @@
+{
+  "build_options": {
+    "manifest_csv": "C:\\Users\\eilke\\Desktop\\Github Repo\\swb_project_321\\data\\321_Black_Hills_Area_Community_Foundation_2025_08\\01_data\\raw\\givingtuesday_990\\datamarts\\metadata\\required_datasets_manifest.csv",
+    "raw_dir": "C:\\Users\\eilke\\Desktop\\Github Repo\\swb_project_321\\data\\321_Black_Hills_Area_Community_Foundation_2025_08\\01_data\\raw\\givingtuesday_990\\datamarts\\raw",
+    "required_dataset_count": 4
+  },
+  "created_at_utc": "2026-03-28T19:56:36Z",
+  "downloaded_file_count": 4,
+  "input_signature": {
+    "catalog_csv": {
+      "content_sha1": "ada6ec5d6f98d508e0d94cdfe504906adeabb9de",
+      "hash_mode": "full",
+      "path": "C:\\Users\\eilke\\Desktop\\Github Repo\\swb_project_321\\data\\321_Black_Hills_Area_Community_Foundation_2025_08\\01_data\\raw\\givingtuesday_990\\datamarts\\metadata\\datamart_catalog.csv",
+      "size_bytes": 14798
+    }
+  },
+  "manifest_csv": "C:\\Users\\eilke\\Desktop\\Github Repo\\swb_project_321\\data\\321_Black_Hills_Area_Community_Foundation_2025_08\\01_data\\raw\\givingtuesday_990\\datamarts\\metadata\\required_datasets_manifest.csv",
+  "raw_dir": "C:\\Users\\eilke\\Desktop\\Github Repo\\swb_project_321\\data\\321_Black_Hills_Area_Community_Foundation_2025_08\\01_data\\raw\\givingtuesday_990\\datamarts\\raw",
+  "required_dataset_count": 4
+}

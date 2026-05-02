@@ -5,6 +5,8 @@ Step 07: Build NCCS BMF analysis outputs for the 2022-2024 analysis window.
 from __future__ import annotations
 
 import argparse
+import importlib.util
+import sys
 import time
 from pathlib import Path
 from typing import Any
@@ -12,14 +14,37 @@ from typing import Any
 import pandas as pd
 from tqdm import tqdm
 
+
+def _ensure_sibling_common_loaded() -> None:
+    common_path = Path(__file__).with_name("common.py").resolve()
+    current = sys.modules.get("common")
+    current_file = getattr(current, "__file__", None)
+    if current_file and Path(current_file).resolve() == common_path:
+        return
+    spec = importlib.util.spec_from_file_location("common", common_path)
+    if spec is None or spec.loader is None:
+        raise ImportError(f"Unable to load common module from {common_path}")
+    module = importlib.util.module_from_spec(spec)
+    sys.modules["common"] = module
+    spec.loader.exec_module(module)
+
+
+_ensure_sibling_common_loaded()
+
 from common import (
-    ANALYSIS_META_PREFIX,
+    ANALYSIS_COVERAGE_PREFIX,
+    ANALYSIS_DOCUMENTATION_PREFIX,
     ANALYSIS_PREFIX,
+    ANALYSIS_VARIABLE_MAPPING_PREFIX,
     ANALYSIS_TAX_YEAR_MAX,
     ANALYSIS_TAX_YEAR_MIN,
+    BMF_CATALOG_URL,
+    BMF_DATASET_URL,
     DEFAULT_S3_BUCKET,
     DEFAULT_S3_REGION,
+    LEGACY_BASE_URL,
     META_DIR,
+    RAW_MONTHLY_BASE_URL,
     STAGING_DIR,
     analysis_data_processing_doc_path,
     analysis_field_metrics_output_path,
@@ -48,33 +73,50 @@ from ingest._shared.analysis_support import (
     normalize_ein,
     series_has_value,
 )
+from utils.paths import DATA as DATA_ROOT
+
+
+_REPO_ROOT = Path(__file__).resolve().parents[3]
+
+
+def _portable_path(path: Path) -> str:
+    """Render generated documentation paths without machine-local prefixes."""
+    resolved = path.resolve()
+    try:
+        return f"SWB_321_DATA_ROOT/{resolved.relative_to(DATA_ROOT.resolve()).as_posix()}"
+    except ValueError:
+        pass
+    try:
+        return resolved.relative_to(_REPO_ROOT).as_posix()
+    except ValueError:
+        return resolved.as_posix()
 
 
 UNAVAILABLE_VARIABLES = [
-    {"canonical_variable": "analysis_program_service_revenue_amount", "variable_role": "unavailable", "draft_variable": "Program service revenue", "notes": "BMF does not carry this 990-style revenue-source field."},
-    {"canonical_variable": "analysis_calculated_total_contributions_amount", "variable_role": "unavailable", "draft_variable": "Total contributions", "notes": "BMF does not carry this 990-style revenue-source field."},
-    {"canonical_variable": "analysis_other_contributions_amount", "variable_role": "unavailable", "draft_variable": "Other contributions", "notes": "BMF does not carry this 990-style revenue-source field."},
-    {"canonical_variable": "analysis_calculated_grants_total_amount", "variable_role": "unavailable", "draft_variable": "Grants (total amount)", "notes": "BMF does not carry this 990-style revenue-source field."},
-    {"canonical_variable": "analysis_total_expense_amount", "variable_role": "unavailable", "draft_variable": "Total expense", "notes": "BMF does not carry this expense field."},
-    {"canonical_variable": "analysis_net_asset_amount", "variable_role": "unavailable", "draft_variable": "Net asset", "notes": "BMF does not provide a direct net-asset field in the current pipeline."},
-    {"canonical_variable": "analysis_calculated_surplus_amount", "variable_role": "unavailable", "draft_variable": "Surplus", "notes": "BMF does not carry a direct revenue-minus-expense surplus field in the current pipeline."},
-    {"canonical_variable": "analysis_calculated_net_margin_ratio", "variable_role": "unavailable", "draft_variable": "Net margin", "notes": "BMF cannot calculate net margin without total expenses."},
-    {"canonical_variable": "analysis_calculated_months_of_reserves", "variable_role": "unavailable", "draft_variable": "Months of reserves", "notes": "BMF cannot calculate months of reserves without total expenses and a direct net-asset field."},
+    {"canonical_variable": "analysis_program_service_revenue_amount", "variable_role": "unavailable", "analysis_requirement": "Program service revenue", "notes": "BMF does not carry this 990-style revenue-source field."},
+    {"canonical_variable": "analysis_calculated_total_contributions_amount", "variable_role": "unavailable", "analysis_requirement": "Total contributions", "notes": "BMF does not carry this 990-style revenue-source field."},
+    {"canonical_variable": "analysis_other_contributions_amount", "variable_role": "unavailable", "analysis_requirement": "Other contributions", "notes": "BMF does not carry this 990-style revenue-source field."},
+    {"canonical_variable": "analysis_calculated_grants_total_amount", "variable_role": "unavailable", "analysis_requirement": "Grants (total amount)", "notes": "BMF does not carry this 990-style revenue-source field."},
+    {"canonical_variable": "analysis_total_expense_amount", "variable_role": "unavailable", "analysis_requirement": "Total expense", "notes": "BMF does not carry this expense field."},
+    {"canonical_variable": "analysis_net_asset_amount", "variable_role": "unavailable", "analysis_requirement": "Net asset", "notes": "BMF does not provide a direct net-asset field in the current pipeline."},
+    {"canonical_variable": "analysis_calculated_surplus_amount", "variable_role": "unavailable", "analysis_requirement": "Surplus", "notes": "BMF does not carry a direct revenue-minus-expense surplus field in the current pipeline."},
+    {"canonical_variable": "analysis_calculated_net_margin_ratio", "variable_role": "unavailable", "analysis_requirement": "Net margin", "notes": "BMF cannot calculate net margin without total expenses."},
+    {"canonical_variable": "analysis_calculated_months_of_reserves", "variable_role": "unavailable", "analysis_requirement": "Months of reserves", "notes": "BMF cannot calculate months of reserves without total expenses and a direct net-asset field."},
 ]
 
 AVAILABLE_VARIABLE_METADATA = [
-    {"canonical_variable": "analysis_total_revenue_amount", "variable_role": "direct", "draft_variable": "Total revenue", "source_rule": "Year-aware direct BMF revenue field", "provenance_column": "analysis_total_revenue_amount_source_column", "notes": "Regionwide total-revenue metric."},
-    {"canonical_variable": "analysis_total_assets_amount", "variable_role": "direct", "draft_variable": "Total assets", "source_rule": "Year-aware direct BMF asset field", "provenance_column": "analysis_total_assets_amount_source_column", "notes": "Regionwide total-assets metric."},
-    {"canonical_variable": "analysis_total_income_amount", "variable_role": "direct", "draft_variable": "Total income", "source_rule": "Year-aware direct BMF income field", "provenance_column": "analysis_total_income_amount_source_column", "notes": "Performance support metric for the draft's time-trend notes."},
-    {"canonical_variable": "analysis_ntee_code", "variable_role": "enriched", "draft_variable": "NTEE filed classification code", "source_rule": "Exact-year BMF lookup joined on EIN + tax_year, then nearest-year BMF, then IRS EO BMF EIN fallback", "provenance_column": "analysis_ntee_code_source_column", "notes": "Analysis-ready classification support field."},
-    {"canonical_variable": "analysis_subsection_code", "variable_role": "enriched", "draft_variable": "Subsection code", "source_rule": "Exact-year BMF lookup joined on EIN + tax_year, then nearest-year BMF, then IRS EO BMF EIN fallback", "provenance_column": "analysis_subsection_code_source_column", "notes": "Political-organization support field."},
-    {"canonical_variable": "analysis_calculated_ntee_broad_code", "variable_role": "calculated", "draft_variable": "Broad NTEE field classification code", "source_rule": "First letter of analysis_ntee_code", "provenance_column": "analysis_calculated_ntee_broad_code_source_column", "notes": "Broad field representation metric."},
-    {"canonical_variable": "analysis_is_hospital", "variable_role": "proxy", "draft_variable": "Hospital flag", "source_rule": "NTEE proxy from analysis_ntee_code", "provenance_column": "analysis_is_hospital_source_column", "notes": "Source-backed hospital proxy."},
-    {"canonical_variable": "analysis_is_university", "variable_role": "proxy", "draft_variable": "University flag", "source_rule": "NTEE proxy from analysis_ntee_code", "provenance_column": "analysis_is_university_source_column", "notes": "Source-backed university proxy."},
-    {"canonical_variable": "analysis_is_political_org", "variable_role": "proxy", "draft_variable": "Political organization flag", "source_rule": "Subsection proxy from analysis_subsection_code", "provenance_column": "analysis_is_political_org_source_column", "notes": "Source-backed political proxy."},
-    {"canonical_variable": "analysis_imputed_is_hospital", "variable_role": "imputed", "draft_variable": "Hospital flag", "source_rule": "analysis_is_hospital, then conservative name fallback, then default false", "provenance_column": "analysis_imputed_is_hospital_source_column", "notes": "Complete hospital flag for analysis exclusions."},
-    {"canonical_variable": "analysis_imputed_is_university", "variable_role": "imputed", "draft_variable": "University flag", "source_rule": "analysis_is_university, then conservative name fallback, then default false", "provenance_column": "analysis_imputed_is_university_source_column", "notes": "Complete university flag for analysis exclusions."},
-    {"canonical_variable": "analysis_imputed_is_political_org", "variable_role": "imputed", "draft_variable": "Political organization flag", "source_rule": "analysis_is_political_org, then conservative name fallback, then default false", "provenance_column": "analysis_imputed_is_political_org_source_column", "notes": "Complete political-organization flag for analysis exclusions."},
+    {"canonical_variable": "analysis_total_revenue_amount", "variable_role": "direct", "analysis_requirement": "Total revenue", "source_rule": "Year-aware direct BMF revenue field", "provenance_column": "analysis_total_revenue_amount_source_column", "notes": "Regionwide total-revenue metric."},
+    {"canonical_variable": "analysis_total_assets_amount", "variable_role": "direct", "analysis_requirement": "Total assets", "source_rule": "Year-aware direct BMF asset field", "provenance_column": "analysis_total_assets_amount_source_column", "notes": "Regionwide total-assets metric."},
+    {"canonical_variable": "analysis_total_income_amount", "variable_role": "direct", "analysis_requirement": "Total income", "source_rule": "Year-aware direct BMF income field", "provenance_column": "analysis_total_income_amount_source_column", "notes": "Performance support metric for time-trend analysis."},
+    {"canonical_variable": "analysis_ntee_code", "variable_role": "enriched", "analysis_requirement": "NTEE filed classification code", "source_rule": "Exact-year BMF lookup joined on EIN + tax_year, then nearest-year BMF, then IRS EO BMF EIN fallback", "provenance_column": "analysis_ntee_code_source_column", "notes": "Analysis-ready classification support field."},
+    {"canonical_variable": "analysis_subsection_code", "variable_role": "enriched", "analysis_requirement": "Subsection code", "source_rule": "Exact-year BMF lookup joined on EIN + tax_year, then nearest-year BMF, then IRS EO BMF EIN fallback", "provenance_column": "analysis_subsection_code_source_column", "notes": "Political-organization support field."},
+    {"canonical_variable": "analysis_calculated_ntee_broad_code", "variable_role": "calculated", "analysis_requirement": "Broad NTEE field classification code", "source_rule": "First letter of analysis_ntee_code", "provenance_column": "analysis_calculated_ntee_broad_code_source_column", "notes": "Broad field representation metric."},
+    {"canonical_variable": "analysis_is_hospital", "variable_role": "proxy", "analysis_requirement": "Hospital flag", "source_rule": "NTEE proxy from analysis_ntee_code", "provenance_column": "analysis_is_hospital_source_column", "notes": "Source-backed hospital proxy."},
+    {"canonical_variable": "analysis_is_university", "variable_role": "proxy", "analysis_requirement": "University flag", "source_rule": "NTEE proxy from analysis_ntee_code", "provenance_column": "analysis_is_university_source_column", "notes": "Source-backed university proxy."},
+    {"canonical_variable": "analysis_is_political_org", "variable_role": "proxy", "analysis_requirement": "Political organization flag", "source_rule": "Subsection proxy from analysis_subsection_code", "provenance_column": "analysis_is_political_org_source_column", "notes": "Source-backed political proxy."},
+    {"canonical_variable": "analysis_imputed_is_hospital", "variable_role": "imputed", "analysis_requirement": "Hospital flag", "source_rule": "analysis_is_hospital, then conservative name fallback, then default false", "provenance_column": "analysis_imputed_is_hospital_source_column", "notes": "Complete hospital flag for analysis exclusions."},
+    {"canonical_variable": "analysis_imputed_is_university", "variable_role": "imputed", "analysis_requirement": "University flag", "source_rule": "analysis_is_university, then conservative name fallback, then default false", "provenance_column": "analysis_imputed_is_university_source_column", "notes": "Complete university flag for analysis exclusions."},
+    {"canonical_variable": "analysis_imputed_is_political_org", "variable_role": "imputed", "analysis_requirement": "Political organization flag", "source_rule": "analysis_is_political_org, then conservative name fallback, then default false", "provenance_column": "analysis_imputed_is_political_org_source_column", "notes": "Complete political-organization flag for analysis exclusions."},
 ]
 
 
@@ -263,31 +305,38 @@ def _write_mapping_markdown(mapping_path: Path) -> None:
         "# NCCS BMF Analysis Variable Mapping",
         "",
         "- Source family: `nccs_bmf`",
-        f"- Analysis output: `{analysis_variables_output_path()}`",
-        f"- Geography metrics output: `{analysis_geography_metrics_output_path()}`",
-        f"- Field metrics output: `{analysis_field_metrics_output_path()}`",
-        f"- Coverage report: `{analysis_variable_coverage_path()}`",
+        f"- Analysis output: `{_portable_path(analysis_variables_output_path())}`",
+        f"- Geography metrics output: `{_portable_path(analysis_geography_metrics_output_path())}`",
+        f"- Field metrics output: `{_portable_path(analysis_field_metrics_output_path())}`",
+        f"- Coverage report: `{_portable_path(analysis_variable_coverage_path())}`",
         "- Scope: `2022-2024` only",
+        "",
+        "## Coverage Evidence",
+        "",
+        f"- Generated coverage CSV: `{_portable_path(analysis_variable_coverage_path())}`",
+        f"- Published S3 variable mapping object: `{ANALYSIS_VARIABLE_MAPPING_PREFIX}/{analysis_variable_mapping_path().name}`",
+        f"- Published S3 coverage object: `{ANALYSIS_COVERAGE_PREFIX}/{analysis_variable_coverage_path().name}`",
+        "- Coverage CSVs are generated by the analysis step and published as quality evidence.",
         "",
         "## Extracted Variables",
         "",
-        "|canonical_variable|variable_role|draft_variable|source_rule|provenance_column|notes|",
+        "|canonical_variable|variable_role|analysis_requirement|source_rule|provenance_column|notes|",
         "|---|---|---|---|---|---|",
         "",
         "## Unavailable Variables",
         "",
-        "|canonical_variable|availability_status|draft_variable|notes|",
+        "|canonical_variable|availability_status|analysis_requirement|notes|",
         "|---|---|---|---|",
     ]
     for row in AVAILABLE_VARIABLE_METADATA:
-        lines.append(f"|{row['canonical_variable']}|{row['variable_role']}|{row['draft_variable']}|{row['source_rule']}|{row['provenance_column']}|{row['notes']}|")
+        lines.append(f"|{row['canonical_variable']}|{row['variable_role']}|{row['analysis_requirement']}|{row['source_rule']}|{row['provenance_column']}|{row['notes']}|")
     for row in UNAVAILABLE_VARIABLES:
-        lines.append(f"|{row['canonical_variable']}|unavailable|{row['draft_variable']}|{row['notes']}|")
-    lines.extend(["", "## Draft Alignment Appendix", "", "|draft_variable|source_specific_output|status|rule_or_reason|", "|---|---|---|---|"])
+        lines.append(f"|{row['canonical_variable']}|unavailable|{row['analysis_requirement']}|{row['notes']}|")
+    lines.extend(["", "## Analysis requirement alignment appendix", "", "|analysis_requirement|source_specific_output|status|rule_or_reason|", "|---|---|---|---|"])
     for row in AVAILABLE_VARIABLE_METADATA:
-        lines.append(f"|{row['draft_variable']}|{row['canonical_variable']}|{row['variable_role']}|{row['source_rule']}|")
+        lines.append(f"|{row['analysis_requirement']}|{row['canonical_variable']}|{row['variable_role']}|{row['source_rule']}|")
     for row in UNAVAILABLE_VARIABLES:
-        lines.append(f"|{row['draft_variable']}|{row['canonical_variable']}|unavailable|{row['notes']}|")
+        lines.append(f"|{row['analysis_requirement']}|{row['canonical_variable']}|unavailable|{row['notes']}|")
     mapping_path.write_text("\n".join(lines) + "\n", encoding="utf-8")
 
 
@@ -332,7 +381,7 @@ The main artifact classes are:
 - Silver filtered artifacts: benchmark-filtered yearly BMF parquets plus yearly exact-year lookup parquets.
 - Final analysis artifacts: the row-level analysis parquet, geography metrics parquet, field metrics parquet, coverage CSV, mapping Markdown, and this processing doc.
 
-This pipeline follows the `CODING_RULES.md` filtered-only combine contract:
+This pipeline follows a filtered-only combine contract (combine stages use filtered inputs only):
 
 - downstream combine stages operate only on benchmark-filtered yearly BMF artifacts
 - the annual benchmark filter happens upstream in step 05
@@ -352,6 +401,21 @@ This pipeline follows the `CODING_RULES.md` filtered-only combine contract:
 | 08 | `08_upload_analysis_outputs.py` | Upload official analysis outputs and verify local-vs-S3 bytes | Analysis artifacts and docs | Silver analysis objects | S3 |
 
 ## How Data Is Retrieved
+
+## Exact Source Locations
+
+- NCCS BMF dataset page: `{BMF_DATASET_URL}`
+- NCCS BMF catalog page: `{BMF_CATALOG_URL}`
+- NCCS raw monthly BMF base URL: `{RAW_MONTHLY_BASE_URL}`
+- NCCS legacy BMF base URL: `{LEGACY_BASE_URL}`
+
+## Raw Source Dictionaries
+
+- Current raw monthly BMF dictionary: `documentation/final_preprocessing_docs/technical_docs/source_dictionaries/irs_eo_bmf/eo-info.pdf`
+- Current raw monthly header companion: `documentation/final_preprocessing_docs/technical_docs/source_dictionaries/nccs_bmf_raw_monthly/2026-03-BMF_header_dictionary.csv`
+- Legacy 2022 dictionary status page: `documentation/final_preprocessing_docs/technical_docs/source_dictionaries/nccs_bmf_legacy_2022/dd_unavailable.html`
+- Legacy 2022 header companion: `documentation/final_preprocessing_docs/technical_docs/source_dictionaries/nccs_bmf_legacy_2022/BMF-2022-08-501CX-NONPROFIT-PX_header_dictionary.csv`
+- NCCS links the 2022 legacy BMF profile to `dd_unavailable.html`; the companion CSV documents the raw header while preserving that limitation.
 
 ### Step 01: release discovery
 
@@ -392,25 +456,27 @@ This means the BMF pipeline keeps:
 
 ### Local directories
 
-- Local raw BMF directory: `{raw_dir}`
-- Local metadata directory: `{META_DIR}`
-- Local staging directory: `{STAGING_DIR}`
+- Local raw BMF directory: `{_portable_path(raw_dir)}`
+- Local metadata directory: `{_portable_path(META_DIR)}`
+- Local staging directory: `{_portable_path(STAGING_DIR)}`
 
 ### Filtered and analysis artifacts
 
-- Row-level analysis parquet: `{analysis_variables_output_path()}`
-- Geography metrics parquet: `{analysis_geography_metrics_output_path()}`
-- NTEE field metrics parquet: `{analysis_field_metrics_output_path()}`
-- Coverage CSV: `{analysis_variable_coverage_path()}`
-- Mapping doc: `{analysis_variable_mapping_path()}`
-- Data-processing doc: `{analysis_data_processing_doc_path()}`
+- Row-level analysis parquet: `{_portable_path(analysis_variables_output_path())}`
+- Geography metrics parquet: `{_portable_path(analysis_geography_metrics_output_path())}`
+- NTEE field metrics parquet: `{_portable_path(analysis_field_metrics_output_path())}`
+- Coverage CSV: `{_portable_path(analysis_variable_coverage_path())}`
+- Mapping doc: `{_portable_path(analysis_variable_mapping_path())}`
+- Data-processing doc: `{_portable_path(analysis_data_processing_doc_path())}`
 
 ### S3 layout
 
 - Silver filtered BMF prefix: `silver/nccs_bmf/`
 - Silver filtered metadata prefix: `silver/nccs_bmf/metadata/`
 - Official S3 analysis prefix: `silver/nccs_bmf/analysis/`
-- Official S3 analysis metadata prefix: `silver/nccs_bmf/analysis/metadata/`
+- Analysis documentation prefix: `{ANALYSIS_DOCUMENTATION_PREFIX}`
+- Analysis variable mapping prefix: `{ANALYSIS_VARIABLE_MAPPING_PREFIX}`
+- Analysis coverage prefix: `{ANALYSIS_COVERAGE_PREFIX}`
 
 ## Step-By-Step Transformation
 
@@ -555,11 +621,19 @@ Each row reports:
 - share of region revenue
 - share of region assets
 
-This is the table intended to support field-composition and sector-mix analysis from the draft.
+This is the table intended to support field-composition and sector-mix analysis from the stated analysis scope.
 
 ### Coverage, mapping, and upload verification
 
 The coverage CSV reports populated counts and fill rates for the available analysis variables by year and overall.
+
+## Coverage Evidence
+
+- Generated coverage CSV: `{_portable_path(analysis_variable_coverage_path())}`
+- Published S3 documentation object: `{ANALYSIS_DOCUMENTATION_PREFIX}/{analysis_data_processing_doc_path().name}`
+- Published S3 variable mapping object: `{ANALYSIS_VARIABLE_MAPPING_PREFIX}/{analysis_variable_mapping_path().name}`
+- Published S3 coverage object: `{ANALYSIS_COVERAGE_PREFIX}/{analysis_variable_coverage_path().name}`
+- Coverage CSVs are generated by step 07 and published as authoritative quality evidence.
 
 The mapping Markdown documents which variables are:
 
@@ -598,9 +672,9 @@ The row-level analysis dataset is the canonical BMF analysis-ready file for `202
 - Revenue-source components such as program service revenue, contributions, and grants remain unavailable rather than being weakly backfilled from another pipeline.
 - The analysis-only dedupe happens only in the final rowset; the upstream yearly benchmark artifacts remain unchanged.
 
-## Draft Alignment Appendix
+## Analysis requirement alignment appendix
 
-| draft_variable | source_specific_output | status | rule_or_reason |
+| analysis_requirement | source_specific_output | status | rule_or_reason |
 | --- | --- | --- | --- |
 | Total revenue | analysis_total_revenue_amount | direct | Year-aware direct BMF revenue field |
 | Total assets | analysis_total_assets_amount | direct | Year-aware direct BMF asset field |
@@ -783,7 +857,7 @@ def build_analysis_outputs(
                     "canonical_variable": variable_name,
                     "availability_status": "available",
                     "variable_role": metadata_row["variable_role"],
-                    "draft_variable": metadata_row["draft_variable"],
+                    "analysis_requirement": metadata_row["analysis_requirement"],
                     "tax_year": tax_year,
                     "row_count": row_count,
                     "populated_count": populated_count,
@@ -797,7 +871,7 @@ def build_analysis_outputs(
                 "canonical_variable": row["canonical_variable"],
                 "availability_status": "unavailable",
                 "variable_role": row["variable_role"],
-                "draft_variable": row["draft_variable"],
+                "analysis_requirement": row["analysis_requirement"],
                 "tax_year": "all",
                 "row_count": int(len(analysis_df)),
                 "populated_count": 0,
@@ -827,7 +901,9 @@ def main() -> None:
     parser.add_argument("--bucket", default=DEFAULT_S3_BUCKET, help="Unused here but logged to mirror pipeline conventions")
     parser.add_argument("--region", default=DEFAULT_S3_REGION, help="Unused here but logged to mirror pipeline conventions")
     parser.add_argument("--analysis-prefix", default=ANALYSIS_PREFIX, help="Logged official analysis S3 prefix")
-    parser.add_argument("--analysis-meta-prefix", default=ANALYSIS_META_PREFIX, help="Logged official analysis metadata prefix")
+    parser.add_argument("--analysis-documentation-prefix", default=ANALYSIS_DOCUMENTATION_PREFIX, help="Logged official analysis documentation prefix")
+    parser.add_argument("--analysis-variable-mapping-prefix", default=ANALYSIS_VARIABLE_MAPPING_PREFIX, help="Logged official analysis variable mapping prefix")
+    parser.add_argument("--analysis-coverage-prefix", default=ANALYSIS_COVERAGE_PREFIX, help="Logged official analysis coverage prefix")
     parser.add_argument("--bmf-staging-dir", type=Path, default=DEFAULT_BMF_STAGING_DIR, help="Lookup directory for exact-year and nearest-year BMF classification fallbacks")
     parser.add_argument("--irs-bmf-raw-dir", type=Path, default=DEFAULT_IRS_BMF_RAW_DIR, help="Raw IRS EO BMF directory for final classification fallback")
     args = parser.parse_args()
@@ -838,7 +914,9 @@ def main() -> None:
     print(f"[analysis] Metadata dir: {args.metadata_dir}", flush=True)
     print(f"[analysis] Staging dir: {args.staging_dir}", flush=True)
     print(f"[analysis] Official analysis prefix: {args.analysis_prefix}", flush=True)
-    print(f"[analysis] Official analysis metadata prefix: {args.analysis_meta_prefix}", flush=True)
+    print(f"[analysis] Official analysis documentation prefix: {args.analysis_documentation_prefix}", flush=True)
+    print(f"[analysis] Official analysis variable mapping prefix: {args.analysis_variable_mapping_prefix}", flush=True)
+    print(f"[analysis] Official analysis coverage prefix: {args.analysis_coverage_prefix}", flush=True)
     summary = build_analysis_outputs(
         metadata_dir=args.metadata_dir,
         staging_dir=args.staging_dir,

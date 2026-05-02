@@ -1,0 +1,99 @@
+{
+  "build_options": {
+    "bucket": "swb-321-irs990-teos",
+    "meta_file_count": 10,
+    "meta_prefix": "bronze/givingtuesday_990/datamarts/metadata",
+    "raw_file_count": 4,
+    "raw_prefix": "bronze/givingtuesday_990/datamarts/raw",
+    "region": "us-east-2"
+  },
+  "created_at_utc": "2026-03-28T19:37:13Z",
+  "input_signature": {
+    "meta::datamart_catalog.csv": {
+      "head_sha1": "ada6ec5d6f98d508e0d94cdfe504906adeabb9de",
+      "mtime_ns": 1774725339223939300,
+      "path": "C:\\Users\\eilke\\Desktop\\Github Repo\\swb_project_321\\data\\321_Black_Hills_Area_Community_Foundation_2025_08\\01_data\\raw\\givingtuesday_990\\datamarts\\metadata\\datamart_catalog.csv",
+      "size_bytes": 14798
+    },
+    "meta::datamart_catalog.md": {
+      "head_sha1": "2a6e0db33cb8a0a1da097a1485c31a0dd6085783",
+      "mtime_ns": 1774725339225158500,
+      "path": "C:\\Users\\eilke\\Desktop\\Github Repo\\swb_project_321\\data\\321_Black_Hills_Area_Community_Foundation_2025_08\\01_data\\raw\\givingtuesday_990\\datamarts\\metadata\\datamart_catalog.md",
+      "size_bytes": 14196
+    },
+    "meta::datamart_catalog_raw.json": {
+      "head_sha1": "0c327238a73b9e5ba1936d8857ab65c6842305fc",
+      "mtime_ns": 1774725319452844500,
+      "path": "C:\\Users\\eilke\\Desktop\\Github Repo\\swb_project_321\\data\\321_Black_Hills_Area_Community_Foundation_2025_08\\01_data\\raw\\givingtuesday_990\\datamarts\\metadata\\datamart_catalog_raw.json",
+      "size_bytes": 42673
+    },
+    "meta::datamart_fields.csv": {
+      "head_sha1": "ee7de73d63e00e01e784582705d3e5f76c3bae93",
+      "mtime_ns": 1774725363581781100,
+      "path": "C:\\Users\\eilke\\Desktop\\Github Repo\\swb_project_321\\data\\321_Black_Hills_Area_Community_Foundation_2025_08\\01_data\\raw\\givingtuesday_990\\datamarts\\metadata\\datamart_fields.csv",
+      "size_bytes": 238445
+    },
+    "meta::datamart_fields.md": {
+      "head_sha1": "0d4fba0509ef352ec915e9a9eb8bf565c8952e93",
+      "mtime_ns": 1774725363586583000,
+      "path": "C:\\Users\\eilke\\Desktop\\Github Repo\\swb_project_321\\data\\321_Black_Hills_Area_Community_Foundation_2025_08\\01_data\\raw\\givingtuesday_990\\datamarts\\metadata\\datamart_fields.md",
+      "size_bytes": 157412
+    },
+    "meta::download_state_manifest.json": {
+      "head_sha1": "fe130dd5e78886a4a97238f67175d45e68e3b155",
+      "mtime_ns": 1774726621815695300,
+      "path": "C:\\Users\\eilke\\Desktop\\Github Repo\\swb_project_321\\data\\321_Black_Hills_Area_Community_Foundation_2025_08\\01_data\\raw\\givingtuesday_990\\datamarts\\metadata\\download_state_manifest.json",
+      "size_bytes": 1373
+    },
+    "meta::required_datasets_manifest.csv": {
+      "head_sha1": "2b64d6229b6ae8d6a8c6129c5040169224a8f7bf",
+      "mtime_ns": 1774726621815695300,
+      "path": "C:\\Users\\eilke\\Desktop\\Github Repo\\swb_project_321\\data\\321_Black_Hills_Area_Community_Foundation_2025_08\\01_data\\raw\\givingtuesday_990\\datamarts\\metadata\\required_datasets_manifest.csv",
+      "size_bytes": 1917
+    },
+    "meta::schema_snapshot_basic_allforms_filtered.json": {
+      "head_sha1": "02c20035ab5fa319ed321b1d1f57890d9a278c85",
+      "mtime_ns": 1774723806132975700,
+      "path": "C:\\Users\\eilke\\Desktop\\Github Repo\\swb_project_321\\data\\321_Black_Hills_Area_Community_Foundation_2025_08\\01_data\\raw\\givingtuesday_990\\datamarts\\metadata\\schema_snapshot_basic_allforms_filtered.json",
+      "size_bytes": 624
+    },
+    "meta::schema_snapshot_filings_filtered.json": {
+      "head_sha1": "4745546fd6f18daf59b334a6f6b30c0d6956982f",
+      "mtime_ns": 1774723806146386200,
+      "path": "C:\\Users\\eilke\\Desktop\\Github Repo\\swb_project_321\\data\\321_Black_Hills_Area_Community_Foundation_2025_08\\01_data\\raw\\givingtuesday_990\\datamarts\\metadata\\schema_snapshot_filings_filtered.json",
+      "size_bytes": 687
+    },
+    "meta::size_verification_report.csv": {
+      "head_sha1": "4d5613caff149e3868625a6a0f28efa883e7a61f",
+      "mtime_ns": 1773862887597049700,
+      "path": "C:\\Users\\eilke\\Desktop\\Github Repo\\swb_project_321\\data\\321_Black_Hills_Area_Community_Foundation_2025_08\\01_data\\raw\\givingtuesday_990\\datamarts\\metadata\\size_verification_report.csv",
+      "size_bytes": 2461
+    },
+    "raw::2025_07_10_All_Years_990_990ez_990pf_990n_Combined_DataMart.csv": {
+      "head_sha1": "3a9fac0d275ceafb826a714eecbaad536e26052a",
+      "mtime_ns": 1774726384629674600,
+      "path": "C:\\Users\\eilke\\Desktop\\Github Repo\\swb_project_321\\data\\321_Black_Hills_Area_Community_Foundation_2025_08\\01_data\\raw\\givingtuesday_990\\datamarts\\raw\\2025_07_10_All_Years_990_990ez_990pf_990n_Combined_DataMart.csv",
+      "size_bytes": 2140103678
+    },
+    "raw::2025_08_29_All_Years_990PFStandardFields.csv": {
+      "head_sha1": "df1a4f0e3cc0d49bbcf43aaa31fb40880e07a416",
+      "mtime_ns": 1774725879098961100,
+      "path": "C:\\Users\\eilke\\Desktop\\Github Repo\\swb_project_321\\data\\321_Black_Hills_Area_Community_Foundation_2025_08\\01_data\\raw\\givingtuesday_990\\datamarts\\raw\\2025_08_29_All_Years_990PFStandardFields.csv",
+      "size_bytes": 677317763
+    },
+    "raw::2025_10_18_All_Years_990StandardFields.csv": {
+      "head_sha1": "51989ab8857eb166b57e24023730b27957991767",
+      "mtime_ns": 1774726621800050700,
+      "path": "C:\\Users\\eilke\\Desktop\\Github Repo\\swb_project_321\\data\\321_Black_Hills_Area_Community_Foundation_2025_08\\01_data\\raw\\givingtuesday_990\\datamarts\\raw\\2025_10_18_All_Years_990StandardFields.csv",
+      "size_bytes": 2302094678
+    },
+    "raw::2025_10_28_All_Years_990EZStandardFields.csv": {
+      "head_sha1": "e50dc513f9863a5dabbb0061af55d5a1bc86ff25",
+      "mtime_ns": 1774726122472035100,
+      "path": "C:\\Users\\eilke\\Desktop\\Github Repo\\swb_project_321\\data\\321_Black_Hills_Area_Community_Foundation_2025_08\\01_data\\raw\\givingtuesday_990\\datamarts\\raw\\2025_10_28_All_Years_990EZStandardFields.csv",
+      "size_bytes": 1432510202
+    }
+  },
+  "skipped_unchanged_file_count": 10,
+  "uploaded_file_count": 4
+}

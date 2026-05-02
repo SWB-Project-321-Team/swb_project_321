@@ -29,14 +29,16 @@ Additional analysis outputs:
 - `01_data/staging/irs_bmf/irs_bmf_analysis_geography_metrics.parquet`
 - `01_data/staging/irs_bmf/irs_bmf_analysis_field_metrics.parquet`
 - `01_data/raw/irs_bmf/metadata/irs_bmf_analysis_variable_coverage.csv`
-- `docs/analysis/irs_bmf_analysis_variable_mapping.md`
-- `docs/data_processing/irs_bmf_pipeline.md`
+- `docs/final_preprocessing_docs/technical_docs/analysis_variable_mappings/irs_bmf_analysis_variable_mapping.md`
+- `docs/final_preprocessing_docs/technical_docs/pipeline_docs/irs_bmf_pipeline.md`
 
 Official analysis S3 layout:
 - `silver/irs990/bmf/analysis/irs_bmf_analysis_variables.parquet`
 - `silver/irs990/bmf/analysis/irs_bmf_analysis_geography_metrics.parquet`
 - `silver/irs990/bmf/analysis/irs_bmf_analysis_field_metrics.parquet`
-- `silver/irs990/bmf/analysis/metadata/<coverage, mapping, pipeline doc>`
+- `silver/irs990/bmf/analysis/documentation/irs_bmf_pipeline.md`
+- `silver/irs990/bmf/analysis/variable_mappings/irs_bmf_analysis_variable_mapping.md`
+- `silver/irs990/bmf/analysis/quality/coverage/irs_bmf_analysis_variable_coverage.csv`
 
 Compatibility notes:
 - `python/ingest/990_irs/00_fetch_bmf.py` remains available as a thin wrapper.

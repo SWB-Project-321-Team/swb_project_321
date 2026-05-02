@@ -13,12 +13,16 @@ import pandas as pd
 from tqdm import tqdm
 
 from common import (
-    ANALYSIS_META_PREFIX,
+    ANALYSIS_COVERAGE_PREFIX,
+    ANALYSIS_DOCUMENTATION_PREFIX,
     ANALYSIS_PREFIX,
+    ANALYSIS_VARIABLE_MAPPING_PREFIX,
     ANALYSIS_TAX_YEAR_MAX,
     ANALYSIS_TAX_YEAR_MIN,
     DEFAULT_S3_BUCKET,
     DEFAULT_S3_REGION,
+    DEFAULT_STATE_CODES,
+    IRS_BMF_BASE_URL,
     META_DIR,
     STAGING_DIR,
     analysis_data_processing_doc_path,
@@ -31,6 +35,7 @@ from common import (
     combined_filtered_output_path,
     load_env_from_secrets,
     print_elapsed,
+    state_source_url,
     yearly_filtered_output_path,
 )
 from ingest._shared.analysis_support import (
@@ -41,36 +46,53 @@ from ingest._shared.analysis_support import (
     build_political_proxy_flag,
     load_bmf_classification_lookup,
 )
+from utils.paths import DATA as DATA_ROOT
+
+
+_REPO_ROOT = Path(__file__).resolve().parents[3]
+
+
+def _portable_path(path: Path) -> str:
+    """Render generated documentation paths without machine-local prefixes."""
+    resolved = path.resolve()
+    try:
+        return f"SWB_321_DATA_ROOT/{resolved.relative_to(DATA_ROOT.resolve()).as_posix()}"
+    except ValueError:
+        pass
+    try:
+        return resolved.relative_to(_REPO_ROOT).as_posix()
+    except ValueError:
+        return resolved.as_posix()
 
 
 UNAVAILABLE_VARIABLES = [
-    {"canonical_variable": "analysis_program_service_revenue_amount", "variable_role": "unavailable", "draft_variable": "Program service revenue", "notes": "IRS EO BMF does not carry this 990-style revenue-source field."},
-    {"canonical_variable": "analysis_calculated_total_contributions_amount", "variable_role": "unavailable", "draft_variable": "Total contributions", "notes": "IRS EO BMF does not carry this 990-style revenue-source field."},
-    {"canonical_variable": "analysis_other_contributions_amount", "variable_role": "unavailable", "draft_variable": "Other contributions", "notes": "IRS EO BMF does not carry this 990-style revenue-source field."},
-    {"canonical_variable": "analysis_calculated_grants_total_amount", "variable_role": "unavailable", "draft_variable": "Grants (total amount)", "notes": "IRS EO BMF does not carry this 990-style revenue-source field."},
-    {"canonical_variable": "analysis_total_expense_amount", "variable_role": "unavailable", "draft_variable": "Total expense", "notes": "IRS EO BMF does not provide a direct expense field."},
-    {"canonical_variable": "analysis_net_asset_amount", "variable_role": "unavailable", "draft_variable": "Net asset", "notes": "IRS EO BMF does not provide a direct net-asset field."},
-    {"canonical_variable": "analysis_calculated_surplus_amount", "variable_role": "unavailable", "draft_variable": "Surplus", "notes": "IRS EO BMF does not provide a revenue-minus-expense surplus field."},
-    {"canonical_variable": "analysis_calculated_net_margin_ratio", "variable_role": "unavailable", "draft_variable": "Net margin", "notes": "IRS EO BMF cannot calculate net margin without total expenses."},
-    {"canonical_variable": "analysis_calculated_months_of_reserves", "variable_role": "unavailable", "draft_variable": "Months of reserves", "notes": "IRS EO BMF cannot calculate months of reserves without expenses and a direct net-asset field."},
+    {"canonical_variable": "analysis_program_service_revenue_amount", "variable_role": "unavailable", "analysis_requirement": "Program service revenue", "notes": "IRS EO BMF does not carry this 990-style revenue-source field."},
+    {"canonical_variable": "analysis_calculated_total_contributions_amount", "variable_role": "unavailable", "analysis_requirement": "Total contributions", "notes": "IRS EO BMF does not carry this 990-style revenue-source field."},
+    {"canonical_variable": "analysis_other_contributions_amount", "variable_role": "unavailable", "analysis_requirement": "Other contributions", "notes": "IRS EO BMF does not carry this 990-style revenue-source field."},
+    {"canonical_variable": "analysis_calculated_grants_total_amount", "variable_role": "unavailable", "analysis_requirement": "Grants (total amount)", "notes": "IRS EO BMF does not carry this 990-style revenue-source field."},
+    {"canonical_variable": "analysis_total_expense_amount", "variable_role": "unavailable", "analysis_requirement": "Total expense", "notes": "IRS EO BMF does not provide a direct expense field."},
+    {"canonical_variable": "analysis_net_asset_amount", "variable_role": "unavailable", "analysis_requirement": "Net asset", "notes": "IRS EO BMF does not provide a direct net-asset field."},
+    {"canonical_variable": "analysis_calculated_surplus_amount", "variable_role": "unavailable", "analysis_requirement": "Surplus", "notes": "IRS EO BMF does not provide a revenue-minus-expense surplus field."},
+    {"canonical_variable": "analysis_calculated_net_margin_ratio", "variable_role": "unavailable", "analysis_requirement": "Net margin", "notes": "IRS EO BMF cannot calculate net margin without total expenses."},
+    {"canonical_variable": "analysis_calculated_months_of_reserves", "variable_role": "unavailable", "analysis_requirement": "Months of reserves", "notes": "IRS EO BMF cannot calculate months of reserves without expenses and a direct net-asset field."},
 ]
 
 AVAILABLE_VARIABLE_METADATA = [
-    {"canonical_variable": "analysis_total_revenue_amount", "variable_role": "direct", "draft_variable": "Total revenue", "source_rule": "Direct IRS EO BMF REVENUE_AMT field from the filtered benchmark rows", "provenance_column": "analysis_total_revenue_amount_source_column", "notes": "Source-direct IRS EO BMF amount retained as nullable numeric."},
-    {"canonical_variable": "analysis_total_assets_amount", "variable_role": "direct", "draft_variable": "Total assets", "source_rule": "Direct IRS EO BMF ASSET_AMT field from the filtered benchmark rows", "provenance_column": "analysis_total_assets_amount_source_column", "notes": "Source-direct IRS EO BMF amount retained as nullable numeric."},
-    {"canonical_variable": "analysis_total_income_amount", "variable_role": "direct", "draft_variable": "Total income", "source_rule": "Direct IRS EO BMF INCOME_AMT field from the filtered benchmark rows", "provenance_column": "analysis_total_income_amount_source_column", "notes": "Source-direct IRS EO BMF amount retained as nullable numeric."},
-    {"canonical_variable": "analysis_ntee_code", "variable_role": "direct", "draft_variable": "NTEE filed classification code", "source_rule": "Direct IRS EO BMF NTEE_CD field from the filtered benchmark rows", "provenance_column": "analysis_ntee_code_source_column", "notes": "Source-direct IRS EO BMF classification retained without overwrite."},
-    {"canonical_variable": "analysis_subsection_code", "variable_role": "direct", "draft_variable": "Subsection code", "source_rule": "Direct IRS EO BMF SUBSECTION field from the filtered benchmark rows", "provenance_column": "analysis_subsection_code_source_column", "notes": "Source-direct IRS EO BMF subsection retained without overwrite."},
-    {"canonical_variable": "analysis_ntee_code_fallback_enriched", "variable_role": "enriched", "draft_variable": "NTEE filed classification code", "source_rule": "IRS EO BMF direct NTEE first, then NCCS BMF exact-year, then NCCS BMF nearest-year fallback", "provenance_column": "analysis_ntee_code_fallback_enriched_source_column", "notes": "Analyst-facing resolved NTEE code with explicit IRS-first precedence."},
-    {"canonical_variable": "analysis_subsection_code_fallback_enriched", "variable_role": "enriched", "draft_variable": "Subsection code", "source_rule": "IRS EO BMF direct subsection first, then NCCS BMF exact-year, then NCCS BMF nearest-year fallback", "provenance_column": "analysis_subsection_code_fallback_enriched_source_column", "notes": "Analyst-facing resolved subsection code with explicit IRS-first precedence."},
-    {"canonical_variable": "analysis_missing_classification_flag", "variable_role": "calculated", "draft_variable": "", "source_rule": "True when analysis_ntee_code_fallback_enriched remains null after IRS-first plus NCCS fallback resolution", "provenance_column": "analysis_missing_classification_flag_source_column", "notes": "Final unresolved-classification flag for analyst filtering."},
-    {"canonical_variable": "analysis_calculated_ntee_broad_code", "variable_role": "calculated", "draft_variable": "Broad NTEE field classification code", "source_rule": "First letter of analysis_ntee_code_fallback_enriched", "provenance_column": "analysis_calculated_ntee_broad_code_source_column", "notes": "Broad field representation metric built from the analyst-facing resolved NTEE field."},
-    {"canonical_variable": "analysis_is_hospital", "variable_role": "proxy", "draft_variable": "Hospital flag", "source_rule": "NTEE proxy from analysis_ntee_code_fallback_enriched", "provenance_column": "analysis_is_hospital_source_column", "notes": "Analyst-facing hospital proxy from the resolved NTEE field."},
-    {"canonical_variable": "analysis_is_university", "variable_role": "proxy", "draft_variable": "University flag", "source_rule": "NTEE proxy from analysis_ntee_code_fallback_enriched", "provenance_column": "analysis_is_university_source_column", "notes": "Analyst-facing university proxy from the resolved NTEE field."},
-    {"canonical_variable": "analysis_is_political_org", "variable_role": "proxy", "draft_variable": "Political organization flag", "source_rule": "Subsection proxy from analysis_subsection_code_fallback_enriched", "provenance_column": "analysis_is_political_org_source_column", "notes": "Analyst-facing political proxy from the resolved subsection field."},
-    {"canonical_variable": "analysis_imputed_is_hospital", "variable_role": "imputed", "draft_variable": "Hospital flag", "source_rule": "analysis_is_hospital, then conservative name fallback, then default false", "provenance_column": "analysis_imputed_is_hospital_source_column", "notes": "Complete hospital flag for analysis exclusions."},
-    {"canonical_variable": "analysis_imputed_is_university", "variable_role": "imputed", "draft_variable": "University flag", "source_rule": "analysis_is_university, then conservative name fallback, then default false", "provenance_column": "analysis_imputed_is_university_source_column", "notes": "Complete university flag for analysis exclusions."},
-    {"canonical_variable": "analysis_imputed_is_political_org", "variable_role": "imputed", "draft_variable": "Political organization flag", "source_rule": "analysis_is_political_org, then conservative name fallback, then default false", "provenance_column": "analysis_imputed_is_political_org_source_column", "notes": "Complete political-organization flag for analysis exclusions."},
+    {"canonical_variable": "analysis_total_revenue_amount", "variable_role": "direct", "analysis_requirement": "Total revenue", "source_rule": "Direct IRS EO BMF REVENUE_AMT field from the filtered benchmark rows", "provenance_column": "analysis_total_revenue_amount_source_column", "notes": "Source-direct IRS EO BMF amount retained as nullable numeric."},
+    {"canonical_variable": "analysis_total_assets_amount", "variable_role": "direct", "analysis_requirement": "Total assets", "source_rule": "Direct IRS EO BMF ASSET_AMT field from the filtered benchmark rows", "provenance_column": "analysis_total_assets_amount_source_column", "notes": "Source-direct IRS EO BMF amount retained as nullable numeric."},
+    {"canonical_variable": "analysis_total_income_amount", "variable_role": "direct", "analysis_requirement": "Total income", "source_rule": "Direct IRS EO BMF INCOME_AMT field from the filtered benchmark rows", "provenance_column": "analysis_total_income_amount_source_column", "notes": "Source-direct IRS EO BMF amount retained as nullable numeric."},
+    {"canonical_variable": "analysis_ntee_code", "variable_role": "direct", "analysis_requirement": "NTEE filed classification code", "source_rule": "Direct IRS EO BMF NTEE_CD field from the filtered benchmark rows", "provenance_column": "analysis_ntee_code_source_column", "notes": "Source-direct IRS EO BMF classification retained without overwrite."},
+    {"canonical_variable": "analysis_subsection_code", "variable_role": "direct", "analysis_requirement": "Subsection code", "source_rule": "Direct IRS EO BMF SUBSECTION field from the filtered benchmark rows", "provenance_column": "analysis_subsection_code_source_column", "notes": "Source-direct IRS EO BMF subsection retained without overwrite."},
+    {"canonical_variable": "analysis_ntee_code_fallback_enriched", "variable_role": "enriched", "analysis_requirement": "NTEE filed classification code", "source_rule": "IRS EO BMF direct NTEE first, then NCCS BMF exact-year, then NCCS BMF nearest-year fallback", "provenance_column": "analysis_ntee_code_fallback_enriched_source_column", "notes": "Analyst-facing resolved NTEE code with explicit IRS-first precedence."},
+    {"canonical_variable": "analysis_subsection_code_fallback_enriched", "variable_role": "enriched", "analysis_requirement": "Subsection code", "source_rule": "IRS EO BMF direct subsection first, then NCCS BMF exact-year, then NCCS BMF nearest-year fallback", "provenance_column": "analysis_subsection_code_fallback_enriched_source_column", "notes": "Analyst-facing resolved subsection code with explicit IRS-first precedence."},
+    {"canonical_variable": "analysis_missing_classification_flag", "variable_role": "calculated", "analysis_requirement": "", "source_rule": "True when analysis_ntee_code_fallback_enriched remains null after IRS-first plus NCCS fallback resolution", "provenance_column": "analysis_missing_classification_flag_source_column", "notes": "Final unresolved-classification flag for analyst filtering."},
+    {"canonical_variable": "analysis_calculated_ntee_broad_code", "variable_role": "calculated", "analysis_requirement": "Broad NTEE field classification code", "source_rule": "First letter of analysis_ntee_code_fallback_enriched", "provenance_column": "analysis_calculated_ntee_broad_code_source_column", "notes": "Broad field representation metric built from the analyst-facing resolved NTEE field."},
+    {"canonical_variable": "analysis_is_hospital", "variable_role": "proxy", "analysis_requirement": "Hospital flag", "source_rule": "NTEE proxy from analysis_ntee_code_fallback_enriched", "provenance_column": "analysis_is_hospital_source_column", "notes": "Analyst-facing hospital proxy from the resolved NTEE field."},
+    {"canonical_variable": "analysis_is_university", "variable_role": "proxy", "analysis_requirement": "University flag", "source_rule": "NTEE proxy from analysis_ntee_code_fallback_enriched", "provenance_column": "analysis_is_university_source_column", "notes": "Analyst-facing university proxy from the resolved NTEE field."},
+    {"canonical_variable": "analysis_is_political_org", "variable_role": "proxy", "analysis_requirement": "Political organization flag", "source_rule": "Subsection proxy from analysis_subsection_code_fallback_enriched", "provenance_column": "analysis_is_political_org_source_column", "notes": "Analyst-facing political proxy from the resolved subsection field."},
+    {"canonical_variable": "analysis_imputed_is_hospital", "variable_role": "imputed", "analysis_requirement": "Hospital flag", "source_rule": "analysis_is_hospital, then conservative name fallback, then default false", "provenance_column": "analysis_imputed_is_hospital_source_column", "notes": "Complete hospital flag for analysis exclusions."},
+    {"canonical_variable": "analysis_imputed_is_university", "variable_role": "imputed", "analysis_requirement": "University flag", "source_rule": "analysis_is_university, then conservative name fallback, then default false", "provenance_column": "analysis_imputed_is_university_source_column", "notes": "Complete university flag for analysis exclusions."},
+    {"canonical_variable": "analysis_imputed_is_political_org", "variable_role": "imputed", "analysis_requirement": "Political organization flag", "source_rule": "analysis_is_political_org, then conservative name fallback, then default false", "provenance_column": "analysis_imputed_is_political_org_source_column", "notes": "Complete political-organization flag for analysis exclusions."},
 ]
 
 
@@ -218,7 +240,7 @@ def _write_variable_coverage_csv(analysis_df: pd.DataFrame, output_path: Path) -
                     "canonical_variable": canonical_variable,
                     "availability_status": "available" if canonical_variable in year_df.columns else "unavailable",
                     "variable_role": metadata["variable_role"],
-                    "draft_variable": metadata.get("draft_variable", ""),
+                    "analysis_requirement": metadata.get("analysis_requirement", ""),
                     "tax_year": year,
                     "row_count": row_count,
                     "populated_count": populated_count,
@@ -240,18 +262,25 @@ def _write_variable_mapping_md(output_path: Path) -> None:
         "This file documents the official IRS EO BMF analysis-ready variables.",
         "All paths are repo-relative and the package is intentionally source-direct to IRS EO BMF.",
         "",
-        "|canonical_variable|role|draft_variable|source_rule|provenance_column|notes|",
+        "## Coverage Evidence",
+        "",
+        f"- Generated coverage CSV: `{_portable_path(analysis_variable_coverage_path())}`",
+        f"- Published S3 variable mapping object: `{ANALYSIS_VARIABLE_MAPPING_PREFIX}/{analysis_variable_mapping_path().name}`",
+        f"- Published S3 coverage object: `{ANALYSIS_COVERAGE_PREFIX}/{analysis_variable_coverage_path().name}`",
+        "- Coverage CSVs are generated by the analysis step and published as quality evidence.",
+        "",
+        "|canonical_variable|role|analysis_requirement|source_rule|provenance_column|notes|",
         "|---|---|---|---|---|---|",
     ]
     for metadata in AVAILABLE_VARIABLE_METADATA:
         lines.append(
-            "|{canonical_variable}|{variable_role}|{draft_variable}|{source_rule}|{provenance_column}|{notes}|".format(
+            "|{canonical_variable}|{variable_role}|{analysis_requirement}|{source_rule}|{provenance_column}|{notes}|".format(
                 **{k: str(v).replace("|", "\\|") for k, v in metadata.items()}
             )
         )
     for metadata in UNAVAILABLE_VARIABLES:
         lines.append(
-            "|{canonical_variable}|{variable_role}|{draft_variable}|Unavailable|n/a|{notes}|".format(
+            "|{canonical_variable}|{variable_role}|{analysis_requirement}|Unavailable|n/a|{notes}|".format(
                 **{k: str(v).replace("|", "\\|") for k, v in metadata.items()}
             )
         )
@@ -300,7 +329,7 @@ The main artifact classes are:
 - Silver filtered artifacts: one combined filtered parquet plus one benchmark parquet per retained analysis year.
 - Final analysis artifacts: the row-level analysis parquet, geography metrics parquet, field metrics parquet, coverage CSV, mapping Markdown, and this processing doc.
 
-This pipeline follows the `CODING_RULES.md` filtered-only combine contract:
+This pipeline follows a filtered-only combine contract (combine stages use filtered inputs only):
 
 - raw state files are filtered to benchmark geography before any combine stage
 - the final analysis step reads only the filtered benchmark outputs
@@ -328,6 +357,18 @@ This pipeline follows the `CODING_RULES.md` filtered-only combine contract:
 
 ## How Data Is Retrieved
 
+## Exact Source Locations
+
+- IRS EO BMF base URL: `{IRS_BMF_BASE_URL}`
+- Configured benchmark-state files:
+{chr(10).join(f"  - `{state}`: `{state_source_url(state)}`" for state in DEFAULT_STATE_CODES)}
+
+## Raw Source Dictionaries
+
+- Official IRS EO BMF dictionary: `documentation/final_preprocessing_docs/technical_docs/source_dictionaries/irs_eo_bmf/eo-info.pdf`
+- Local client package copy: `docs/final_preprocessing_docs/technical_docs/source_dictionaries/irs_eo_bmf/eo-info.pdf`
+- Applies to the raw IRS EO BMF state CSVs used by this pipeline.
+
 ### Step 01: state-file retrieval
 
 The raw source is one IRS EO BMF state CSV per file.
@@ -353,13 +394,13 @@ This preserves:
 
 ### Local artifacts
 
-- Combined filtered parquet: `{combined_filtered_output_path()}`
-- Analysis parquet: `{analysis_variables_output_path()}`
-- Geography metrics parquet: `{analysis_geography_metrics_output_path()}`
-- Field metrics parquet: `{analysis_field_metrics_output_path()}`
-- Coverage CSV: `{analysis_variable_coverage_path()}`
-- Mapping Markdown: `{analysis_variable_mapping_path()}`
-- Data-processing Markdown: `{analysis_data_processing_doc_path()}`
+- Combined filtered parquet: `{_portable_path(combined_filtered_output_path())}`
+- Analysis parquet: `{_portable_path(analysis_variables_output_path())}`
+- Geography metrics parquet: `{_portable_path(analysis_geography_metrics_output_path())}`
+- Field metrics parquet: `{_portable_path(analysis_field_metrics_output_path())}`
+- Coverage CSV: `{_portable_path(analysis_variable_coverage_path())}`
+- Mapping Markdown: `{_portable_path(analysis_variable_mapping_path())}`
+- Data-processing Markdown: `{_portable_path(analysis_data_processing_doc_path())}`
 
 ### S3 layout
 
@@ -368,7 +409,9 @@ This preserves:
 - Filtered benchmark prefix: `silver/irs990/bmf`
 - Filtered metadata prefix: `silver/irs990/bmf/metadata`
 - Analysis prefix: `{ANALYSIS_PREFIX}`
-- Analysis metadata prefix: `{ANALYSIS_META_PREFIX}`
+- Analysis documentation prefix: `{ANALYSIS_DOCUMENTATION_PREFIX}`
+- Analysis variable mapping prefix: `{ANALYSIS_VARIABLE_MAPPING_PREFIX}`
+- Analysis coverage prefix: `{ANALYSIS_COVERAGE_PREFIX}`
 
 ## Step-By-Step Transformation
 
@@ -491,6 +534,14 @@ It reports organization count, financial sums, and share-of-region metrics to su
 
 The coverage CSV records fill rates for direct IRS fields, fallback-enriched classification fields, and the proxy/imputed exclusion flags.
 
+## Coverage Evidence
+
+- Generated coverage CSV: `{_portable_path(analysis_variable_coverage_path())}`
+- Published S3 documentation object: `{ANALYSIS_DOCUMENTATION_PREFIX}/{analysis_data_processing_doc_path().name}`
+- Published S3 variable mapping object: `{ANALYSIS_VARIABLE_MAPPING_PREFIX}/{analysis_variable_mapping_path().name}`
+- Published S3 coverage object: `{ANALYSIS_COVERAGE_PREFIX}/{analysis_variable_coverage_path().name}`
+- Coverage CSVs are generated by step 07 and published as authoritative quality evidence.
+
 The mapping Markdown documents which fields are:
 
 - direct
@@ -528,9 +579,9 @@ This package is intended as a registry, geography, and classification support la
 - Financial completeness is weaker than NCCS BMF and much weaker than GT or efile.
 - `analysis_ntee_code_fallback_enriched` is the analyst-facing resolved NTEE field; `analysis_ntee_code` remains intentionally source-direct and may be sparser.
 
-## Draft Alignment Appendix
+## Analysis requirement alignment appendix
 
-| draft_variable | source_specific_output | status | rule_or_reason |
+| analysis_requirement | source_specific_output | status | rule_or_reason |
 | --- | --- | --- | --- |
 | Total revenue | analysis_total_revenue_amount | direct | Direct IRS EO BMF amount field |
 | Total assets | analysis_total_assets_amount | direct | Direct IRS EO BMF amount field |
@@ -735,7 +786,9 @@ def main() -> None:
     parser.add_argument("--staging-dir", type=Path, default=STAGING_DIR, help="Local IRS EO BMF staging directory")
     parser.add_argument("--bmf-staging-dir", type=Path, default=DEFAULT_BMF_STAGING_DIR, help="Local NCCS BMF staging directory used for classification fallback")
     parser.add_argument("--analysis-prefix", default=ANALYSIS_PREFIX, help="Documented S3 analysis prefix")
-    parser.add_argument("--analysis-meta-prefix", default=ANALYSIS_META_PREFIX, help="Documented S3 analysis metadata prefix")
+    parser.add_argument("--analysis-documentation-prefix", default=ANALYSIS_DOCUMENTATION_PREFIX, help="Documented S3 analysis documentation prefix")
+    parser.add_argument("--analysis-variable-mapping-prefix", default=ANALYSIS_VARIABLE_MAPPING_PREFIX, help="Documented S3 analysis variable mapping prefix")
+    parser.add_argument("--analysis-coverage-prefix", default=ANALYSIS_COVERAGE_PREFIX, help="Documented S3 analysis coverage prefix")
     args = parser.parse_args()
 
     start = time.perf_counter()

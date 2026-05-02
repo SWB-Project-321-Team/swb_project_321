@@ -52,8 +52,8 @@ def main() -> None:
             raise FileNotFoundError(f"Missing analysis artifact: {local_path}")
 
         # Keep the CLI prefix override scoped to the main analysis parquet prefix.
-        # Metadata artifacts continue to use the dedicated analysis metadata
-        # prefix so the public S3 layout stays explicit and predictable.
+        # Documentation, variable mapping, and coverage artifacts use their
+        # dedicated prefixes so the public S3 layout stays explicit.
         prefix_override = args.prefix if artifact.s3_prefix == ANALYSIS_PREFIX else None
         s3_key = artifact_s3_key(artifact, prefix_override)
         if should_skip_upload(local_path, args.bucket, s3_key, args.region, overwrite=args.overwrite):

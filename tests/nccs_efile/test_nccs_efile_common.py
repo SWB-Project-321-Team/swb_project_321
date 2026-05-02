@@ -631,7 +631,7 @@ def test_build_efile_analysis_outputs_builds_expected_metrics(tmp_path: Path, mo
         coverage_df["canonical_variable"] == "analysis_program_service_revenue_amount"
     ].iloc[0]
     assert program_service_coverage["availability_status"] == "unavailable"
-    assert program_service_coverage["draft_variable"] == "Program service revenue"
+    assert program_service_coverage["analysis_requirement"] == "Program service revenue"
     assert program_service_coverage["variable_role"] == "unavailable"
     assets_coverage = coverage_df.loc[
         coverage_df["canonical_variable"] == "analysis_total_assets_amount"

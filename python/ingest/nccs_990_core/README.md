@@ -48,8 +48,8 @@ python python/run_nccs_990_core.py
 - `01_data/staging/nccs_990/core/nccs_990_core_analysis_variables.parquet`
 - `01_data/staging/nccs_990/core/nccs_990_core_analysis_geography_metrics.parquet`
 - `01_data/raw/nccs_990/core/metadata/nccs_990_core_analysis_variable_coverage.csv`
-- `docs/analysis/nccs_990_core_analysis_variable_mapping.md`
-- `docs/data_processing/nccs_990_core_pipeline.md`
+- `docs/final_preprocessing_docs/technical_docs/analysis_variable_mappings/nccs_990_core_analysis_variable_mapping.md`
+- `docs/final_preprocessing_docs/technical_docs/pipeline_docs/nccs_990_core_pipeline.md`
 
 ## S3 layout
 
@@ -61,9 +61,9 @@ python python/run_nccs_990_core.py
 - `silver/nccs_990/core/year=YYYY/nccs_990_core_combined_filtered_year=YYYY.parquet`
 - `silver/nccs_990/core/analysis/nccs_990_core_analysis_variables.parquet`
 - `silver/nccs_990/core/analysis/nccs_990_core_analysis_geography_metrics.parquet`
-- `silver/nccs_990/core/analysis/metadata/nccs_990_core_analysis_variable_coverage.csv`
-- `silver/nccs_990/core/analysis/metadata/nccs_990_core_analysis_variable_mapping.md`
-- `silver/nccs_990/core/analysis/metadata/nccs_990_core_pipeline.md`
+- `silver/nccs_990/core/analysis/documentation/nccs_990_core_pipeline.md`
+- `silver/nccs_990/core/analysis/variable_mappings/nccs_990_core_analysis_variable_mapping.md`
+- `silver/nccs_990/core/analysis/quality/coverage/nccs_990_core_analysis_variable_coverage.csv`
 
 ## Filtering and analysis notes
 

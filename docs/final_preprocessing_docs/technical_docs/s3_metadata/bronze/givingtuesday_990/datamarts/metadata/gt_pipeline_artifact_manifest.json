@@ -1,0 +1,307 @@
+{
+  "artifact_count": 12,
+  "artifacts": [
+    {
+      "artifact_id": "basic_allforms_unfiltered",
+      "category": "bronze_unfiltered",
+      "local_bytes": 2395061328,
+      "local_path": "C:\\Users\\eilke\\Desktop\\Github Repo\\swb_project_321\\data\\321_Black_Hills_Area_Community_Foundation_2025_08\\01_data\\staging\\filing\\givingtuesday_990_basic_allforms_unfiltered.parquet",
+      "local_signature": {
+        "head_sha1": "683e639271e8374544777e046d3b4d99a4026a77",
+        "mtime_ns": 1774726654676618700,
+        "path": "C:\\Users\\eilke\\Desktop\\Github Repo\\swb_project_321\\data\\321_Black_Hills_Area_Community_Foundation_2025_08\\01_data\\staging\\filing\\givingtuesday_990_basic_allforms_unfiltered.parquet",
+        "size_bytes": 2395061328
+      },
+      "s3_bucket": "swb-321-irs990-teos",
+      "s3_bytes": 2395061328,
+      "s3_key": "bronze/givingtuesday_990/datamarts/unfiltered/givingtuesday_990_basic_allforms_unfiltered.parquet",
+      "size_match": true,
+      "verify_mode": "live"
+    },
+    {
+      "artifact_id": "basic_plus_combined_unfiltered",
+      "category": "bronze_unfiltered",
+      "local_bytes": 2622793846,
+      "local_path": "C:\\Users\\eilke\\Desktop\\Github Repo\\swb_project_321\\data\\321_Black_Hills_Area_Community_Foundation_2025_08\\01_data\\staging\\filing\\givingtuesday_990_basic_plus_combined_unfiltered.parquet",
+      "local_signature": {
+        "head_sha1": "e910296f387eb956c3df2bd2c16ffbd2016a32cb",
+        "mtime_ns": 1774727631320949400,
+        "path": "C:\\Users\\eilke\\Desktop\\Github Repo\\swb_project_321\\data\\321_Black_Hills_Area_Community_Foundation_2025_08\\01_data\\staging\\filing\\givingtuesday_990_basic_plus_combined_unfiltered.parquet",
+        "size_bytes": 2622793846
+      },
+      "s3_bucket": "swb-321-irs990-teos",
+      "s3_bytes": 2622793846,
+      "s3_key": "bronze/givingtuesday_990/datamarts/unfiltered/givingtuesday_990_basic_plus_combined_unfiltered.parquet",
+      "size_match": true,
+      "verify_mode": "live"
+    },
+    {
+      "artifact_id": "basic_allforms_filtered",
+      "category": "silver_filtered",
+      "local_bytes": 2280236,
+      "local_path": "C:\\Users\\eilke\\Desktop\\Github Repo\\swb_project_321\\data\\321_Black_Hills_Area_Community_Foundation_2025_08\\01_data\\staging\\filing\\givingtuesday_990_basic_allforms_benchmark.parquet",
+      "local_signature": {
+        "head_sha1": "a6df84d4749c3452dbdbd2adca5e0d780ab0a496",
+        "mtime_ns": 1774727675519597800,
+        "path": "C:\\Users\\eilke\\Desktop\\Github Repo\\swb_project_321\\data\\321_Black_Hills_Area_Community_Foundation_2025_08\\01_data\\staging\\filing\\givingtuesday_990_basic_allforms_benchmark.parquet",
+        "size_bytes": 2280236
+      },
+      "s3_bucket": "swb-321-irs990-teos",
+      "s3_bytes": 2280236,
+      "s3_key": "silver/givingtuesday_990/filing/givingtuesday_990_basic_allforms_benchmark.parquet",
+      "size_match": true,
+      "verify_mode": "live"
+    },
+    {
+      "artifact_id": "basic_allforms_filtered_manifest",
+      "category": "silver_filtered_manifest",
+      "local_bytes": 2076,
+      "local_path": "C:\\Users\\eilke\\Desktop\\Github Repo\\swb_project_321\\data\\321_Black_Hills_Area_Community_Foundation_2025_08\\01_data\\staging\\filing\\manifest_basic_allforms_filtered.json",
+      "local_signature": {
+        "head_sha1": "b523ffc674ca7d2b0236cd30b951cf155e8c0f90",
+        "mtime_ns": 1774727675705944600,
+        "path": "C:\\Users\\eilke\\Desktop\\Github Repo\\swb_project_321\\data\\321_Black_Hills_Area_Community_Foundation_2025_08\\01_data\\staging\\filing\\manifest_basic_allforms_filtered.json",
+        "size_bytes": 2076
+      },
+      "s3_bucket": "swb-321-irs990-teos",
+      "s3_bytes": 2076,
+      "s3_key": "silver/givingtuesday_990/filing/manifest_basic_allforms_filtered.json",
+      "size_match": true,
+      "verify_mode": "live"
+    },
+    {
+      "artifact_id": "basic_allforms_filtered_schema_snapshot",
+      "category": "silver_metadata",
+      "local_bytes": 6442,
+      "local_path": "C:\\Users\\eilke\\Desktop\\Github Repo\\swb_project_321\\data\\321_Black_Hills_Area_Community_Foundation_2025_08\\01_data\\raw\\givingtuesday_990\\datamarts\\metadata\\schema_snapshot_basic_allforms_filtered.json",
+      "local_signature": {
+        "head_sha1": "98f82a38a105e06320dbac1de9d438797740c4fd",
+        "mtime_ns": 1774727675711461100,
+        "path": "C:\\Users\\eilke\\Desktop\\Github Repo\\swb_project_321\\data\\321_Black_Hills_Area_Community_Foundation_2025_08\\01_data\\raw\\givingtuesday_990\\datamarts\\metadata\\schema_snapshot_basic_allforms_filtered.json",
+        "size_bytes": 6442
+      },
+      "s3_bucket": "swb-321-irs990-teos",
+      "s3_bytes": 6442,
+      "s3_key": "silver/givingtuesday_990/filing/metadata/schema_snapshot_basic_allforms_filtered.json",
+      "size_match": true,
+      "verify_mode": "live"
+    },
+    {
+      "artifact_id": "basic_plus_combined_filtered",
+      "category": "silver_filtered",
+      "local_bytes": 2351091,
+      "local_path": "C:\\Users\\eilke\\Desktop\\Github Repo\\swb_project_321\\data\\321_Black_Hills_Area_Community_Foundation_2025_08\\01_data\\staging\\filing\\givingtuesday_990_filings_benchmark.parquet",
+      "local_signature": {
+        "head_sha1": "c87153586e3535c90544fe8d6f1ef08fad370afa",
+        "mtime_ns": 1774727696727735000,
+        "path": "C:\\Users\\eilke\\Desktop\\Github Repo\\swb_project_321\\data\\321_Black_Hills_Area_Community_Foundation_2025_08\\01_data\\staging\\filing\\givingtuesday_990_filings_benchmark.parquet",
+        "size_bytes": 2351091
+      },
+      "s3_bucket": "swb-321-irs990-teos",
+      "s3_bytes": 2351091,
+      "s3_key": "silver/givingtuesday_990/filing/givingtuesday_990_filings_benchmark.parquet",
+      "size_match": true,
+      "verify_mode": "live"
+    },
+    {
+      "artifact_id": "basic_plus_combined_filtered_manifest",
+      "category": "silver_filtered_manifest",
+      "local_bytes": 2064,
+      "local_path": "C:\\Users\\eilke\\Desktop\\Github Repo\\swb_project_321\\data\\321_Black_Hills_Area_Community_Foundation_2025_08\\01_data\\staging\\filing\\manifest_filtered.json",
+      "local_signature": {
+        "head_sha1": "2a554e1fb09bcbe53b448e348f8ac464bc695fd6",
+        "mtime_ns": 1774727696878667000,
+        "path": "C:\\Users\\eilke\\Desktop\\Github Repo\\swb_project_321\\data\\321_Black_Hills_Area_Community_Foundation_2025_08\\01_data\\staging\\filing\\manifest_filtered.json",
+        "size_bytes": 2064
+      },
+      "s3_bucket": "swb-321-irs990-teos",
+      "s3_bytes": 2064,
+      "s3_key": "silver/givingtuesday_990/filing/manifest_filtered.json",
+      "size_match": true,
+      "verify_mode": "live"
+    },
+    {
+      "artifact_id": "basic_plus_combined_filtered_schema_snapshot",
+      "category": "silver_metadata",
+      "local_bytes": 6516,
+      "local_path": "C:\\Users\\eilke\\Desktop\\Github Repo\\swb_project_321\\data\\321_Black_Hills_Area_Community_Foundation_2025_08\\01_data\\raw\\givingtuesday_990\\datamarts\\metadata\\schema_snapshot_filings_filtered.json",
+      "local_signature": {
+        "head_sha1": "277145f58f6496de041c2cbf7ffbd43d51a1c919",
+        "mtime_ns": 1774727696894698900,
+        "path": "C:\\Users\\eilke\\Desktop\\Github Repo\\swb_project_321\\data\\321_Black_Hills_Area_Community_Foundation_2025_08\\01_data\\raw\\givingtuesday_990\\datamarts\\metadata\\schema_snapshot_filings_filtered.json",
+        "size_bytes": 6516
+      },
+      "s3_bucket": "swb-321-irs990-teos",
+      "s3_bytes": 6516,
+      "s3_key": "silver/givingtuesday_990/filing/metadata/schema_snapshot_filings_filtered.json",
+      "size_match": true,
+      "verify_mode": "live"
+    },
+    {
+      "artifact_id": "manifest_basic_allforms_unfiltered",
+      "category": "build_manifest",
+      "columns_output": 290,
+      "input_signature": {
+        "catalog_csv": {
+          "head_sha1": "ada6ec5d6f98d508e0d94cdfe504906adeabb9de",
+          "mtime_ns": 1774725339223939300,
+          "path": "C:\\Users\\eilke\\Desktop\\Github Repo\\swb_project_321\\data\\321_Black_Hills_Area_Community_Foundation_2025_08\\01_data\\raw\\givingtuesday_990\\datamarts\\metadata\\datamart_catalog.csv",
+          "size_bytes": 14798
+        },
+        "raw_basic_990": {
+          "head_sha1": "51989ab8857eb166b57e24023730b27957991767",
+          "mtime_ns": 1774726621800050700,
+          "path": "C:\\Users\\eilke\\Desktop\\Github Repo\\swb_project_321\\data\\321_Black_Hills_Area_Community_Foundation_2025_08\\01_data\\raw\\givingtuesday_990\\datamarts\\raw\\2025_10_18_All_Years_990StandardFields.csv",
+          "size_bytes": 2302094678
+        },
+        "raw_basic_990ez": {
+          "head_sha1": "e50dc513f9863a5dabbb0061af55d5a1bc86ff25",
+          "mtime_ns": 1774726122472035100,
+          "path": "C:\\Users\\eilke\\Desktop\\Github Repo\\swb_project_321\\data\\321_Black_Hills_Area_Community_Foundation_2025_08\\01_data\\raw\\givingtuesday_990\\datamarts\\raw\\2025_10_28_All_Years_990EZStandardFields.csv",
+          "size_bytes": 1432510202
+        },
+        "raw_basic_990pf": {
+          "head_sha1": "df1a4f0e3cc0d49bbcf43aaa31fb40880e07a416",
+          "mtime_ns": 1774725879098961100,
+          "path": "C:\\Users\\eilke\\Desktop\\Github Repo\\swb_project_321\\data\\321_Black_Hills_Area_Community_Foundation_2025_08\\01_data\\raw\\givingtuesday_990\\datamarts\\raw\\2025_08_29_All_Years_990PFStandardFields.csv",
+          "size_bytes": 677317763
+        }
+      },
+      "local_bytes": 2240,
+      "local_path": "C:\\Users\\eilke\\Desktop\\Github Repo\\swb_project_321\\data\\321_Black_Hills_Area_Community_Foundation_2025_08\\01_data\\staging\\filing\\manifest_basic_allforms_unfiltered.json",
+      "local_signature": {
+        "head_sha1": "f44ced21ab57a52c8b179c22df15b1a875eaaffe",
+        "mtime_ns": 1774726654721838800,
+        "path": "C:\\Users\\eilke\\Desktop\\Github Repo\\swb_project_321\\data\\321_Black_Hills_Area_Community_Foundation_2025_08\\01_data\\staging\\filing\\manifest_basic_allforms_unfiltered.json",
+        "size_bytes": 2240
+      },
+      "rows_output": 6684976,
+      "s3_bucket": "",
+      "s3_bytes": null,
+      "s3_key": "",
+      "size_match": null,
+      "verify_mode": "local_only"
+    },
+    {
+      "artifact_id": "manifest_basic_plus_combined_unfiltered",
+      "category": "build_manifest",
+      "columns_output": 293,
+      "input_signature": {
+        "basic_parquet": {
+          "head_sha1": "683e639271e8374544777e046d3b4d99a4026a77",
+          "mtime_ns": 1774726654676618700,
+          "path": "C:\\Users\\eilke\\Desktop\\Github Repo\\swb_project_321\\data\\321_Black_Hills_Area_Community_Foundation_2025_08\\01_data\\staging\\filing\\givingtuesday_990_basic_allforms_unfiltered.parquet",
+          "size_bytes": 2395061328
+        },
+        "catalog_csv": {
+          "head_sha1": "ada6ec5d6f98d508e0d94cdfe504906adeabb9de",
+          "mtime_ns": 1774725339223939300,
+          "path": "C:\\Users\\eilke\\Desktop\\Github Repo\\swb_project_321\\data\\321_Black_Hills_Area_Community_Foundation_2025_08\\01_data\\raw\\givingtuesday_990\\datamarts\\metadata\\datamart_catalog.csv",
+          "size_bytes": 14798
+        },
+        "combined_raw_csv": {
+          "head_sha1": "3a9fac0d275ceafb826a714eecbaad536e26052a",
+          "mtime_ns": 1774726384629674600,
+          "path": "C:\\Users\\eilke\\Desktop\\Github Repo\\swb_project_321\\data\\321_Black_Hills_Area_Community_Foundation_2025_08\\01_data\\raw\\givingtuesday_990\\datamarts\\raw\\2025_07_10_All_Years_990_990ez_990pf_990n_Combined_DataMart.csv",
+          "size_bytes": 2140103678
+        }
+      },
+      "local_bytes": 1871,
+      "local_path": "C:\\Users\\eilke\\Desktop\\Github Repo\\swb_project_321\\data\\321_Black_Hills_Area_Community_Foundation_2025_08\\01_data\\staging\\filing\\manifest_basic_plus_combined_unfiltered.json",
+      "local_signature": {
+        "head_sha1": "22241db9b5b43fdec1fc417d3cd1344e3f50c56f",
+        "mtime_ns": 1774727636468305400,
+        "path": "C:\\Users\\eilke\\Desktop\\Github Repo\\swb_project_321\\data\\321_Black_Hills_Area_Community_Foundation_2025_08\\01_data\\staging\\filing\\manifest_basic_plus_combined_unfiltered.json",
+        "size_bytes": 1871
+      },
+      "rows_output": 8022627,
+      "s3_bucket": "",
+      "s3_bytes": null,
+      "s3_key": "",
+      "size_match": null,
+      "verify_mode": "local_only"
+    },
+    {
+      "artifact_id": "manifest_basic_allforms_filtered",
+      "category": "build_manifest",
+      "columns_output": "",
+      "input_signature": {
+        "geoid_csv": {
+          "head_sha1": "10c2b2877eeb5fca8b972661544eaf4a75ffc978",
+          "mtime_ns": 1772479652976759700,
+          "path": "C:\\Users\\eilke\\Desktop\\Github Repo\\swb_project_321\\data\\321_Black_Hills_Area_Community_Foundation_2025_08\\01_data\\reference\\GEOID_reference.csv",
+          "size_bytes": 2119
+        },
+        "input_parquet": {
+          "head_sha1": "683e639271e8374544777e046d3b4d99a4026a77",
+          "mtime_ns": 1774726654676618700,
+          "path": "C:\\Users\\eilke\\Desktop\\Github Repo\\swb_project_321\\data\\321_Black_Hills_Area_Community_Foundation_2025_08\\01_data\\staging\\filing\\givingtuesday_990_basic_allforms_unfiltered.parquet",
+          "size_bytes": 2395061328
+        },
+        "zip_to_county_csv": {
+          "head_sha1": "5f9d364fa7d126e26cb0497cf9d066122a98ff71",
+          "mtime_ns": 1772479668888282200,
+          "path": "C:\\Users\\eilke\\Desktop\\Github Repo\\swb_project_321\\data\\321_Black_Hills_Area_Community_Foundation_2025_08\\01_data\\reference\\zip_to_county_fips.csv",
+          "size_bytes": 439293
+        }
+      },
+      "local_bytes": 2076,
+      "local_path": "C:\\Users\\eilke\\Desktop\\Github Repo\\swb_project_321\\data\\321_Black_Hills_Area_Community_Foundation_2025_08\\01_data\\staging\\filing\\manifest_basic_allforms_filtered.json",
+      "local_signature": {
+        "head_sha1": "b523ffc674ca7d2b0236cd30b951cf155e8c0f90",
+        "mtime_ns": 1774727675705944600,
+        "path": "C:\\Users\\eilke\\Desktop\\Github Repo\\swb_project_321\\data\\321_Black_Hills_Area_Community_Foundation_2025_08\\01_data\\staging\\filing\\manifest_basic_allforms_filtered.json",
+        "size_bytes": 2076
+      },
+      "rows_output": 6306,
+      "s3_bucket": "",
+      "s3_bytes": null,
+      "s3_key": "",
+      "size_match": null,
+      "verify_mode": "local_only"
+    },
+    {
+      "artifact_id": "manifest_filtered_mixed",
+      "category": "build_manifest",
+      "columns_output": "",
+      "input_signature": {
+        "geoid_csv": {
+          "head_sha1": "10c2b2877eeb5fca8b972661544eaf4a75ffc978",
+          "mtime_ns": 1772479652976759700,
+          "path": "C:\\Users\\eilke\\Desktop\\Github Repo\\swb_project_321\\data\\321_Black_Hills_Area_Community_Foundation_2025_08\\01_data\\reference\\GEOID_reference.csv",
+          "size_bytes": 2119
+        },
+        "input_parquet": {
+          "head_sha1": "e910296f387eb956c3df2bd2c16ffbd2016a32cb",
+          "mtime_ns": 1774727631320949400,
+          "path": "C:\\Users\\eilke\\Desktop\\Github Repo\\swb_project_321\\data\\321_Black_Hills_Area_Community_Foundation_2025_08\\01_data\\staging\\filing\\givingtuesday_990_basic_plus_combined_unfiltered.parquet",
+          "size_bytes": 2622793846
+        },
+        "zip_to_county_csv": {
+          "head_sha1": "5f9d364fa7d126e26cb0497cf9d066122a98ff71",
+          "mtime_ns": 1772479668888282200,
+          "path": "C:\\Users\\eilke\\Desktop\\Github Repo\\swb_project_321\\data\\321_Black_Hills_Area_Community_Foundation_2025_08\\01_data\\reference\\zip_to_county_fips.csv",
+          "size_bytes": 439293
+        }
+      },
+      "local_bytes": 2064,
+      "local_path": "C:\\Users\\eilke\\Desktop\\Github Repo\\swb_project_321\\data\\321_Black_Hills_Area_Community_Foundation_2025_08\\01_data\\staging\\filing\\manifest_filtered.json",
+      "local_signature": {
+        "head_sha1": "2a554e1fb09bcbe53b448e348f8ac464bc695fd6",
+        "mtime_ns": 1774727696878667000,
+        "path": "C:\\Users\\eilke\\Desktop\\Github Repo\\swb_project_321\\data\\321_Black_Hills_Area_Community_Foundation_2025_08\\01_data\\staging\\filing\\manifest_filtered.json",
+        "size_bytes": 2064
+      },
+      "rows_output": 6255,
+      "s3_bucket": "",
+      "s3_bytes": null,
+      "s3_key": "",
+      "size_match": null,
+      "verify_mode": "local_only"
+    }
+  ],
+  "created_at_utc": "2026-03-28T19:55:12Z",
+  "emit": "both",
+  "failure_count": 0,
+  "verify_only_changed": true
+}

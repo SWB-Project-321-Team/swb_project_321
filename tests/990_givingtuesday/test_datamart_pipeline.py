@@ -119,8 +119,8 @@ def test_step14_uploads_registered_analysis_outputs(tmp_path: Path, monkeypatch:
     artifacts = [
         gt_common.PipelineArtifact("analysis_variables", analysis_parquet, gt_common.ANALYSIS_PREFIX, "application/octet-stream", "analysis_output"),
         gt_common.PipelineArtifact("analysis_region_metrics", region_parquet, gt_common.ANALYSIS_PREFIX, "application/octet-stream", "analysis_output"),
-        gt_common.PipelineArtifact("analysis_coverage", coverage_csv, gt_common.ANALYSIS_META_PREFIX, "text/csv", "analysis_metadata"),
-        gt_common.PipelineArtifact("analysis_mapping", mapping_md, gt_common.ANALYSIS_META_PREFIX, "text/markdown", "analysis_metadata"),
+        gt_common.PipelineArtifact("analysis_coverage", coverage_csv, gt_common.ANALYSIS_COVERAGE_PREFIX, "text/csv", "analysis_metadata"),
+        gt_common.PipelineArtifact("analysis_mapping", mapping_md, gt_common.ANALYSIS_VARIABLE_MAPPING_PREFIX, "text/markdown", "analysis_metadata"),
     ]
 
     uploaded: list[tuple[str, str, str, str]] = []
@@ -164,13 +164,13 @@ def test_step14_uploads_registered_analysis_outputs(tmp_path: Path, monkeypatch:
         (
             "givingtuesday_990_basic_allforms_analysis_variable_coverage.csv",
             "example-bucket",
-            "silver/givingtuesday_990/analysis/metadata/givingtuesday_990_basic_allforms_analysis_variable_coverage.csv",
+            "silver/givingtuesday_990/analysis/quality/coverage/givingtuesday_990_basic_allforms_analysis_variable_coverage.csv",
             "text/csv",
         ),
         (
             "givingtuesday_basic_analysis_variable_mapping.md",
             "example-bucket",
-            "silver/givingtuesday_990/analysis/metadata/givingtuesday_basic_analysis_variable_mapping.md",
+            "silver/givingtuesday_990/analysis/variable_mappings/givingtuesday_basic_analysis_variable_mapping.md",
             "text/markdown",
         ),
     ]

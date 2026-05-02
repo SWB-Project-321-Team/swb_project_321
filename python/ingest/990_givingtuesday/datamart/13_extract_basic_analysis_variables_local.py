@@ -1,12 +1,12 @@
 """
-Step 13: Extract GT basic-only analysis variables for the current analysis draft.
+Step 13: Extract GT basic-only analysis variables for the stated analysis scope.
 
 This step intentionally reads the GT basic-only benchmark-filtered artifact and
 produces a GT-only analysis-variable layer. It does not try to backfill missing
 concepts from NCCS, BMF, or e-file sources, except for the explicit BMF NTEE
 enrichment approved for this final GT analysis layer. That narrow exception
 keeps the analysis extract source-faithful and auditable while still covering
-the analysis-plan classification variable GT does not carry directly.
+the classification variable GT does not carry directly.
 
 The NTEE enrichment now follows an explicit fallback chain:
 1. NCCS BMF exact-year EIN + tax_year match
@@ -22,17 +22,35 @@ older mixed-source flag logic.
 from __future__ import annotations
 
 import argparse
-import os
+import importlib.util
 import re
+import sys
 import time
 from pathlib import Path
 
 import pandas as pd
 from tqdm import tqdm
 
+
+def _ensure_sibling_common_loaded() -> None:
+    common_path = Path(__file__).with_name("common.py").resolve()
+    current = sys.modules.get("common")
+    current_file = getattr(current, "__file__", None)
+    if current_file and Path(current_file).resolve() == common_path:
+        return
+    spec = importlib.util.spec_from_file_location("common", common_path)
+    if spec is None or spec.loader is None:
+        raise ImportError(f"Unable to load common module from {common_path}")
+    module = importlib.util.module_from_spec(spec)
+    sys.modules["common"] = module
+    spec.loader.exec_module(module)
+
+
+_ensure_sibling_common_loaded()
+
 from common import (
-    ANALYSIS_PLAN_WORKING_DRAFT_MD,
-    CODING_RULES_MD,
+    ANALYSIS_COVERAGE_PREFIX,
+    ANALYSIS_VARIABLE_MAPPING_PREFIX,
     DOCS_ANALYSIS_DIR,
     FILTERED_BASIC_ALLFORMS_PARQUET,
     GT_BASIC_ANALYSIS_REGION_METRICS_PARQUET,
@@ -47,64 +65,27 @@ from common import (
     normalize_ein,
     print_elapsed,
 )
+from utils.paths import DATA as DATA_ROOT
+
+
+_REPO_ROOT = Path(__file__).resolve().parents[4]
+
+
+def _portable_path(path: Path) -> str:
+    resolved = path.resolve()
+    try:
+        return f"SWB_321_DATA_ROOT/{resolved.relative_to(DATA_ROOT.resolve()).as_posix()}"
+    except ValueError:
+        pass
+    try:
+        return resolved.relative_to(_REPO_ROOT).as_posix()
+    except ValueError:
+        return resolved.as_posix()
 
 
 TRUE_FLAG_VALUES = {"1", "Y", "YES", "TRUE", "T"}
 FALSE_FLAG_VALUES = {"0", "N", "NO", "FALSE", "F"}
 POLITICAL_ORG_SUBSECTION_CODES = {"4", "527", "501C4", "501C527"}
-
-EXACT_ANALYSIS_PLAN_BASIS = [
-    {
-        "label": "Section requirements for exact variables",
-        "link": "../Analysis plan working draft.md#L9",
-        "quote": "What data elements will be needed? What data sources will they be derived from and exactly what variables will be used?",
-    },
-    {
-        "label": "GT filing scope",
-        "link": "../Analysis plan working draft.md#L221",
-        "quote": "For Limited Number Of Organizations (Form 990, EZ, PF)",
-    },
-    {
-        "label": "Revenue-source variables",
-        "link": "../Analysis plan working draft.md#L223",
-        "quote": "Variables: Total revenue; program service revenue; total contributions; other contributions (foundation grants etc.)",
-    },
-    {
-        "label": "Revenue-source method",
-        "link": "../Analysis plan working draft.md#L227",
-        "quote": "Analysis method: Total contributions for 990, EZ, and PF; program service revenue from 990 and EZ; ANOVA",
-    },
-    {
-        "label": "Financial-performance variables",
-        "link": "../Analysis plan working draft.md#L230",
-        "quote": "Variables: Total revenue; total expense; net asset",
-    },
-    {
-        "label": "Financial-performance method",
-        "link": "../Analysis plan working draft.md#L234",
-        "quote": "Months of reserves = (net assets / total expenses) x 12; net margin = (surplus = revenue - expenses) / total revenue; multiple regression controlling for population",
-    },
-    {
-        "label": "Exclusion-support variables",
-        "link": "../Analysis plan working draft.md#L193",
-        "quote": "with and without hospitals, universities, and political organizations",
-    },
-    {
-        "label": "NTEE classification for revenue comparisons",
-        "link": "../Analysis plan working draft.md#L181",
-        "quote": "Variables: Total revenue; NTEE filed classification code",
-    },
-    {
-        "label": "NTEE classification for grants versus revenue",
-        "link": "../Analysis plan working draft.md#L195",
-        "quote": "Variables: Grants (total amount); total revenue; NTEE field classification code",
-    },
-    {
-        "label": "Broad NTEE category requirement",
-        "link": "../Analysis plan working draft.md#L202",
-        "quote": "Variables: NTEE field classification code, using only the broad category first letter; total revenue; total asset",
-    },
-]
 
 FORM_AWARE_AMOUNT_SPECS = [
     {
@@ -142,37 +123,37 @@ DIRECT_AMOUNT_SPECS = [
     {
         "output_column": "analysis_cash_contributions_amount",
         "source_column": "TOTACASHCONT",
-        "analysis_basis": "Contribution component exposed because total contributions are still unresolved in the draft.",
+        "analysis_basis": "Contribution component exposed because total contributions remain unresolved at the requirement level.",
         "notes": "Component only; does not synthesize a final total-contributions measure.",
     },
     {
         "output_column": "analysis_noncash_contributions_amount",
         "source_column": "NONCASCONTRI",
-        "analysis_basis": "Contribution component exposed because total contributions are still unresolved in the draft.",
+        "analysis_basis": "Contribution component exposed because total contributions remain unresolved at the requirement level.",
         "notes": "Component only; does not synthesize a final total-contributions measure.",
     },
     {
         "output_column": "analysis_other_contributions_amount",
         "source_column": "ALLOOTHECONT",
-        "analysis_basis": "Contribution component exposed because the draft mentions other contributions such as foundation grants.",
+        "analysis_basis": "Contribution component exposed for other contribution lines such as foundation grants.",
         "notes": "Component only; do not treat as a final all-contributions total.",
     },
     {
         "output_column": "analysis_foundation_grants_amount",
         "source_column": "FOREGRANTOTA",
-        "analysis_basis": "Grant component exposed because the draft calls for grants versus other revenue sources.",
+        "analysis_basis": "Grant component exposed for grants-versus-other-revenue comparisons.",
         "notes": "Component only; do not treat as a final all-grants total.",
     },
     {
         "output_column": "analysis_government_grants_amount",
         "source_column": "GOVERNGRANTS",
-        "analysis_basis": "Grant component exposed because the draft calls for grants versus other revenue sources.",
+        "analysis_basis": "Grant component exposed for grants-versus-other-revenue comparisons.",
         "notes": "Component only; do not treat as a final all-grants total.",
     },
     {
         "output_column": "analysis_other_grant_component_amount",
         "source_column": "GRANTOORORGA",
-        "analysis_basis": "Grant component exposed because the draft calls for grants versus other revenue sources.",
+        "analysis_basis": "Grant component exposed for grants-versus-other-revenue comparisons.",
         "notes": "Component only; do not treat as a final all-grants total.",
     },
 ]
@@ -202,7 +183,7 @@ NTEE_PROXY_FLAG_SPECS = [
     {
         "output_column": "analysis_is_hospital",
         "positive_prefixes": ("E20", "E21", "E22", "E24"),
-        "analysis_basis": "Supports the draft's with/without hospitals comparison.",
+        "analysis_basis": "Supports with/without hospitals comparison.",
         "notes": (
             "NTEE proxy. Blank NTEE stays missing; codes beginning with E20, E21, E22, or E24 become True; "
             "other populated NTEE codes become False."
@@ -211,7 +192,7 @@ NTEE_PROXY_FLAG_SPECS = [
     {
         "output_column": "analysis_is_university",
         "positive_prefixes": ("B40", "B41", "B42", "B43", "B50"),
-        "analysis_basis": "Supports the draft's with/without universities comparison.",
+        "analysis_basis": "Supports with/without universities comparison.",
         "notes": (
             "NTEE proxy. Blank NTEE stays missing; higher-education codes beginning with B40, B41, B42, B43, "
             "or B50 become True; other populated NTEE codes become False."
@@ -220,7 +201,7 @@ NTEE_PROXY_FLAG_SPECS = [
     {
         "output_column": "analysis_is_political_org",
         "positive_prefixes": ("R40", "W24"),
-        "analysis_basis": "Supports the draft's with/without political organizations comparison.",
+        "analysis_basis": "Supports with/without political organizations comparison.",
         "notes": (
             "NTEE proxy. Blank NTEE stays missing; explicitly politics-oriented codes beginning with R40 or W24 "
             "become True; other populated NTEE codes become False."
@@ -510,7 +491,7 @@ def _build_component_sum(source_df: pd.DataFrame, source_columns: list[str]) -> 
     Build one additive GT metric from several component columns plus provenance.
 
     This helper is intentionally explicit about blank handling because the
-    analysis draft asks for combined contribution/grant totals while the GT
+    analysis asks for combined contribution/grant totals while the GT
     source exposes those concepts as separate component fields. We treat blank
     components as missing pieces of the sum, not as hard failures, and only
     emit a null total when every component is blank.
@@ -1209,33 +1190,33 @@ def _write_mapping_markdown(
     metric_specs: list[dict[str, str]],
     unresolved_concepts: list[dict[str, str]],
 ) -> None:
-    """Write the GT analysis variable mapping document with exact draft references."""
-    # Write repo-relative paths so the handoff document stays portable across
-    # machines instead of hard-coding one local Windows workspace path.
-    source_display = os.path.relpath(source_path, start=mapping_path.parent).replace("\\", "/")
-    coverage_display = os.path.relpath(coverage_path, start=mapping_path.parent).replace("\\", "/")
+    """Write the GT analysis variable mapping document."""
+    source_display = _portable_path(source_path)
+    coverage_display = _portable_path(coverage_path)
     lines = [
         "# GivingTuesday Basic-Only Analysis Variable Mapping",
         "",
         f"- Source artifact: `{source_display}`",
         f"- Coverage report: `{coverage_display}`",
-        "- Required coding rules: [`CODING_RULES.md`](../../secrets/coding_rules/CODING_RULES.md)",
-        "- Analysis draft source: [`Analysis plan working draft.md`](../Analysis plan working draft.md)",
         "",
-        "## Exact Analysis-Plan Basis",
+        "## Coverage Evidence",
         "",
+        f"- Generated coverage CSV: `{coverage_display}`",
+        f"- Published S3 variable mapping object: `{ANALYSIS_VARIABLE_MAPPING_PREFIX}/{GT_BASIC_ANALYSIS_VARIABLE_MAPPING_MD.name}`",
+        f"- Published S3 coverage object: `{ANALYSIS_COVERAGE_PREFIX}/{GT_BASIC_ANALYSIS_VARIABLE_COVERAGE_CSV.name}`",
+        "- Coverage CSVs are generated by the analysis step and published as quality evidence.",
+        "",
+        "## Analysis Data Dictionary",
+        "",
+        "This file is the analysis-ready data dictionary for the GivingTuesday basic-only analysis dataset. "
+        "It lists each canonical analysis variable, the source rule used to populate it, the provenance column when applicable, "
+        "the analysis basis, and source-specific limitations.",
+        "",
+        "## Extracted Variables",
+        "",
+        "|canonical_variable|source_rule|provenance_column|analysis_basis|notes|",
+        "|---|---|---|---|---|",
     ]
-    for basis in EXACT_ANALYSIS_PLAN_BASIS:
-        lines.append(f"- [{basis['label']}]({basis['link']}): \"{basis['quote']}\"")
-    lines.extend(
-        [
-            "",
-            "## Extracted Variables",
-            "",
-            "|canonical_variable|source_rule|provenance_column|analysis_basis|notes|",
-            "|---|---|---|---|---|",
-        ]
-    )
     for spec in metric_specs:
         lines.append(
             "|"
@@ -1250,30 +1231,31 @@ def _write_mapping_markdown(
             )
             + "|"
         )
-    lines.extend(
-        [
-            "",
-            "## Unresolved Draft Concepts",
-            "",
-            "|concept|status|reason|related_fields|",
-            "|---|---|---|---|",
-        ]
-    )
-    for concept in unresolved_concepts:
-        lines.append(
-            "|"
-            + "|".join(
-                [
-                    concept["concept"],
-                    concept["status"],
-                    concept["reason"],
-                    concept["related_fields"],
-                ]
-            )
-            + "|"
+    if unresolved_concepts:
+        lines.extend(
+            [
+                "",
+                "## Client Caveats",
+                "",
+                "|concept|status|reason|related_fields|",
+                "|---|---|---|---|",
+            ]
         )
+        for concept in unresolved_concepts:
+            lines.append(
+                "|"
+                + "|".join(
+                    [
+                        concept["concept"],
+                        concept["status"],
+                        concept["reason"],
+                        concept["related_fields"],
+                    ]
+                )
+                + "|"
+            )
     mapping_path.parent.mkdir(parents=True, exist_ok=True)
-    mapping_path.write_text("\n".join(lines), encoding="utf-8")
+    mapping_path.write_text("\n".join(lines) + "\n", encoding="utf-8")
 
 
 def main() -> None:
@@ -1319,9 +1301,6 @@ def main() -> None:
     print(f"[analysis] Region metrics out:   {region_metrics_output_path}", flush=True)
     print(f"[analysis] Coverage CSV:         {coverage_path}", flush=True)
     print(f"[analysis] Mapping Markdown:     {mapping_path}", flush=True)
-    print(f"[analysis] Analysis draft path:  {ANALYSIS_PLAN_WORKING_DRAFT_MD}", flush=True)
-    print(f"[analysis] Coding rules path:    {CODING_RULES_MD}", flush=True)
-
     source_df = pd.read_parquet(input_path)
     source_df = source_df.copy()
     source_df["ein"] = source_df["ein"].map(normalize_ein).astype("string")
@@ -1473,21 +1452,21 @@ def main() -> None:
                 "output_column": "analysis_ntee_code",
                 "source_rule": "NCCS BMF exact-year harm_ntee_code on ein + tax_year, then NCCS nearest-year EIN fallback, then IRS EO BMF EIN fallback",
                 "provenance_column": "analysis_ntee_code_source_family; analysis_ntee_code_source_variant; analysis_ntee_code_source_column",
-                "analysis_basis": "NTEE classification required by the analysis draft for GT-adjacent comparisons.",
+                "analysis_basis": "NTEE classification required for GT-adjacent comparisons.",
                 "notes": "Approved classification enrichment only. Preferred order is NCCS exact-year, then NCCS nearest-year by EIN, then IRS EO BMF by EIN when NCCS still leaves the row blank.",
             },
             {
                 "output_column": "analysis_calculated_ntee_broad_code",
                 "source_rule": "derived:first letter of analysis_ntee_code",
                 "provenance_column": "analysis_calculated_ntee_broad_code_source_column",
-                "analysis_basis": "Broad NTEE field category required where the draft specifies first-letter grouping.",
+                "analysis_basis": "Broad NTEE field category required where analysis uses first-letter NTEE grouping.",
                 "notes": "Derived only when the exact NCCS BMF NTEE code is present.",
             },
             {
                 "output_column": "analysis_subsection_code",
                 "source_rule": "NCCS BMF exact-year harm_subsection_code on ein + tax_year, then NCCS nearest-year EIN fallback, then IRS EO BMF EIN fallback",
                 "provenance_column": "analysis_subsection_code_source_family; analysis_subsection_code_source_variant; analysis_subsection_code_source_column",
-                "analysis_basis": "Political-organization support for the draft's exclusion comparisons.",
+                "analysis_basis": "Political-organization support for exclusion comparisons.",
                 "notes": "Classification support field used to derive the final political-organization boolean.",
             },
         ]
@@ -1513,7 +1492,7 @@ def main() -> None:
             }
         )
 
-    # Surplus is part of the draft's net-margin formula. Calculate it here from
+    # Surplus is part of the net-margin formula for financial-performance analysis. Calculate it here from
     # the final form-aware revenue and expense columns rather than relying on
     # upstream `derived_income_amount`, because PF uses PF-specific revenue and
     # expense fields that the older upstream derivation did not include.
@@ -1534,7 +1513,7 @@ def main() -> None:
             "output_column": "analysis_calculated_surplus_amount",
             "source_rule": "derived:analysis_total_revenue_amount - analysis_total_expense_amount",
             "provenance_column": "analysis_calculated_surplus_amount_source_column",
-            "analysis_basis": "Surplus component used by the net-margin formula in the draft.",
+            "analysis_basis": "Surplus component used by the net-margin formula for financial-performance analysis.",
             "notes": "Calculated from the final form-aware analysis revenue and expense values, including PF-specific revenue and expense fields.",
         }
     )
@@ -1568,7 +1547,7 @@ def main() -> None:
             }
         )
 
-    # The draft's grants-dependency question is expressed as a percentage of
+    # The grants-dependency question is expressed as a percentage of
     # grants in total revenue. We expose that as a row-level ratio so the
     # analysis team does not have to rebuild the basic denominator logic from
     # scratch.
@@ -1618,7 +1597,7 @@ def main() -> None:
             "output_column": "analysis_calculated_net_asset_amount",
             "source_rule": "derived:TOASEOOYY - TOLIEOOYY for 990 and supported 990EZ rows",
             "provenance_column": "analysis_calculated_net_asset_amount_source_column",
-            "analysis_basis": "Net asset proxy for the financial-performance question in the draft.",
+            "analysis_basis": "Net asset proxy for financial-performance analysis.",
             "notes": (
                 "Partial GT calculation only. Populated for Form 990 and for the subset of Form 990EZ rows "
                 "that carry both assets and liabilities. Form 990PF stays null because this GT source layer "
@@ -1645,7 +1624,7 @@ def main() -> None:
             "output_column": "analysis_calculated_months_of_reserves",
             "source_rule": "derived:(analysis_calculated_net_asset_amount / analysis_total_expense_amount) * 12",
             "provenance_column": "analysis_calculated_months_of_reserves_source_column",
-            "analysis_basis": "Months of reserves from the financial-performance method in the draft.",
+            "analysis_basis": "Months of reserves per the financial-performance method.",
             "notes": (
                 "Partial GT calculation only. Populated where the GT net-asset proxy and GT total expense are both "
                 "available and total expense is nonzero."
@@ -1678,7 +1657,7 @@ def main() -> None:
             "output_column": "analysis_calculated_net_margin_ratio",
             "source_rule": "derived:analysis_calculated_surplus_amount / analysis_total_revenue_amount",
             "provenance_column": "analysis_calculated_net_margin_ratio_source_column",
-            "analysis_basis": "Net margin from the financial-performance method in the draft.",
+            "analysis_basis": "Net margin per the financial-performance method.",
             "notes": "Null when total revenue is missing or zero.",
         }
     )

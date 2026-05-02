@@ -1,0 +1,185 @@
+{
+  "efile_dataset_url": "https://nccs.urban.org/nccs/datasets/efile/",
+  "efile_catalog_url": "https://nccs.urban.org/nccs/catalogs/catalog-efile-v2_1.html",
+  "required_tables": [
+    "F9-P00-T00-HEADER",
+    "F9-P01-T00-SUMMARY",
+    "SA-P01-T00-PUBLIC-CHARITY-STATUS"
+  ],
+  "selected_tax_years": [
+    2022,
+    2023,
+    2024
+  ],
+  "latest_published_year": 2024,
+  "partial_tax_years": [
+    2024
+  ],
+  "selected_assets": [
+    {
+      "asset_group": "efile_csv",
+      "asset_type": "efile_table_csv",
+      "table_name": "F9-P00-T00-HEADER",
+      "tax_year": 2022,
+      "is_partial_year": false,
+      "source_url": "https://nccs-efile.s3.us-east-1.amazonaws.com/public/efile_v2_1/F9-P00-T00-HEADER-2022.CSV",
+      "filename": "F9-P00-T00-HEADER-2022.CSV",
+      "source_content_type": "text/csv",
+      "source_content_length_bytes": 353293716,
+      "source_last_modified": "Tue, 28 Oct 2025 17:11:01 GMT"
+    },
+    {
+      "asset_group": "efile_csv",
+      "asset_type": "efile_table_csv",
+      "table_name": "F9-P01-T00-SUMMARY",
+      "tax_year": 2022,
+      "is_partial_year": false,
+      "source_url": "https://nccs-efile.s3.us-east-1.amazonaws.com/public/efile_v2_1/F9-P01-T00-SUMMARY-2022.CSV",
+      "filename": "F9-P01-T00-SUMMARY-2022.CSV",
+      "source_content_type": "text/csv",
+      "source_content_length_bytes": 300076556,
+      "source_last_modified": "Tue, 28 Oct 2025 17:12:22 GMT"
+    },
+    {
+      "asset_group": "efile_csv",
+      "asset_type": "efile_table_csv",
+      "table_name": "SA-P01-T00-PUBLIC-CHARITY-STATUS",
+      "tax_year": 2022,
+      "is_partial_year": false,
+      "source_url": "https://nccs-efile.s3.us-east-1.amazonaws.com/public/efile_v2_1/SA-P01-T00-PUBLIC-CHARITY-STATUS-2022.CSV",
+      "filename": "SA-P01-T00-PUBLIC-CHARITY-STATUS-2022.CSV",
+      "source_content_type": "text/csv",
+      "source_content_length_bytes": 144514771,
+      "source_last_modified": "Tue, 28 Oct 2025 17:42:43 GMT"
+    },
+    {
+      "asset_group": "efile_csv",
+      "asset_type": "efile_table_csv",
+      "table_name": "F9-P00-T00-HEADER",
+      "tax_year": 2023,
+      "is_partial_year": false,
+      "source_url": "https://nccs-efile.s3.us-east-1.amazonaws.com/public/efile_v2_1/F9-P00-T00-HEADER-2023.CSV",
+      "filename": "F9-P00-T00-HEADER-2023.CSV",
+      "source_content_type": "text/csv",
+      "source_content_length_bytes": 335234643,
+      "source_last_modified": "Tue, 28 Oct 2025 17:11:10 GMT"
+    },
+    {
+      "asset_group": "efile_csv",
+      "asset_type": "efile_table_csv",
+      "table_name": "F9-P01-T00-SUMMARY",
+      "tax_year": 2023,
+      "is_partial_year": false,
+      "source_url": "https://nccs-efile.s3.us-east-1.amazonaws.com/public/efile_v2_1/F9-P01-T00-SUMMARY-2023.CSV",
+      "filename": "F9-P01-T00-SUMMARY-2023.CSV",
+      "source_content_type": "text/csv",
+      "source_content_length_bytes": 285762444,
+      "source_last_modified": "Tue, 28 Oct 2025 17:12:30 GMT"
+    },
+    {
+      "asset_group": "efile_csv",
+      "asset_type": "efile_table_csv",
+      "table_name": "SA-P01-T00-PUBLIC-CHARITY-STATUS",
+      "tax_year": 2023,
+      "is_partial_year": false,
+      "source_url": "https://nccs-efile.s3.us-east-1.amazonaws.com/public/efile_v2_1/SA-P01-T00-PUBLIC-CHARITY-STATUS-2023.CSV",
+      "filename": "SA-P01-T00-PUBLIC-CHARITY-STATUS-2023.CSV",
+      "source_content_type": "text/csv",
+      "source_content_length_bytes": 137688638,
+      "source_last_modified": "Tue, 28 Oct 2025 17:42:46 GMT"
+    },
+    {
+      "asset_group": "efile_csv",
+      "asset_type": "efile_table_csv",
+      "table_name": "F9-P00-T00-HEADER",
+      "tax_year": 2024,
+      "is_partial_year": true,
+      "source_url": "https://nccs-efile.s3.us-east-1.amazonaws.com/public/efile_v2_1/F9-P00-T00-HEADER-2024.CSV",
+      "filename": "F9-P00-T00-HEADER-2024.CSV",
+      "source_content_type": "text/csv",
+      "source_content_length_bytes": 95861181,
+      "source_last_modified": "Tue, 28 Oct 2025 17:11:18 GMT"
+    },
+    {
+      "asset_group": "efile_csv",
+      "asset_type": "efile_table_csv",
+      "table_name": "F9-P01-T00-SUMMARY",
+      "tax_year": 2024,
+      "is_partial_year": true,
+      "source_url": "https://nccs-efile.s3.us-east-1.amazonaws.com/public/efile_v2_1/F9-P01-T00-SUMMARY-2024.CSV",
+      "filename": "F9-P01-T00-SUMMARY-2024.CSV",
+      "source_content_type": "text/csv",
+      "source_content_length_bytes": 80900384,
+      "source_last_modified": "Tue, 28 Oct 2025 17:12:42 GMT"
+    },
+    {
+      "asset_group": "efile_csv",
+      "asset_type": "efile_table_csv",
+      "table_name": "SA-P01-T00-PUBLIC-CHARITY-STATUS",
+      "tax_year": 2024,
+      "is_partial_year": true,
+      "source_url": "https://nccs-efile.s3.us-east-1.amazonaws.com/public/efile_v2_1/SA-P01-T00-PUBLIC-CHARITY-STATUS-2024.CSV",
+      "filename": "SA-P01-T00-PUBLIC-CHARITY-STATUS-2024.CSV",
+      "source_content_type": "text/csv",
+      "source_content_length_bytes": 40929398,
+      "source_last_modified": "Tue, 28 Oct 2025 17:42:49 GMT"
+    }
+  ],
+  "discovered_at_utc": "2026-03-23T21:00:02Z",
+  "source_size_cache": {
+    "https://nccs-efile.s3.us-east-1.amazonaws.com/public/efile_v2_1/F9-P00-T00-HEADER-2022.CSV|Tue, 28 Oct 2025 17:11:01 GMT": {
+      "source_url": "https://nccs-efile.s3.us-east-1.amazonaws.com/public/efile_v2_1/F9-P00-T00-HEADER-2022.CSV",
+      "source_last_modified": "Tue, 28 Oct 2025 17:11:01 GMT",
+      "source_content_length_bytes": 353293716,
+      "cached_at_utc": "2026-03-23T20:59:06Z"
+    },
+    "https://nccs-efile.s3.us-east-1.amazonaws.com/public/efile_v2_1/F9-P01-T00-SUMMARY-2022.CSV|Tue, 28 Oct 2025 17:12:22 GMT": {
+      "source_url": "https://nccs-efile.s3.us-east-1.amazonaws.com/public/efile_v2_1/F9-P01-T00-SUMMARY-2022.CSV",
+      "source_last_modified": "Tue, 28 Oct 2025 17:12:22 GMT",
+      "source_content_length_bytes": 300076556,
+      "cached_at_utc": "2026-03-23T20:58:40Z"
+    },
+    "https://nccs-efile.s3.us-east-1.amazonaws.com/public/efile_v2_1/SA-P01-T00-PUBLIC-CHARITY-STATUS-2022.CSV|Tue, 28 Oct 2025 17:42:43 GMT": {
+      "source_url": "https://nccs-efile.s3.us-east-1.amazonaws.com/public/efile_v2_1/SA-P01-T00-PUBLIC-CHARITY-STATUS-2022.CSV",
+      "source_last_modified": "Tue, 28 Oct 2025 17:42:43 GMT",
+      "source_content_length_bytes": 144514771,
+      "cached_at_utc": "2026-03-23T20:57:09Z"
+    },
+    "https://nccs-efile.s3.us-east-1.amazonaws.com/public/efile_v2_1/F9-P00-T00-HEADER-2023.CSV|Tue, 28 Oct 2025 17:11:10 GMT": {
+      "source_url": "https://nccs-efile.s3.us-east-1.amazonaws.com/public/efile_v2_1/F9-P00-T00-HEADER-2023.CSV",
+      "source_last_modified": "Tue, 28 Oct 2025 17:11:10 GMT",
+      "source_content_length_bytes": 335234643,
+      "cached_at_utc": "2026-03-23T20:59:52Z"
+    },
+    "https://nccs-efile.s3.us-east-1.amazonaws.com/public/efile_v2_1/F9-P01-T00-SUMMARY-2023.CSV|Tue, 28 Oct 2025 17:12:30 GMT": {
+      "source_url": "https://nccs-efile.s3.us-east-1.amazonaws.com/public/efile_v2_1/F9-P01-T00-SUMMARY-2023.CSV",
+      "source_last_modified": "Tue, 28 Oct 2025 17:12:30 GMT",
+      "source_content_length_bytes": 285762444,
+      "cached_at_utc": "2026-03-23T20:58:50Z"
+    },
+    "https://nccs-efile.s3.us-east-1.amazonaws.com/public/efile_v2_1/SA-P01-T00-PUBLIC-CHARITY-STATUS-2023.CSV|Tue, 28 Oct 2025 17:42:46 GMT": {
+      "source_url": "https://nccs-efile.s3.us-east-1.amazonaws.com/public/efile_v2_1/SA-P01-T00-PUBLIC-CHARITY-STATUS-2023.CSV",
+      "source_last_modified": "Tue, 28 Oct 2025 17:42:46 GMT",
+      "source_content_length_bytes": 137688638,
+      "cached_at_utc": "2026-03-23T20:57:09Z"
+    },
+    "https://nccs-efile.s3.us-east-1.amazonaws.com/public/efile_v2_1/F9-P00-T00-HEADER-2024.CSV|Tue, 28 Oct 2025 17:11:18 GMT": {
+      "source_url": "https://nccs-efile.s3.us-east-1.amazonaws.com/public/efile_v2_1/F9-P00-T00-HEADER-2024.CSV",
+      "source_last_modified": "Tue, 28 Oct 2025 17:11:18 GMT",
+      "source_content_length_bytes": 95861181,
+      "cached_at_utc": "2026-03-23T20:57:24Z"
+    },
+    "https://nccs-efile.s3.us-east-1.amazonaws.com/public/efile_v2_1/F9-P01-T00-SUMMARY-2024.CSV|Tue, 28 Oct 2025 17:12:42 GMT": {
+      "source_url": "https://nccs-efile.s3.us-east-1.amazonaws.com/public/efile_v2_1/F9-P01-T00-SUMMARY-2024.CSV",
+      "source_last_modified": "Tue, 28 Oct 2025 17:12:42 GMT",
+      "source_content_length_bytes": 80900384,
+      "cached_at_utc": "2026-03-23T20:57:44Z"
+    },
+    "https://nccs-efile.s3.us-east-1.amazonaws.com/public/efile_v2_1/SA-P01-T00-PUBLIC-CHARITY-STATUS-2024.CSV|Tue, 28 Oct 2025 17:42:49 GMT": {
+      "source_url": "https://nccs-efile.s3.us-east-1.amazonaws.com/public/efile_v2_1/SA-P01-T00-PUBLIC-CHARITY-STATUS-2024.CSV",
+      "source_last_modified": "Tue, 28 Oct 2025 17:42:49 GMT",
+      "source_content_length_bytes": 40929398,
+      "cached_at_utc": "2026-03-23T20:57:30Z"
+    }
+  }
+}

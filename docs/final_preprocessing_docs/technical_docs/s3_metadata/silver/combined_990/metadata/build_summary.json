@@ -1,0 +1,209 @@
+{
+  "combined_schema_version": "1.6.0",
+  "created_at_utc": "2026-04-06T21:10:22Z",
+  "union_output_parquet": "C:\\Users\\eilke\\Desktop\\Github Repo\\swb_project_321\\data\\321_Black_Hills_Area_Community_Foundation_2025_08\\01_data\\staging\\combined_990\\combined_990_filtered_source_union.parquet",
+  "master_output_parquet": "C:\\Users\\eilke\\Desktop\\Github Repo\\swb_project_321\\data\\321_Black_Hills_Area_Community_Foundation_2025_08\\01_data\\staging\\combined_990\\combined_990_master_ein_tax_year.parquet",
+  "union_row_count": 41501,
+  "union_column_count": 542,
+  "row_count": 41501,
+  "column_count": 542,
+  "master_row_count": 30916,
+  "master_column_count": 257,
+  "input_signature": [
+    {
+      "source_family": "givingtuesday_datamart",
+      "source_variant": "benchmark_filings",
+      "input_path": "C:\\Users\\eilke\\Desktop\\Github Repo\\swb_project_321\\data\\321_Black_Hills_Area_Community_Foundation_2025_08\\01_data\\staging\\filing\\givingtuesday_990_filings_benchmark.parquet",
+      "signature": {
+        "path": "C:\\Users\\eilke\\Desktop\\Github Repo\\swb_project_321\\data\\321_Black_Hills_Area_Community_Foundation_2025_08\\01_data\\staging\\filing\\givingtuesday_990_filings_benchmark.parquet",
+        "size_bytes": 1770811,
+        "mtime_ns": 1775509512656498100,
+        "head_sha1": "924cdeef019d6bfd5fc4af52d8464856d1ca65ca"
+      }
+    },
+    {
+      "source_family": "nccs_postcard",
+      "source_variant": "snapshot_year_2026_tax_year_start_2022",
+      "input_path": "C:\\Users\\eilke\\Desktop\\Github Repo\\swb_project_321\\data\\321_Black_Hills_Area_Community_Foundation_2025_08\\01_data\\staging\\nccs_990\\postcard\\snapshot_year=2026\\nccs_990_postcard_benchmark_tax_year_start=2022_snapshot_year=2026.parquet",
+      "signature": {
+        "path": "C:\\Users\\eilke\\Desktop\\Github Repo\\swb_project_321\\data\\321_Black_Hills_Area_Community_Foundation_2025_08\\01_data\\staging\\nccs_990\\postcard\\snapshot_year=2026\\nccs_990_postcard_benchmark_tax_year_start=2022_snapshot_year=2026.parquet",
+        "size_bytes": 342083,
+        "mtime_ns": 1774298643060510900,
+        "head_sha1": "0c7f8b853a6de98af5c87fbf0e90ce9864672dd2"
+      }
+    },
+    {
+      "source_family": "nccs_efile",
+      "source_variant": "efile_tax_year_2022",
+      "input_path": "C:\\Users\\eilke\\Desktop\\Github Repo\\swb_project_321\\data\\321_Black_Hills_Area_Community_Foundation_2025_08\\01_data\\staging\\nccs_efile\\tax_year=2022\\nccs_efile_benchmark_tax_year=2022.parquet",
+      "signature": {
+        "path": "C:\\Users\\eilke\\Desktop\\Github Repo\\swb_project_321\\data\\321_Black_Hills_Area_Community_Foundation_2025_08\\01_data\\staging\\nccs_efile\\tax_year=2022\\nccs_efile_benchmark_tax_year=2022.parquet",
+        "size_bytes": 395229,
+        "mtime_ns": 1774991896368520200,
+        "head_sha1": "a63a543066503911178266851c64d3dc3b890c5b"
+      }
+    },
+    {
+      "source_family": "nccs_efile",
+      "source_variant": "efile_tax_year_2023",
+      "input_path": "C:\\Users\\eilke\\Desktop\\Github Repo\\swb_project_321\\data\\321_Black_Hills_Area_Community_Foundation_2025_08\\01_data\\staging\\nccs_efile\\tax_year=2023\\nccs_efile_benchmark_tax_year=2023.parquet",
+      "signature": {
+        "path": "C:\\Users\\eilke\\Desktop\\Github Repo\\swb_project_321\\data\\321_Black_Hills_Area_Community_Foundation_2025_08\\01_data\\staging\\nccs_efile\\tax_year=2023\\nccs_efile_benchmark_tax_year=2023.parquet",
+        "size_bytes": 383068,
+        "mtime_ns": 1774991912357481300,
+        "head_sha1": "015da19146563d78a8f953ef047538ed95bd819c"
+      }
+    },
+    {
+      "source_family": "nccs_efile",
+      "source_variant": "efile_tax_year_2024",
+      "input_path": "C:\\Users\\eilke\\Desktop\\Github Repo\\swb_project_321\\data\\321_Black_Hills_Area_Community_Foundation_2025_08\\01_data\\staging\\nccs_efile\\tax_year=2024\\nccs_efile_benchmark_tax_year=2024.parquet",
+      "signature": {
+        "path": "C:\\Users\\eilke\\Desktop\\Github Repo\\swb_project_321\\data\\321_Black_Hills_Area_Community_Foundation_2025_08\\01_data\\staging\\nccs_efile\\tax_year=2024\\nccs_efile_benchmark_tax_year=2024.parquet",
+        "size_bytes": 144865,
+        "mtime_ns": 1774991917091461600,
+        "head_sha1": "d21034090444618985b3d9d042cdd276e5759531"
+      }
+    },
+    {
+      "source_family": "nccs_bmf",
+      "source_variant": "legacy_bmf_2022",
+      "input_path": "C:\\Users\\eilke\\Desktop\\Github Repo\\swb_project_321\\data\\321_Black_Hills_Area_Community_Foundation_2025_08\\01_data\\staging\\nccs_bmf\\year=2022\\nccs_bmf_benchmark_year=2022.parquet",
+      "signature": {
+        "path": "C:\\Users\\eilke\\Desktop\\Github Repo\\swb_project_321\\data\\321_Black_Hills_Area_Community_Foundation_2025_08\\01_data\\staging\\nccs_bmf\\year=2022\\nccs_bmf_benchmark_year=2022.parquet",
+        "size_bytes": 314692,
+        "mtime_ns": 1774801840490347300,
+        "head_sha1": "01b7ea68c021d158a1214ea548ea91b844780db0"
+      }
+    },
+    {
+      "source_family": "nccs_bmf",
+      "source_variant": "raw_bmf_2023",
+      "input_path": "C:\\Users\\eilke\\Desktop\\Github Repo\\swb_project_321\\data\\321_Black_Hills_Area_Community_Foundation_2025_08\\01_data\\staging\\nccs_bmf\\year=2023\\nccs_bmf_benchmark_year=2023.parquet",
+      "signature": {
+        "path": "C:\\Users\\eilke\\Desktop\\Github Repo\\swb_project_321\\data\\321_Black_Hills_Area_Community_Foundation_2025_08\\01_data\\staging\\nccs_bmf\\year=2023\\nccs_bmf_benchmark_year=2023.parquet",
+        "size_bytes": 343374,
+        "mtime_ns": 1774801844459799900,
+        "head_sha1": "dfd4d0faaddccc8db3ded8fca0e2c52925815c2d"
+      }
+    },
+    {
+      "source_family": "nccs_bmf",
+      "source_variant": "raw_bmf_2024",
+      "input_path": "C:\\Users\\eilke\\Desktop\\Github Repo\\swb_project_321\\data\\321_Black_Hills_Area_Community_Foundation_2025_08\\01_data\\staging\\nccs_bmf\\year=2024\\nccs_bmf_benchmark_year=2024.parquet",
+      "signature": {
+        "path": "C:\\Users\\eilke\\Desktop\\Github Repo\\swb_project_321\\data\\321_Black_Hills_Area_Community_Foundation_2025_08\\01_data\\staging\\nccs_bmf\\year=2024\\nccs_bmf_benchmark_year=2024.parquet",
+        "size_bytes": 352739,
+        "mtime_ns": 1774801849942425500,
+        "head_sha1": "cd7a5e3cf2eb04c6208640566cba494bdbadc53c"
+      }
+    },
+    {
+      "source_family": "nccs_bmf",
+      "source_variant": "raw_bmf_2025",
+      "input_path": "C:\\Users\\eilke\\Desktop\\Github Repo\\swb_project_321\\data\\321_Black_Hills_Area_Community_Foundation_2025_08\\01_data\\staging\\nccs_bmf\\year=2025\\nccs_bmf_benchmark_year=2025.parquet",
+      "signature": {
+        "path": "C:\\Users\\eilke\\Desktop\\Github Repo\\swb_project_321\\data\\321_Black_Hills_Area_Community_Foundation_2025_08\\01_data\\staging\\nccs_bmf\\year=2025\\nccs_bmf_benchmark_year=2025.parquet",
+        "size_bytes": 363349,
+        "mtime_ns": 1774801855022286800,
+        "head_sha1": "611a212abfbb8be9232d73115a4a6ce4f26ae61c"
+      }
+    },
+    {
+      "source_family": "nccs_bmf",
+      "source_variant": "raw_bmf_2026",
+      "input_path": "C:\\Users\\eilke\\Desktop\\Github Repo\\swb_project_321\\data\\321_Black_Hills_Area_Community_Foundation_2025_08\\01_data\\staging\\nccs_bmf\\year=2026\\nccs_bmf_benchmark_year=2026.parquet",
+      "signature": {
+        "path": "C:\\Users\\eilke\\Desktop\\Github Repo\\swb_project_321\\data\\321_Black_Hills_Area_Community_Foundation_2025_08\\01_data\\staging\\nccs_bmf\\year=2026\\nccs_bmf_benchmark_year=2026.parquet",
+        "size_bytes": 368881,
+        "mtime_ns": 1774801859882512300,
+        "head_sha1": "2004975bd004cfe01ff7e530fd0bc87f4fff7392"
+      }
+    },
+    {
+      "source_family": "auxiliary",
+      "source_variant": "bmf_exact_lookup_2022",
+      "input_path": "C:\\Users\\eilke\\Desktop\\Github Repo\\swb_project_321\\data\\321_Black_Hills_Area_Community_Foundation_2025_08\\01_data\\staging\\nccs_bmf\\year=2022\\nccs_bmf_exact_year_lookup_year=2022.parquet",
+      "signature": {
+        "path": "C:\\Users\\eilke\\Desktop\\Github Repo\\swb_project_321\\data\\321_Black_Hills_Area_Community_Foundation_2025_08\\01_data\\staging\\nccs_bmf\\year=2022\\nccs_bmf_exact_year_lookup_year=2022.parquet",
+        "size_bytes": 33542400,
+        "mtime_ns": 1774801843108119200,
+        "head_sha1": "e777e24eab98609878a3e8c1a8a6c760aab41e1e"
+      }
+    },
+    {
+      "source_family": "auxiliary",
+      "source_variant": "bmf_exact_lookup_2023",
+      "input_path": "C:\\Users\\eilke\\Desktop\\Github Repo\\swb_project_321\\data\\321_Black_Hills_Area_Community_Foundation_2025_08\\01_data\\staging\\nccs_bmf\\year=2023\\nccs_bmf_exact_year_lookup_year=2023.parquet",
+      "signature": {
+        "path": "C:\\Users\\eilke\\Desktop\\Github Repo\\swb_project_321\\data\\321_Black_Hills_Area_Community_Foundation_2025_08\\01_data\\staging\\nccs_bmf\\year=2023\\nccs_bmf_exact_year_lookup_year=2023.parquet",
+        "size_bytes": 34703615,
+        "mtime_ns": 1774801848541176900,
+        "head_sha1": "6a92af455a17e4a4dec452879e8dcd3bbd3d0c31"
+      }
+    },
+    {
+      "source_family": "auxiliary",
+      "source_variant": "bmf_exact_lookup_2024",
+      "input_path": "C:\\Users\\eilke\\Desktop\\Github Repo\\swb_project_321\\data\\321_Black_Hills_Area_Community_Foundation_2025_08\\01_data\\staging\\nccs_bmf\\year=2024\\nccs_bmf_exact_year_lookup_year=2024.parquet",
+      "signature": {
+        "path": "C:\\Users\\eilke\\Desktop\\Github Repo\\swb_project_321\\data\\321_Black_Hills_Area_Community_Foundation_2025_08\\01_data\\staging\\nccs_bmf\\year=2024\\nccs_bmf_exact_year_lookup_year=2024.parquet",
+        "size_bytes": 35368679,
+        "mtime_ns": 1774801853790827600,
+        "head_sha1": "c95dbc722a6498d85b51ef0d6d9abe22ec9264de"
+      }
+    },
+    {
+      "source_family": "auxiliary",
+      "source_variant": "bmf_exact_lookup_2025",
+      "input_path": "C:\\Users\\eilke\\Desktop\\Github Repo\\swb_project_321\\data\\321_Black_Hills_Area_Community_Foundation_2025_08\\01_data\\staging\\nccs_bmf\\year=2025\\nccs_bmf_exact_year_lookup_year=2025.parquet",
+      "signature": {
+        "path": "C:\\Users\\eilke\\Desktop\\Github Repo\\swb_project_321\\data\\321_Black_Hills_Area_Community_Foundation_2025_08\\01_data\\staging\\nccs_bmf\\year=2025\\nccs_bmf_exact_year_lookup_year=2025.parquet",
+        "size_bytes": 36489073,
+        "mtime_ns": 1774801858393939000,
+        "head_sha1": "1e2a1cb4e2e1591a345f2fe7e7ac4695be0c384e"
+      }
+    },
+    {
+      "source_family": "auxiliary",
+      "source_variant": "bmf_exact_lookup_2026",
+      "input_path": "C:\\Users\\eilke\\Desktop\\Github Repo\\swb_project_321\\data\\321_Black_Hills_Area_Community_Foundation_2025_08\\01_data\\staging\\nccs_bmf\\year=2026\\nccs_bmf_exact_year_lookup_year=2026.parquet",
+      "signature": {
+        "path": "C:\\Users\\eilke\\Desktop\\Github Repo\\swb_project_321\\data\\321_Black_Hills_Area_Community_Foundation_2025_08\\01_data\\staging\\nccs_bmf\\year=2026\\nccs_bmf_exact_year_lookup_year=2026.parquet",
+        "size_bytes": 36743777,
+        "mtime_ns": 1774801863924151800,
+        "head_sha1": "843c12c2410b8ba0573c26f4205ab57ba0e5a805"
+      }
+    }
+  ],
+  "source_row_counts": {
+    "nccs_bmf": 29793,
+    "givingtuesday_datamart": 4381,
+    "nccs_efile": 3866,
+    "nccs_postcard": 3461
+  },
+  "grouped_row_count": 41501,
+  "excluded_blank_key_row_count": 0,
+  "master_source_family_participation_counts": {
+    "givingtuesday_datamart": 4378,
+    "nccs_postcard": 3461,
+    "nccs_efile": 3866,
+    "nccs_bmf": 29789
+  },
+  "bmf_exact_lookup_file_count": 5,
+  "bmf_exact_lookup_row_count": 7281,
+  "bmf_overlay_row_count": 11006,
+  "bmf_overlay_field_fill_counts": {
+    "harm_org_name": 0,
+    "harm_state": 2,
+    "harm_zip5": 0,
+    "harm_ntee_code": 8900,
+    "harm_subsection_code": 11006
+  },
+  "master_record_type_counts": {
+    "reference_only": 24809,
+    "filing_only": 4362,
+    "nonfinancial_only": 1729,
+    "mixed": 16
+  }
+}

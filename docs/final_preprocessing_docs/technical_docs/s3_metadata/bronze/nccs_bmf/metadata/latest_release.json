@@ -1,0 +1,115 @@
+{
+  "bmf_dataset_url": "https://nccs.urban.org/nccs/datasets/bmf/",
+  "bmf_catalog_url": "https://nccs.urban.org/nccs/catalogs/catalog-bmf.html",
+  "raw_base_url": "https://nccsdata.s3.us-east-1.amazonaws.com/raw/bmf/",
+  "legacy_base_url": "https://nccsdata.s3.us-east-1.amazonaws.com/legacy/bmf/",
+  "start_year": 2022,
+  "latest_raw_month": "2026-03",
+  "selected_snapshot_years": [
+    2022,
+    2023,
+    2024,
+    2025,
+    2026
+  ],
+  "selected_assets": [
+    {
+      "asset_group": "legacy_bmf_csv",
+      "asset_type": "legacy_bmf_csv",
+      "snapshot_year": 2022,
+      "snapshot_month": "",
+      "source_period": "2022-08",
+      "source_url": "https://nccsdata.s3.us-east-1.amazonaws.com/legacy/bmf/BMF-2022-08-501CX-NONPROFIT-PX.csv",
+      "filename": "BMF-2022-08-501CX-NONPROFIT-PX.csv",
+      "year_basis": "legacy_latest_in_year",
+      "source_content_type": "text/csv",
+      "source_content_length_bytes": 345836470,
+      "source_last_modified": "Wed, 25 Oct 2023 16:12:13 GMT"
+    },
+    {
+      "asset_group": "raw_bmf_csv",
+      "asset_type": "raw_bmf_csv",
+      "snapshot_year": 2023,
+      "snapshot_month": "2023-12",
+      "source_period": "2023-12",
+      "source_url": "https://nccsdata.s3.us-east-1.amazonaws.com/raw/bmf/2023-12-BMF.csv",
+      "filename": "2023-12-BMF.csv",
+      "year_basis": "december_preferred",
+      "source_content_type": "binary/octet-stream",
+      "source_content_length_bytes": 386754648,
+      "source_last_modified": "Fri, 01 Dec 2023 13:02:29 GMT"
+    },
+    {
+      "asset_group": "raw_bmf_csv",
+      "asset_type": "raw_bmf_csv",
+      "snapshot_year": 2024,
+      "snapshot_month": "2024-12",
+      "source_period": "2024-12",
+      "source_url": "https://nccsdata.s3.us-east-1.amazonaws.com/raw/bmf/2024-12-BMF.csv",
+      "filename": "2024-12-BMF.csv",
+      "year_basis": "december_preferred",
+      "source_content_type": "binary/octet-stream",
+      "source_content_length_bytes": 391222247,
+      "source_last_modified": "Sun, 01 Dec 2024 13:02:41 GMT"
+    },
+    {
+      "asset_group": "raw_bmf_csv",
+      "asset_type": "raw_bmf_csv",
+      "snapshot_year": 2025,
+      "snapshot_month": "2025-12",
+      "source_period": "2025-12",
+      "source_url": "https://nccsdata.s3.us-east-1.amazonaws.com/raw/bmf/2025-12-BMF.csv",
+      "filename": "2025-12-BMF.csv",
+      "year_basis": "december_preferred",
+      "source_content_type": "binary/octet-stream",
+      "source_content_length_bytes": 400623508,
+      "source_last_modified": "Mon, 01 Dec 2025 13:02:35 GMT"
+    },
+    {
+      "asset_group": "raw_bmf_csv",
+      "asset_type": "raw_bmf_csv",
+      "snapshot_year": 2026,
+      "snapshot_month": "2026-03",
+      "source_period": "2026-03",
+      "source_url": "https://nccsdata.s3.us-east-1.amazonaws.com/raw/bmf/2026-03-BMF.csv",
+      "filename": "2026-03-BMF.csv",
+      "year_basis": "latest_available_month",
+      "source_content_type": "binary/octet-stream",
+      "source_content_length_bytes": 403208276,
+      "source_last_modified": "Sun, 01 Mar 2026 13:02:50 GMT"
+    }
+  ],
+  "discovered_at_utc": "2026-03-23T20:48:47Z",
+  "source_size_cache": {
+    "https://nccsdata.s3.us-east-1.amazonaws.com/legacy/bmf/BMF-2022-08-501CX-NONPROFIT-PX.csv|Wed, 25 Oct 2023 16:12:13 GMT": {
+      "source_url": "https://nccsdata.s3.us-east-1.amazonaws.com/legacy/bmf/BMF-2022-08-501CX-NONPROFIT-PX.csv",
+      "source_last_modified": "Wed, 25 Oct 2023 16:12:13 GMT",
+      "source_content_length_bytes": 345836470,
+      "cached_at_utc": "2026-03-23T20:47:56Z"
+    },
+    "https://nccsdata.s3.us-east-1.amazonaws.com/raw/bmf/2023-12-BMF.csv|Fri, 01 Dec 2023 13:02:29 GMT": {
+      "source_url": "https://nccsdata.s3.us-east-1.amazonaws.com/raw/bmf/2023-12-BMF.csv",
+      "source_last_modified": "Fri, 01 Dec 2023 13:02:29 GMT",
+      "source_content_length_bytes": 386754648,
+      "cached_at_utc": "2026-03-23T20:48:41Z"
+    },
+    "https://nccsdata.s3.us-east-1.amazonaws.com/raw/bmf/2024-12-BMF.csv|Sun, 01 Dec 2024 13:02:41 GMT": {
+      "source_url": "https://nccsdata.s3.us-east-1.amazonaws.com/raw/bmf/2024-12-BMF.csv",
+      "source_last_modified": "Sun, 01 Dec 2024 13:02:41 GMT",
+      "source_content_length_bytes": 391222247,
+      "cached_at_utc": "2026-03-23T20:48:41Z"
+    },
+    "https://nccsdata.s3.us-east-1.amazonaws.com/raw/bmf/2025-12-BMF.csv|Mon, 01 Dec 2025 13:02:35 GMT": {
+      "source_url": "https://nccsdata.s3.us-east-1.amazonaws.com/raw/bmf/2025-12-BMF.csv",
+      "source_last_modified": "Mon, 01 Dec 2025 13:02:35 GMT",
+      "source_content_length_bytes": 400623508,
+      "cached_at_utc": "2026-03-23T20:48:04Z"
+    },
+    "https://nccsdata.s3.us-east-1.amazonaws.com/raw/bmf/2026-03-BMF.csv|Sun, 01 Mar 2026 13:02:50 GMT": {
+      "source_url": "https://nccsdata.s3.us-east-1.amazonaws.com/raw/bmf/2026-03-BMF.csv",
+      "source_last_modified": "Sun, 01 Mar 2026 13:02:50 GMT",
+      "source_content_length_bytes": 403208276,
+      "cached_at_utc": "2026-03-23T20:47:50Z"
+    }
+  }
+}

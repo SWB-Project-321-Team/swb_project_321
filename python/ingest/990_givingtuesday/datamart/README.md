@@ -6,7 +6,7 @@ DataMart-first pipeline for SWB 321:
 - materializes one cached normalized parquet mirror of the raw Combined CSV for faster rebuilds in step 07
 - uploads full raw + dictionary to Bronze before filtering
 - writes two benchmark-filtered files to Silver
-- can extract and upload one GT basic-only analysis-variable layer for the current analysis draft
+- can extract and upload one GT basic-only analysis-variable layer for the stated analysis scope
 - enforces strict source/local/S3 byte-size parity for required raw files
 - uses **Polars lazy** processing in steps 06/07/08 to reduce memory pressure and improve throughput
 - caches steps 03-08 by default when inputs and outputs are unchanged
@@ -87,7 +87,7 @@ python python/ingest/990_givingtuesday/datamart/run_990_datamart_pipeline.py --b
   - `01_data/staging/filing/givingtuesday_990_basic_allforms_analysis_variables.parquet`
   - `01_data/staging/filing/givingtuesday_990_basic_allforms_analysis_region_metrics.parquet`
   - `01_data/raw/givingtuesday_990/datamarts/metadata/givingtuesday_990_basic_allforms_analysis_variable_coverage.csv`
-  - `docs/analysis/givingtuesday_basic_analysis_variable_mapping.md`
+  - `docs/final_preprocessing_docs/technical_docs/analysis_variable_mappings/givingtuesday_basic_analysis_variable_mapping.md`
 
 ## S3 Layout
 
@@ -97,7 +97,9 @@ python python/ingest/990_givingtuesday/datamart/run_990_datamart_pipeline.py --b
 - Silver filtered: `silver/givingtuesday_990/filing/`
 - Silver filtered metadata: `silver/givingtuesday_990/filing/metadata/`
 - Silver analysis outputs: `silver/givingtuesday_990/analysis/`
-- Silver analysis metadata: `silver/givingtuesday_990/analysis/metadata/`
+- Silver analysis documentation: `silver/givingtuesday_990/analysis/documentation/`
+- Silver analysis variable mappings: `silver/givingtuesday_990/analysis/variable_mappings/`
+- Silver analysis coverage evidence: `silver/givingtuesday_990/analysis/quality/coverage/`
 
 ## Notes
 
@@ -113,7 +115,7 @@ python python/ingest/990_givingtuesday/datamart/run_990_datamart_pipeline.py --b
 - Step `11` supports `--verify-only-changed` by default, so unchanged curated artifacts reuse the last successful S3-size result instead of re-heading every object.
 - Steps `07` and `08` now keep the GT benchmark outputs within the explicit `2022-2024` analysis window by default.
 - Step `13` extracts GT analysis variables from the filtered basic-only artifact, including the approved NCCS BMF NTEE enrichment needed for classification analyses.
-- Step `14` uploads the step-13 analysis parquet, region metrics parquet, coverage CSV, and mapping Markdown to the dedicated GT analysis S3 prefix.
+- Step `14` uploads the step-13 analysis parquet, region metrics parquet, coverage CSV, and mapping Markdown to the dedicated GT analysis S3 prefixes.
 - Step `08` keeps the canonical Silver mixed output stable by validating the ROI-scoped mixed stage and dropping the internal ROI-admission metadata columns before the final Silver write.
 
 Default bucket: `swb-321-irs990-teos`

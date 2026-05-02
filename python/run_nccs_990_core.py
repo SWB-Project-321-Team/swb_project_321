@@ -46,7 +46,9 @@ def main() -> None:
     parser.add_argument("--meta-prefix", default=None)
     parser.add_argument("--silver-prefix", default=None)
     parser.add_argument("--analysis-prefix", default=None)
-    parser.add_argument("--analysis-meta-prefix", default=None)
+    parser.add_argument("--analysis-documentation-prefix", default=None)
+    parser.add_argument("--analysis-variable-mapping-prefix", default=None)
+    parser.add_argument("--analysis-coverage-prefix", default=None)
     parser.add_argument("--bmf-staging-dir", default=None)
     parser.add_argument("--irs-bmf-raw-dir", default=None)
     parser.add_argument("--geoid-reference", default=None)
@@ -167,7 +169,9 @@ def main() -> None:
         ("--bmf-staging-dir", args.bmf_staging_dir),
         ("--irs-bmf-raw-dir", args.irs_bmf_raw_dir),
         ("--analysis-prefix", args.analysis_prefix),
-        ("--analysis-meta-prefix", args.analysis_meta_prefix),
+        ("--analysis-documentation-prefix", args.analysis_documentation_prefix),
+        ("--analysis-variable-mapping-prefix", args.analysis_variable_mapping_prefix),
+        ("--analysis-coverage-prefix", args.analysis_coverage_prefix),
         ("--tax-year", args.year),
     ):
         _append_arg(step_07_args, flag, value)
@@ -180,7 +184,9 @@ def main() -> None:
         ("--metadata-dir", args.metadata_dir),
         ("--staging-dir", args.staging_dir),
         ("--analysis-prefix", args.analysis_prefix),
-        ("--analysis-meta-prefix", args.analysis_meta_prefix),
+        ("--analysis-documentation-prefix", args.analysis_documentation_prefix),
+        ("--analysis-variable-mapping-prefix", args.analysis_variable_mapping_prefix),
+        ("--analysis-coverage-prefix", args.analysis_coverage_prefix),
     ):
         _append_arg(step_08_args, flag, value)
     if args.overwrite:

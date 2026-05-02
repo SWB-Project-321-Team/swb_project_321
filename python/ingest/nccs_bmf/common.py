@@ -59,8 +59,10 @@ RAW_ROOT = DATA / "raw" / "nccs_bmf"
 BMF_RAW_DIR = RAW_ROOT / "raw"
 META_DIR = RAW_ROOT / "metadata"
 STAGING_DIR = DATA / "staging" / "nccs_bmf"
-DOCS_ANALYSIS_DIR = get_base() / "docs" / "analysis"
-DOCS_DATA_PROCESSING_DIR = get_base() / "docs" / "data_processing"
+DOCS_PACKAGE_DIR = get_base() / "docs" / "final_preprocessing_docs"
+DOCS_TECHNICAL_DIR = DOCS_PACKAGE_DIR / "technical_docs"
+DOCS_ANALYSIS_DIR = DOCS_TECHNICAL_DIR / "analysis_variable_mappings"
+DOCS_DATA_PROCESSING_DIR = DOCS_TECHNICAL_DIR / "pipeline_docs"
 
 LATEST_RELEASE_JSON = META_DIR / "latest_release.json"
 BMF_DATASET_SNAPSHOT = META_DIR / "dataset_bmf.html"
@@ -72,7 +74,9 @@ RAW_PREFIX = "bronze/nccs_bmf/raw"
 META_PREFIX = "bronze/nccs_bmf/metadata"
 SILVER_PREFIX = "silver/nccs_bmf"
 ANALYSIS_PREFIX = f"{SILVER_PREFIX}/analysis"
-ANALYSIS_META_PREFIX = f"{ANALYSIS_PREFIX}/metadata"
+ANALYSIS_DOCUMENTATION_PREFIX = f"{ANALYSIS_PREFIX}/documentation"
+ANALYSIS_VARIABLE_MAPPING_PREFIX = f"{ANALYSIS_PREFIX}/variable_mappings"
+ANALYSIS_COVERAGE_PREFIX = f"{ANALYSIS_PREFIX}/quality/coverage"
 
 GEOID_REFERENCE_CSV = _CORE_COMMON.GEOID_REFERENCE_CSV
 ZIP_TO_COUNTY_CSV = _CORE_COMMON.ZIP_TO_COUNTY_CSV

@@ -1,0 +1,1200 @@
+{
+  "extracted_at_utc": "2026-03-29T19:23:14Z",
+  "catalog_url": "default",
+  "document_count": 33,
+  "documents": [
+    {
+      "_id": "679696bd141dbd17de689f3a",
+      "_collection": "678d25291eceb5d121099200",
+      "published": true,
+      "title": "Managers Contributing to Budget",
+      "author": [
+        ""
+      ],
+      "desc": "This data mart lists any managers of the foundation who have contributed more than 2% of the total contributions received by the foundation\nbefore the close of any tax year (but only if they have contributed more than $5,000). ",
+      "resource_url": "",
+      "slug": "managers-contributing-to-budget-679696bd141dbd17de689f3a",
+      "custom_fields": {
+        "category": [
+          "Individuals and Relationships"
+        ],
+        "part": [
+          "14 1a"
+        ],
+        "recently_added": "",
+        "size": 86.1,
+        "form_type": "990PF",
+        "last_updated": "2025-10-14",
+        "dataset_documentation": "https://docs.google.com/spreadsheets/d/1UnOtFmbaVz0cWBkjhbclIGmQOZCtWFYy-GeNATJNI3c/edit?userstoinvite=sbuller%40salesforce.com&sharingaction=manageaccess&role=writer&gid=2047163204#gid=2047163204",
+        "download_url": "https://gt990datalake-analytics-and-datamarts.s3.us-east-1.amazonaws.com/EfileDataMarts/2025_08_29_All_Years_990PFPart14ManagersContribute1a.csv",
+        "organizations": []
+      },
+      "page_views": 19,
+      "visibility": "public",
+      "meta": {
+        "count": {
+          "total": 33
+        }
+      },
+      "score": 1
+    },
+    {
+      "_id": "679696bd141dbd17de689f51",
+      "_collection": "678d25291eceb5d121099200",
+      "published": true,
+      "title": "Managers Owning Stock",
+      "author": [
+        ""
+      ],
+      "desc": "This data mart lists any managers of the foundation who own 10% or more of the stock of a corporation (or an equally large portion of the\nownership of a partnership or other entity) of which the foundation has a 10% or greater interest.",
+      "resource_url": "",
+      "slug": "managers-owning-stock-679696bd141dbd17de689f51",
+      "custom_fields": {
+        "category": [
+          "Individuals and Relationships"
+        ],
+        "part": [
+          "14 1b"
+        ],
+        "recently_added": "",
+        "size": 26.4,
+        "form_type": "990PF",
+        "last_updated": "2025-08-31",
+        "dataset_documentation": "https://docs.google.com/spreadsheets/d/1UnOtFmbaVz0cWBkjhbclIGmQOZCtWFYy-GeNATJNI3c/edit?userstoinvite=sbuller%40salesforce.com&sharingaction=manageaccess&role=writer&gid=2085021984#gid=2085021984",
+        "download_url": "https://gt990datalake-analytics-and-datamarts.s3.us-east-1.amazonaws.com/EfileDataMarts/2025_08_29_All_Years_990PFPart14ManagersContribute1b.csv",
+        "organizations": []
+      },
+      "page_views": 21,
+      "visibility": "public",
+      "meta": {
+        "count": {
+          "total": 33
+        }
+      },
+      "score": 1
+    },
+    {
+      "_id": "67cefae970c03882bcff2aa9",
+      "_collection": "678d25291eceb5d121099200",
+      "published": true,
+      "title": "Highest Paid Employees",
+      "author": [
+        ""
+      ],
+      "desc": "This data mart contains reported compensation of the organization's highest paid employees for the calendar year ending with or within the organization\u2019s tax year.",
+      "resource_url": "",
+      "slug": "highest-paid-employees-67cefae970c03882bcff2aa9",
+      "custom_fields": {
+        "category": [
+          "Individuals and Relationships"
+        ],
+        "part": [
+          "6"
+        ],
+        "recently_added": "",
+        "size": 1,
+        "form_type": "990EZ",
+        "last_updated": "2025-08-31",
+        "dataset_documentation": "https://docs.google.com/spreadsheets/d/1UnOtFmbaVz0cWBkjhbclIGmQOZCtWFYy-GeNATJNI3c/edit?userstoinvite=sbuller%40salesforce.com&sharingaction=manageaccess&role=writer&gid=2085125972#gid=2085125972",
+        "download_url": "https://gt990datalake-analytics-and-datamarts.s3.us-east-1.amazonaws.com/EfileDataMarts/2025_08_29_All_Years_990EZPart6HighestCompensatedEmployees.csv",
+        "organizations": []
+      },
+      "page_views": 48,
+      "visibility": "public",
+      "meta": {
+        "count": {
+          "total": 33
+        }
+      },
+      "score": 1
+    },
+    {
+      "_id": "679696bd141dbd17de689f0c",
+      "_collection": "678d25291eceb5d121099200",
+      "published": true,
+      "title": "Highest Paid Employees",
+      "author": [
+        ""
+      ],
+      "desc": "This data mart contains reported compensation of the foundations highly paid employees for the calendar year ending with or within the organization\u2019s tax year.",
+      "resource_url": "",
+      "slug": "highest-paid-employees-679696bd141dbd17de689f0c",
+      "custom_fields": {
+        "category": [
+          "Individuals and Relationships"
+        ],
+        "part": [
+          "7"
+        ],
+        "recently_added": "",
+        "size": 13,
+        "form_type": "990PF",
+        "last_updated": "2025-08-31",
+        "dataset_documentation": "https://docs.google.com/spreadsheets/d/1UnOtFmbaVz0cWBkjhbclIGmQOZCtWFYy-GeNATJNI3c/edit?userstoinvite=sbuller%40salesforce.com&sharingaction=manageaccess&role=writer&gid=1945897634#gid=1945897634",
+        "download_url": "https://gt990datalake-analytics-and-datamarts.s3.us-east-1.amazonaws.com/EfileDataMarts/2025_08_29_All_Years_990PFPart7p1-Officers.csv",
+        "organizations": []
+      },
+      "page_views": 43,
+      "visibility": "public",
+      "meta": {
+        "count": {
+          "total": 33
+        }
+      },
+      "score": 1
+    },
+    {
+      "_id": "67cefae870c03882bcff2a7b",
+      "_collection": "678d25291eceb5d121099200",
+      "published": true,
+      "title": "Programs",
+      "author": [
+        ""
+      ],
+      "desc": "This data mart contains a brief description of the organization's program accomplishments\n\nPlease note that due to the nature of the 990EZ form, the 990EZ Programs datamart is a different format from the regular 990 Programs datamart. If you wish to merge these two datamarts, please follow these steps:\n\n1. Partition the 990EZ table by EIN & Tax Year and order by expenses (descending)\n2. Take the top 3 programs for each organization (e.g., first three rows for each EIN/Tax Year)\n3. Pivot the data so that each EIN/Tax Year has up to three programs in separate columns",
+      "resource_url": "",
+      "slug": "programs-67cefae870c03882bcff2a7b",
+      "custom_fields": {
+        "category": [
+          "Missions and Programs"
+        ],
+        "part": [
+          "3"
+        ],
+        "recently_added": "",
+        "size": 1300,
+        "form_type": "990EZ",
+        "last_updated": "2025-10-28",
+        "dataset_documentation": "https://docs.google.com/spreadsheets/d/1UnOtFmbaVz0cWBkjhbclIGmQOZCtWFYy-GeNATJNI3c/edit?userstoinvite=sbuller%40salesforce.com&sharingaction=manageaccess&role=writer&gid=783066136#gid=783066136",
+        "download_url": "https://gt990datalake-analytics-and-datamarts.s3.us-east-1.amazonaws.com/EfileDataMarts/2025_08_29_All_Years_990EZPart3Programs.csv",
+        "organizations": []
+      },
+      "page_views": 63,
+      "visibility": "public",
+      "meta": {
+        "count": {
+          "total": 33
+        }
+      },
+      "score": 1
+    },
+    {
+      "_id": "679696bd141dbd17de689f68",
+      "_collection": "678d25291eceb5d121099200",
+      "published": true,
+      "title": "Relationships Table 1d",
+      "author": [
+        ""
+      ],
+      "desc": "This data mart contains information on the organization's reported transfers to, transactions and relationships with noncharitable exempt\norganizations ",
+      "resource_url": "",
+      "slug": "relationships-table-1d-679696bd141dbd17de689f68",
+      "custom_fields": {
+        "category": [
+          "Individuals and Relationships"
+        ],
+        "part": [
+          "16"
+        ],
+        "recently_added": "",
+        "size": 2.2,
+        "form_type": "990PF",
+        "last_updated": "2025-08-31",
+        "dataset_documentation": "https://docs.google.com/spreadsheets/d/1UnOtFmbaVz0cWBkjhbclIGmQOZCtWFYy-GeNATJNI3c/edit?userstoinvite=sbuller%40salesforce.com&sharingaction=manageaccess&role=writer&gid=2019640053#gid=2019640053",
+        "download_url": "https://gt990datalake-analytics-and-datamarts.s3.us-east-1.amazonaws.com/EfileDataMarts/2025_08_29_All_Years_990PFPart16RelatedOrgs1D.csv",
+        "organizations": []
+      },
+      "page_views": 48,
+      "visibility": "public",
+      "meta": {
+        "count": {
+          "total": 33
+        }
+      },
+      "score": 1
+    },
+    {
+      "_id": "691cc8018cc1ed255b56398d",
+      "_collection": "678d25291eceb5d121099200",
+      "published": true,
+      "title": "Schedule F",
+      "author": [
+        ""
+      ],
+      "desc": "This data mart contains the organization's Statement of Activities Outside the United States.",
+      "resource_url": "",
+      "slug": "schedule-f-691cc8018cc1ed255b56398d",
+      "custom_fields": {
+        "category": [
+          "Grants and Funds"
+        ],
+        "part": [
+          "5"
+        ],
+        "recently_added": "Recently Added",
+        "size": 79,
+        "form_type": "990",
+        "last_updated": "2025-08-31",
+        "dataset_documentation": "https://docs.google.com/spreadsheets/d/1UnOtFmbaVz0cWBkjhbclIGmQOZCtWFYy-GeNATJNI3c/edit?gid=821352895#gid=821352895",
+        "download_url": "https://gt990datalake-analytics-and-datamarts.s3.us-east-1.amazonaws.com/EfileDataMarts/2025_08_29_All_Years_ScheduleFPart5Supplemental.csv",
+        "organizations": []
+      },
+      "page_views": 6,
+      "visibility": "public",
+      "meta": {
+        "count": {
+          "total": 33
+        }
+      },
+      "score": 1
+    },
+    {
+      "_id": "679696bc141dbd17de689e3d",
+      "_collection": "678d25291eceb5d121099200",
+      "published": true,
+      "title": "Programs",
+      "author": [
+        ""
+      ],
+      "desc": "This data mart contains the statement of program service accomplishments",
+      "resource_url": "",
+      "slug": "programs-679696bc141dbd17de689e3d",
+      "custom_fields": {
+        "category": [
+          "Missions and Programs"
+        ],
+        "part": [
+          "3"
+        ],
+        "recently_added": "",
+        "size": 1900,
+        "form_type": "990",
+        "last_updated": "2025-08-31",
+        "dataset_documentation": "https://docs.google.com/spreadsheets/d/1UnOtFmbaVz0cWBkjhbclIGmQOZCtWFYy-GeNATJNI3c/edit?gid=1147057597#gid=1147057597",
+        "download_url": "https://gt990datalake-analytics-and-datamarts.s3.us-east-1.amazonaws.com/EfileDataMarts/2025_08_29_All_Years_990Part3Programs.csv",
+        "organizations": []
+      },
+      "page_views": 72,
+      "visibility": "public",
+      "meta": {
+        "count": {
+          "total": 33
+        }
+      },
+      "score": 1
+    },
+    {
+      "_id": "691cc8018cc1ed255b563975",
+      "_collection": "678d25291eceb5d121099200",
+      "published": true,
+      "title": "Schedule F",
+      "author": [
+        ""
+      ],
+      "desc": "This data mart contains the organization's Statement of Activities Outside the United States.",
+      "resource_url": "",
+      "slug": "schedule-f-691cc8018cc1ed255b563975",
+      "custom_fields": {
+        "category": [
+          "Grants and Funds"
+        ],
+        "part": [
+          "3"
+        ],
+        "recently_added": "Recently Added",
+        "size": 26.8,
+        "form_type": "990",
+        "last_updated": "2025-08-31",
+        "dataset_documentation": "https://docs.google.com/spreadsheets/d/1UnOtFmbaVz0cWBkjhbclIGmQOZCtWFYy-GeNATJNI3c/edit?gid=821352895#gid=821352895",
+        "download_url": "https://gt990datalake-analytics-and-datamarts.s3.us-east-1.amazonaws.com/EfileDataMarts/2025_08_29_All_Years_ScheduleFPart3Grants.csv",
+        "organizations": []
+      },
+      "page_views": 4,
+      "visibility": "public",
+      "meta": {
+        "count": {
+          "total": 33
+        }
+      },
+      "score": 1
+    },
+    {
+      "_id": "691cc8018cc1ed255b56395d",
+      "_collection": "678d25291eceb5d121099200",
+      "published": true,
+      "title": "Schedule F",
+      "author": [
+        ""
+      ],
+      "desc": "This data mart contains the organization's Statement of Activities Outside the United States.",
+      "resource_url": "",
+      "slug": "schedule-f-691cc8018cc1ed255b56395d",
+      "custom_fields": {
+        "category": [
+          "Grants and Funds"
+        ],
+        "part": [
+          "2"
+        ],
+        "recently_added": "Recently Added",
+        "size": 170.6,
+        "form_type": "990",
+        "last_updated": "2025-08-31",
+        "dataset_documentation": "https://docs.google.com/spreadsheets/d/1UnOtFmbaVz0cWBkjhbclIGmQOZCtWFYy-GeNATJNI3c/edit?gid=821352895#gid=821352895",
+        "download_url": "https://gt990datalake-analytics-and-datamarts.s3.us-east-1.amazonaws.com/EfileDataMarts/2025_08_29_All_Years_ScheduleFPart2Grants.csv",
+        "organizations": []
+      },
+      "page_views": 2,
+      "visibility": "public",
+      "meta": {
+        "count": {
+          "total": 33
+        }
+      },
+      "score": 1
+    },
+    {
+      "_id": "691cc8018cc1ed255b563945",
+      "_collection": "678d25291eceb5d121099200",
+      "published": true,
+      "title": "Schedule F",
+      "author": [
+        ""
+      ],
+      "desc": "This data mart contains the organization's Statement of Activities Outside the United States.",
+      "resource_url": "",
+      "slug": "schedule-f-691cc8018cc1ed255b563945",
+      "custom_fields": {
+        "category": [
+          "Grants and Funds"
+        ],
+        "part": [
+          "1"
+        ],
+        "recently_added": "Recently Added",
+        "size": 109.1,
+        "form_type": "990",
+        "last_updated": "2025-08-31",
+        "dataset_documentation": "https://docs.google.com/spreadsheets/d/1UnOtFmbaVz0cWBkjhbclIGmQOZCtWFYy-GeNATJNI3c/edit?gid=821352895#gid=821352895",
+        "download_url": "https://gt990datalake-analytics-and-datamarts.s3.us-east-1.amazonaws.com/EfileDataMarts/2025_08_29_All_Years_ScheduleFPart1Grants.csv",
+        "organizations": []
+      },
+      "page_views": 6,
+      "visibility": "public",
+      "meta": {
+        "count": {
+          "total": 33
+        }
+      },
+      "score": 1
+    },
+    {
+      "_id": "691cc8028cc1ed255b5639d5",
+      "_collection": "678d25291eceb5d121099200",
+      "published": true,
+      "title": "Schedule J",
+      "author": [
+        ""
+      ],
+      "desc": "This data mart contains the organization's supplemental compensation information.",
+      "resource_url": "",
+      "slug": "schedule-j-691cc8028cc1ed255b5639d5",
+      "custom_fields": {
+        "category": [
+          "Grants and Funds"
+        ],
+        "part": [
+          "3"
+        ],
+        "recently_added": "Recently Added",
+        "size": 322.1,
+        "form_type": "990",
+        "last_updated": "2025-08-31",
+        "dataset_documentation": "https://docs.google.com/spreadsheets/d/1UnOtFmbaVz0cWBkjhbclIGmQOZCtWFYy-GeNATJNI3c/edit?gid=780489534#gid=780489534",
+        "download_url": "https://gt990datalake-analytics-and-datamarts.s3.us-east-1.amazonaws.com/EfileDataMarts/2025_08_29_All_Years_ScheduleJPart3Supplemental.csv",
+        "organizations": []
+      },
+      "page_views": 11,
+      "visibility": "public",
+      "meta": {
+        "count": {
+          "total": 33
+        }
+      },
+      "score": 1
+    },
+    {
+      "_id": "691cc8018cc1ed255b5639bd",
+      "_collection": "678d25291eceb5d121099200",
+      "published": true,
+      "title": "Schedule J",
+      "author": [
+        ""
+      ],
+      "desc": "This data mart contains the organization's supplemental compensation information.",
+      "resource_url": "",
+      "slug": "schedule-j-691cc8018cc1ed255b5639bd",
+      "custom_fields": {
+        "category": [
+          "Grants and Funds"
+        ],
+        "part": [
+          "2"
+        ],
+        "recently_added": "Recently Added",
+        "size": 682.6,
+        "form_type": "990",
+        "last_updated": "2025-08-31",
+        "dataset_documentation": "https://docs.google.com/spreadsheets/d/1UnOtFmbaVz0cWBkjhbclIGmQOZCtWFYy-GeNATJNI3c/edit?gid=780489534#gid=780489534",
+        "download_url": "https://gt990datalake-analytics-and-datamarts.s3.us-east-1.amazonaws.com/EfileDataMarts/2025_08_29_All_Years_ScheduleJPart2Officers.csv",
+        "organizations": []
+      },
+      "page_views": 14,
+      "visibility": "public",
+      "meta": {
+        "count": {
+          "total": 33
+        }
+      },
+      "score": 1
+    },
+    {
+      "_id": "691cc8018cc1ed255b56392d",
+      "_collection": "678d25291eceb5d121099200",
+      "published": true,
+      "title": "Schedule F",
+      "author": [
+        ""
+      ],
+      "desc": "This data mart contains the organization's Statement of Activities Outside the United States.",
+      "resource_url": "",
+      "slug": "schedule-f-691cc8018cc1ed255b56392d",
+      "custom_fields": {
+        "category": [
+          "Grants and Funds"
+        ],
+        "part": "",
+        "recently_added": "Recently Added",
+        "size": 21,
+        "form_type": "990",
+        "last_updated": "2025-08-31",
+        "dataset_documentation": "https://docs.google.com/spreadsheets/d/1UnOtFmbaVz0cWBkjhbclIGmQOZCtWFYy-GeNATJNI3c/edit?gid=821352895#gid=821352895",
+        "download_url": "https://gt990datalake-analytics-and-datamarts.s3.us-east-1.amazonaws.com/EfileDataMarts/2025_08_29_All_Years_ScheduleFPart0Standard.csv",
+        "organizations": []
+      },
+      "page_views": 6,
+      "visibility": "public",
+      "meta": {
+        "count": {
+          "total": 33
+        }
+      },
+      "score": 1
+    },
+    {
+      "_id": "679696bd141dbd17de689ef5",
+      "_collection": "678d25291eceb5d121099200",
+      "published": true,
+      "title": "States Registered In",
+      "author": [
+        ""
+      ],
+      "desc": "This data mart contains the the states to which the foundation reports or with which it is registered",
+      "resource_url": "",
+      "slug": "states-registered-in-679696bd141dbd17de689ef5",
+      "custom_fields": {
+        "category": [
+          "Geography"
+        ],
+        "part": [
+          "6A"
+        ],
+        "recently_added": "",
+        "size": 150,
+        "form_type": "990PF",
+        "last_updated": "2025-08-31",
+        "dataset_documentation": "https://docs.google.com/spreadsheets/d/1UnOtFmbaVz0cWBkjhbclIGmQOZCtWFYy-GeNATJNI3c/edit?userstoinvite=sbuller%40salesforce.com&sharingaction=manageaccess&role=writer&gid=1497870853#gid=1497870853",
+        "download_url": "https://gt990datalake-analytics-and-datamarts.s3.us-east-1.amazonaws.com/EfileDataMarts/2025_08_29_All_Years_990PFPart6aStatesRegistered.csv",
+        "organizations": []
+      },
+      "page_views": 35,
+      "visibility": "public",
+      "meta": {
+        "count": {
+          "total": 33
+        }
+      },
+      "score": 1
+    },
+    {
+      "_id": "679696bc141dbd17de689e26",
+      "_collection": "678d25291eceb5d121099200",
+      "published": true,
+      "title": "Mission Statement",
+      "author": [
+        ""
+      ],
+      "desc": "This data mart contains a brief description of the organization's mission & most significant activities",
+      "resource_url": "",
+      "slug": "mission-statement-679696bc141dbd17de689e26",
+      "custom_fields": {
+        "category": [
+          "Missions and Programs"
+        ],
+        "part": [
+          "1"
+        ],
+        "recently_added": "",
+        "size": 882,
+        "form_type": "990",
+        "last_updated": "2025-08-31",
+        "dataset_documentation": "https://docs.google.com/spreadsheets/d/1UnOtFmbaVz0cWBkjhbclIGmQOZCtWFYy-GeNATJNI3c/edit?gid=0#gid=0",
+        "download_url": "https://gt990datalake-analytics-and-datamarts.s3.us-east-1.amazonaws.com/EfileDataMarts/2025_08_29_All_Years_990Part1Missions.csv",
+        "organizations": []
+      },
+      "page_views": 107,
+      "visibility": "public",
+      "meta": {
+        "count": {
+          "total": 33
+        }
+      },
+      "score": 1
+    },
+    {
+      "_id": "691cc8018cc1ed255b5638fd",
+      "_collection": "678d25291eceb5d121099200",
+      "published": true,
+      "title": "Schedule O",
+      "author": [
+        ""
+      ],
+      "desc": "This data mart contains reported compensation of the organization's five highest-paid independent contractors for professional services.",
+      "resource_url": "",
+      "slug": "schedule-o-691cc8018cc1ed255b5638fd",
+      "custom_fields": {
+        "category": [
+          "Missions and Programs",
+          "Individuals and Relationships",
+          "Grants and Funds",
+          "Geography"
+        ],
+        "part": [
+          "3",
+          "5",
+          "6",
+          "7",
+          "9"
+        ],
+        "recently_added": "Recently Added",
+        "size": 1000,
+        "form_type": "990",
+        "last_updated": "2025-08-31",
+        "dataset_documentation": "https://docs.google.com/spreadsheets/d/1UnOtFmbaVz0cWBkjhbclIGmQOZCtWFYy-GeNATJNI3c/edit?gid=5839853#gid=5839853",
+        "download_url": "https://gt990datalake-analytics-and-datamarts.s3.us-east-1.amazonaws.com/EfileDataMarts/2025_08_29_All_Years_ScheduleO.csv",
+        "organizations": []
+      },
+      "page_views": 41,
+      "visibility": "public",
+      "meta": {
+        "count": {
+          "total": 33
+        }
+      },
+      "score": 1
+    },
+    {
+      "_id": "679696bd141dbd17de689f23",
+      "_collection": "678d25291eceb5d121099200",
+      "published": true,
+      "title": "Contractors",
+      "author": [
+        ""
+      ],
+      "desc": "This data mart contains reported compensation of the foundations five highest-paid independent contractors for professional services.",
+      "resource_url": "",
+      "slug": "contractors-679696bd141dbd17de689f23",
+      "custom_fields": {
+        "category": [
+          "Individuals and Relationships"
+        ],
+        "part": [
+          "7"
+        ],
+        "recently_added": "",
+        "size": 2.3,
+        "form_type": "990PF",
+        "last_updated": "2025-08-31",
+        "dataset_documentation": "https://docs.google.com/spreadsheets/d/1UnOtFmbaVz0cWBkjhbclIGmQOZCtWFYy-GeNATJNI3c/edit?userstoinvite=sbuller%40salesforce.com&sharingaction=manageaccess&role=writer&gid=496047085#gid=496047085",
+        "download_url": "https://gt990datalake-analytics-and-datamarts.s3.us-east-1.amazonaws.com/EfileDataMarts/2025_10_14_All_Years_990PFPart7Contractors.csv",
+        "organizations": []
+      },
+      "page_views": 101,
+      "visibility": "public",
+      "meta": {
+        "count": {
+          "total": 33
+        }
+      },
+      "score": 1
+    },
+    {
+      "_id": "67cefae970c03882bcff2ac0",
+      "_collection": "678d25291eceb5d121099200",
+      "published": true,
+      "title": "Contractors",
+      "author": [
+        ""
+      ],
+      "desc": "This data mart contains reported compensation of the organization's five highest-paid independent contractors for professional services.",
+      "resource_url": "",
+      "slug": "contractors-67cefae970c03882bcff2ac0",
+      "custom_fields": {
+        "category": [
+          "Individuals and Relationships"
+        ],
+        "part": [
+          "6"
+        ],
+        "recently_added": "",
+        "size": 0.7,
+        "form_type": "990EZ",
+        "last_updated": "2025-08-31",
+        "dataset_documentation": "https://docs.google.com/spreadsheets/d/1UnOtFmbaVz0cWBkjhbclIGmQOZCtWFYy-GeNATJNI3c/edit?userstoinvite=sbuller%40salesforce.com&sharingaction=manageaccess&role=writer&gid=2131234124#gid=2131234124",
+        "download_url": "https://gt990datalake-analytics-and-datamarts.s3.us-east-1.amazonaws.com/EfileDataMarts/2025_08_29_All_Years_990EZPart6Contractors.csv",
+        "organizations": []
+      },
+      "page_views": 79,
+      "visibility": "public",
+      "meta": {
+        "count": {
+          "total": 33
+        }
+      },
+      "score": 1
+    },
+    {
+      "_id": "679696bc141dbd17de689ec7",
+      "_collection": "678d25291eceb5d121099200",
+      "published": true,
+      "title": "Grants to Domestic Individuals",
+      "author": [
+        ""
+      ],
+      "desc": "This data mart contains the organization's grants and other assistance to domestic individuals.",
+      "resource_url": "",
+      "slug": "grants-to-domestic-individuals-679696bc141dbd17de689ec7",
+      "custom_fields": {
+        "category": [
+          "Grants and Funds"
+        ],
+        "part": [
+          "Schedule I Part III"
+        ],
+        "recently_added": "",
+        "size": 119,
+        "form_type": "990",
+        "last_updated": "2025-08-31",
+        "dataset_documentation": "https://docs.google.com/spreadsheets/d/1UnOtFmbaVz0cWBkjhbclIGmQOZCtWFYy-GeNATJNI3c/edit?gid=9987768#gid=9987768",
+        "download_url": "https://gt990datalake-analytics-and-datamarts.s3.us-east-1.amazonaws.com/EfileDataMarts/2025_08_29_All_Years_ScheduleIPart3Grants.csv",
+        "organizations": []
+      },
+      "page_views": 69,
+      "visibility": "public",
+      "meta": {
+        "count": {
+          "total": 33
+        }
+      },
+      "score": 1
+    },
+    {
+      "_id": "679696bc141dbd17de689eb0",
+      "_collection": "678d25291eceb5d121099200",
+      "published": true,
+      "title": "Grants to Domestic Orgs",
+      "author": [
+        ""
+      ],
+      "desc": "This data mart contains the organization's grants and other assistance to domestic organizations and domestic governments.",
+      "resource_url": "",
+      "slug": "grants-to-domestic-orgs-679696bc141dbd17de689eb0",
+      "custom_fields": {
+        "category": [
+          "Grants and Funds"
+        ],
+        "part": [
+          "Schedule I Part II"
+        ],
+        "recently_added": "",
+        "size": 1600,
+        "form_type": "990",
+        "last_updated": "2025-08-31",
+        "dataset_documentation": "https://docs.google.com/spreadsheets/d/1UnOtFmbaVz0cWBkjhbclIGmQOZCtWFYy-GeNATJNI3c/edit?gid=186589430#gid=186589430",
+        "download_url": "https://gt990datalake-analytics-and-datamarts.s3.us-east-1.amazonaws.com/EfileDataMarts/2025_08_29_All_Years_ScheduleIPart2Grants.csv",
+        "organizations": []
+      },
+      "page_views": 129,
+      "visibility": "public",
+      "meta": {
+        "count": {
+          "total": 33
+        }
+      },
+      "score": 1
+    },
+    {
+      "_id": "679696bc141dbd17de689e0f",
+      "_collection": "678d25291eceb5d121099200",
+      "published": true,
+      "title": "Basic Fields",
+      "author": [
+        ""
+      ],
+      "desc": "This data mart holds various fields from Form 990 based on the most requested fields by users",
+      "resource_url": "",
+      "slug": "basic-fields-679696bc141dbd17de689e0f",
+      "custom_fields": {
+        "category": [
+          "Missions and Programs",
+          "Individuals and Relationships",
+          "Grants and Funds",
+          "Geography"
+        ],
+        "part": [
+          "1",
+          "4",
+          "6",
+          "8",
+          "9",
+          "10"
+        ],
+        "recently_added": "",
+        "size": 1500,
+        "form_type": "990",
+        "last_updated": "2025-10-20",
+        "dataset_documentation": "https://docs.google.com/spreadsheets/d/1UnOtFmbaVz0cWBkjhbclIGmQOZCtWFYy-GeNATJNI3c/edit?gid=1336370246#gid=1336370246",
+        "download_url": "https://gt990datalake-analytics-and-datamarts.s3.us-east-1.amazonaws.com/EfileDataMarts/2025_10_18_All_Years_990StandardFields.csv",
+        "organizations": []
+      },
+      "page_views": 441,
+      "visibility": "public",
+      "meta": {
+        "count": {
+          "total": 33
+        }
+      },
+      "score": 1
+    },
+    {
+      "_id": "679696bd141dbd17de689f7f",
+      "_collection": "678d25291eceb5d121099200",
+      "published": true,
+      "title": "Relationships Table 2b",
+      "author": [
+        ""
+      ],
+      "desc": "This data mart contains information on the foundation's direct or indirect affiliation with one or more noncharitable exempt\norganizations ",
+      "resource_url": "",
+      "slug": "relationships-table-2b-679696bd141dbd17de689f7f",
+      "custom_fields": {
+        "category": [
+          "Individuals and Relationships"
+        ],
+        "part": [
+          "16"
+        ],
+        "recently_added": "",
+        "size": 3.6,
+        "form_type": "990PF",
+        "last_updated": "2025-08-31",
+        "dataset_documentation": "https://docs.google.com/spreadsheets/d/1UnOtFmbaVz0cWBkjhbclIGmQOZCtWFYy-GeNATJNI3c/edit?userstoinvite=sbuller%40salesforce.com&sharingaction=manageaccess&role=writer&gid=613207025#gid=613207025",
+        "download_url": "https://gt990datalake-analytics-and-datamarts.s3.us-east-1.amazonaws.com/EfileDataMarts/2025_08_29_All_Years_990PFPart16RelatedOrgs2B.csv",
+        "organizations": []
+      },
+      "page_views": 43,
+      "visibility": "public",
+      "meta": {
+        "count": {
+          "total": 33
+        }
+      },
+      "score": 1
+    },
+    {
+      "_id": "679696bc141dbd17de689ede",
+      "_collection": "678d25291eceb5d121099200",
+      "published": true,
+      "title": "Basic Fields",
+      "author": [
+        ""
+      ],
+      "desc": "This data mart holds various fields from Form 990 PF based on the most requested fields by users",
+      "resource_url": "",
+      "slug": "basic-fields-679696bc141dbd17de689ede",
+      "custom_fields": {
+        "category": [
+          "Missions and Programs",
+          "Individuals and Relationships",
+          "Grants and Funds",
+          "Geography"
+        ],
+        "part": [
+          "1",
+          "6",
+          "7",
+          "8",
+          "13",
+          "14",
+          "15",
+          "16"
+        ],
+        "recently_added": "",
+        "size": 431,
+        "form_type": "990PF",
+        "last_updated": "2025-08-31",
+        "dataset_documentation": "https://docs.google.com/spreadsheets/d/1UnOtFmbaVz0cWBkjhbclIGmQOZCtWFYy-GeNATJNI3c/edit?gid=1423003714#gid=1423003714",
+        "download_url": "https://gt990datalake-analytics-and-datamarts.s3.us-east-1.amazonaws.com/EfileDataMarts/2025_08_29_All_Years_990PFStandardFields.csv",
+        "organizations": []
+      },
+      "page_views": 337,
+      "visibility": "public",
+      "meta": {
+        "count": {
+          "total": 33
+        }
+      },
+      "score": 1
+    },
+    {
+      "_id": "679696bc141dbd17de689e99",
+      "_collection": "678d25291eceb5d121099200",
+      "published": true,
+      "title": "Future Grants",
+      "author": [
+        ""
+      ],
+      "desc": "This data mart contains the private foundation's grants and contributions approved to be distributed during future years",
+      "resource_url": "",
+      "slug": "future-grants-679696bc141dbd17de689e99",
+      "custom_fields": {
+        "category": [
+          "Grants and Funds"
+        ],
+        "part": [
+          "15",
+          "14"
+        ],
+        "recently_added": "",
+        "size": 87,
+        "form_type": "990PF",
+        "last_updated": "2025-08-31",
+        "dataset_documentation": "https://docs.google.com/spreadsheets/d/1UnOtFmbaVz0cWBkjhbclIGmQOZCtWFYy-GeNATJNI3c/edit?gid=1493586912#gid=1493586912",
+        "download_url": "https://gt990datalake-analytics-and-datamarts.s3.us-east-1.amazonaws.com/EfileDataMarts/2025_08_29_All_Years_990PFPart14Grants3B.csv",
+        "organizations": []
+      },
+      "page_views": 86,
+      "visibility": "public",
+      "meta": {
+        "count": {
+          "total": 33
+        }
+      },
+      "score": 1
+    },
+    {
+      "_id": "691cc8018cc1ed255b563915",
+      "_collection": "678d25291eceb5d121099200",
+      "published": true,
+      "title": "Schedule D",
+      "author": [
+        ""
+      ],
+      "desc": "This data mart contains the organization's supplemental financial statements.",
+      "resource_url": "",
+      "slug": "schedule-d-691cc8018cc1ed255b563915",
+      "custom_fields": {
+        "category": [
+          "Grants and Funds"
+        ],
+        "part": [
+          "4"
+        ],
+        "recently_added": "Recently Added",
+        "size": 318.4,
+        "form_type": "990",
+        "last_updated": "2025-08-31",
+        "dataset_documentation": "https://docs.google.com/spreadsheets/d/1UnOtFmbaVz0cWBkjhbclIGmQOZCtWFYy-GeNATJNI3c/edit?gid=120638418#gid=120638418",
+        "download_url": "https://gt990datalake-analytics-and-datamarts.s3.us-east-1.amazonaws.com/EfileDataMarts/2025_12_18_All_Years_ScheduleDPart0Standard.csv",
+        "organizations": []
+      },
+      "page_views": 54,
+      "visibility": "public",
+      "meta": {
+        "count": {
+          "total": 33
+        }
+      },
+      "score": 1
+    },
+    {
+      "_id": "679696bc141dbd17de689e82",
+      "_collection": "678d25291eceb5d121099200",
+      "published": true,
+      "title": "Current Grants",
+      "author": [
+        ""
+      ],
+      "desc": "This data mart contains the private foundation's grants and contributions paid during the current year",
+      "resource_url": "",
+      "slug": "current-grants-679696bc141dbd17de689e82",
+      "custom_fields": {
+        "category": [
+          "Grants and Funds"
+        ],
+        "part": [
+          "15",
+          "14"
+        ],
+        "recently_added": "",
+        "size": 3200,
+        "form_type": "990PF",
+        "last_updated": "2025-08-31",
+        "dataset_documentation": "https://docs.google.com/spreadsheets/d/1UnOtFmbaVz0cWBkjhbclIGmQOZCtWFYy-GeNATJNI3c/edit?gid=1732536358#gid=1732536358",
+        "download_url": "https://gt990datalake-analytics-and-datamarts.s3.us-east-1.amazonaws.com/EfileDataMarts/2025_08_29_All_Years_990PFPart14Grants3A.csv",
+        "organizations": []
+      },
+      "page_views": 251,
+      "visibility": "public",
+      "meta": {
+        "count": {
+          "total": 33
+        }
+      },
+      "score": 1
+    },
+    {
+      "_id": "691cc8028cc1ed255b5639ed",
+      "_collection": "678d25291eceb5d121099200",
+      "published": true,
+      "title": "Combined Forms Datamart",
+      "author": [
+        ""
+      ],
+      "desc": "This data mart contains the fields that are common across all 990 form types.",
+      "resource_url": "",
+      "slug": "combined-forms-datamart-691cc8028cc1ed255b5639ed",
+      "custom_fields": {
+        "category": [
+          "Grants and Funds",
+          "Missions and Programs",
+          "Geography",
+          "Individuals and Relationships"
+        ],
+        "part": [
+          "1",
+          "2",
+          "3",
+          "4",
+          "5"
+        ],
+        "recently_added": "Recently Added",
+        "size": 2000,
+        "form_type": "990",
+        "last_updated": "2025-08-31",
+        "dataset_documentation": "https://docs.google.com/spreadsheets/d/1UnOtFmbaVz0cWBkjhbclIGmQOZCtWFYy-GeNATJNI3c/edit?gid=1433094593#gid=1433094593",
+        "download_url": "https://gt990datalake-analytics-and-datamarts.s3.us-east-1.amazonaws.com/EfileDataMarts/2025_07_10_All_Years_990_990ez_990pf_990n_Combined_DataMart.csv",
+        "organizations": []
+      },
+      "page_views": 172,
+      "visibility": "public",
+      "meta": {
+        "count": {
+          "total": 33
+        }
+      },
+      "score": 1
+    },
+    {
+      "_id": "67cefae870c03882bcff2a64",
+      "_collection": "678d25291eceb5d121099200",
+      "published": true,
+      "title": "Basic Fields",
+      "author": [
+        ""
+      ],
+      "desc": "This data mart holds various fields from Form 990 EZ based on the most requested fields by users",
+      "resource_url": "",
+      "slug": "basic-fields-67cefae870c03882bcff2a64",
+      "custom_fields": {
+        "category": [
+          "Missions and Programs",
+          "Grants and Funds",
+          "Individuals and Relationships",
+          "Geography"
+        ],
+        "part": [
+          "1",
+          "2",
+          "3",
+          "4",
+          "5",
+          "6"
+        ],
+        "recently_added": "",
+        "size": 955.5,
+        "form_type": "990EZ",
+        "last_updated": "2025-08-31",
+        "dataset_documentation": "https://docs.google.com/spreadsheets/d/1UnOtFmbaVz0cWBkjhbclIGmQOZCtWFYy-GeNATJNI3c/edit?userstoinvite=sbuller%40salesforce.com&sharingaction=manageaccess&role=writer&gid=1673448678#gid=1673448678",
+        "download_url": "https://gt990datalake-analytics-and-datamarts.s3.us-east-1.amazonaws.com/EfileDataMarts/2025_10_28_All_Years_990EZStandardFields.csv",
+        "organizations": []
+      },
+      "page_views": 477,
+      "visibility": "public",
+      "meta": {
+        "count": {
+          "total": 33
+        }
+      },
+      "score": 1
+    },
+    {
+      "_id": "67cefae870c03882bcff2a92",
+      "_collection": "678d25291eceb5d121099200",
+      "published": true,
+      "title": "Officers",
+      "author": [
+        ""
+      ],
+      "desc": "This data mart contains reported compensation of officers, directors, trustees, and key employees for the calendar year ending with or within the\norganization's tax year.",
+      "resource_url": "",
+      "slug": "officers-67cefae870c03882bcff2a92",
+      "custom_fields": {
+        "category": [
+          "Individuals and Relationships"
+        ],
+        "part": [
+          "4"
+        ],
+        "recently_added": "",
+        "size": 2100,
+        "form_type": "990EZ",
+        "last_updated": "2025-08-31",
+        "dataset_documentation": "https://docs.google.com/spreadsheets/d/1UnOtFmbaVz0cWBkjhbclIGmQOZCtWFYy-GeNATJNI3c/edit?userstoinvite=sbuller%40salesforce.com&sharingaction=manageaccess&role=writer&gid=670359355#gid=670359355",
+        "download_url": "https://gt990datalake-analytics-and-datamarts.s3.us-east-1.amazonaws.com/EfileDataMarts/2025_08_29_All_Years_990EZPart4Officers.csv",
+        "organizations": []
+      },
+      "page_views": 58,
+      "visibility": "public",
+      "meta": {
+        "count": {
+          "total": 33
+        }
+      },
+      "score": 1
+    },
+    {
+      "_id": "679696bc141dbd17de689e6b",
+      "_collection": "678d25291eceb5d121099200",
+      "published": true,
+      "title": "Officers",
+      "author": [
+        ""
+      ],
+      "desc": "This data mart contains reported compensation of officers, directors,trustees, foundation managers, highly paid employees for the calendar year ending with or within the organization\u2019s tax year.",
+      "resource_url": "",
+      "slug": "officers-679696bc141dbd17de689e6b",
+      "custom_fields": {
+        "category": [
+          "Individuals and Relationships"
+        ],
+        "part": [
+          "7"
+        ],
+        "recently_added": "",
+        "size": 612,
+        "form_type": "990PF",
+        "last_updated": "2025-08-31",
+        "dataset_documentation": "https://docs.google.com/spreadsheets/d/1UnOtFmbaVz0cWBkjhbclIGmQOZCtWFYy-GeNATJNI3c/edit?gid=1067812276#gid=1067812276",
+        "download_url": "https://gt990datalake-analytics-and-datamarts.s3.us-east-1.amazonaws.com/EfileDataMarts/2025_08_29_All_Years_990PFPart7p1-Officers.csv",
+        "organizations": []
+      },
+      "page_views": 52,
+      "visibility": "public",
+      "meta": {
+        "count": {
+          "total": 33
+        }
+      },
+      "score": 1
+    },
+    {
+      "_id": "679696bc141dbd17de689e54",
+      "_collection": "678d25291eceb5d121099200",
+      "published": true,
+      "title": "Officers",
+      "author": [
+        ""
+      ],
+      "desc": "This data mart contains reported compensation of officers, directors, trustees, and key employees for the calendar year ending with or within the\norganization's tax year.",
+      "resource_url": "",
+      "slug": "officers-679696bc141dbd17de689e54",
+      "custom_fields": {
+        "category": [
+          "Individuals and Relationships"
+        ],
+        "part": [
+          "7A"
+        ],
+        "recently_added": "",
+        "size": 6900,
+        "form_type": "990",
+        "last_updated": "2025-08-31",
+        "dataset_documentation": "https://docs.google.com/spreadsheets/d/1UnOtFmbaVz0cWBkjhbclIGmQOZCtWFYy-GeNATJNI3c/edit?gid=360554442#gid=360554442",
+        "download_url": "https://gt990datalake-analytics-and-datamarts.s3.us-east-1.amazonaws.com/EfileDataMarts/2025_08_29_All_Years_990Part7AOfficers.csv",
+        "organizations": []
+      },
+      "page_views": 99,
+      "visibility": "public",
+      "meta": {
+        "count": {
+          "total": 33
+        }
+      },
+      "score": 1
+    },
+    {
+      "_id": "691cc8018cc1ed255b5639a5",
+      "_collection": "678d25291eceb5d121099200",
+      "published": true,
+      "title": "Schedule J",
+      "author": [
+        ""
+      ],
+      "desc": "This data mart contains the organization's supplemental compensation information.",
+      "resource_url": "",
+      "slug": "schedule-j-691cc8018cc1ed255b5639a5",
+      "custom_fields": {
+        "category": [
+          "Grants and Funds"
+        ],
+        "part": "",
+        "recently_added": "Recently Added",
+        "size": 98.1,
+        "form_type": "990",
+        "last_updated": "2025-08-31",
+        "dataset_documentation": "https://docs.google.com/spreadsheets/d/1UnOtFmbaVz0cWBkjhbclIGmQOZCtWFYy-GeNATJNI3c/edit?gid=780489534#gid=780489534",
+        "download_url": "https://gt990datalake-analytics-and-datamarts.s3.us-east-1.amazonaws.com/EfileDataMarts/2025_08_29_All_Years_ScheduleJPart0Standard.csv",
+        "organizations": []
+      },
+      "page_views": 17,
+      "visibility": "public",
+      "meta": {
+        "count": {
+          "total": 33
+        }
+      },
+      "score": 1
+    }
+  ]
+}

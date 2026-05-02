@@ -1,0 +1,42 @@
+{
+  "landing_page_url": "https://www.irs.gov/statistics/soi-tax-stats-county-data",
+  "year_page_url": "https://www.irs.gov/statistics/soi-tax-stats-county-data-2022",
+  "tax_year": 2022,
+  "year_selection": "latest",
+  "irs_page_last_reviewed": "18-Mar-2026",
+  "discovered_at_utc": "2026-03-20T18:01:21Z",
+  "assets": [
+    {
+      "asset_type": "county_csv_agi",
+      "source_url": "https://www.irs.gov/pub/irs-soi/22incyallagi.csv",
+      "filename": "22incyallagi.csv",
+      "source_content_type": "text/csv",
+      "source_content_length_bytes": null,
+      "source_last_modified": "Fri, 14 Feb 2025 19:10:13 GMT"
+    },
+    {
+      "asset_type": "county_csv_noagi",
+      "source_url": "https://www.irs.gov/pub/irs-soi/22incyallnoagi.csv",
+      "filename": "22incyallnoagi.csv",
+      "source_content_type": "text/csv",
+      "source_content_length_bytes": null,
+      "source_last_modified": "Fri, 14 Feb 2025 19:10:14 GMT"
+    },
+    {
+      "asset_type": "users_guide_docx",
+      "source_url": "https://www.irs.gov/pub/irs-soi/22incydocguide.docx",
+      "filename": "22incydocguide.docx",
+      "source_content_type": "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+      "source_content_length_bytes": 47920,
+      "source_last_modified": "Fri, 14 Feb 2025 19:10:22 GMT"
+    }
+  ],
+  "source_size_cache": {
+    "https://www.irs.gov/pub/irs-soi/22incydocguide.docx|Fri, 14 Feb 2025 19:10:22 GMT": {
+      "source_url": "https://www.irs.gov/pub/irs-soi/22incydocguide.docx",
+      "source_last_modified": "Fri, 14 Feb 2025 19:10:22 GMT",
+      "source_content_length_bytes": 47920,
+      "cached_at_utc": "2026-03-20T18:01:21Z"
+    }
+  }
+}

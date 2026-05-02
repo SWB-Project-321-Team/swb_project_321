@@ -5,6 +5,8 @@ Step 07: Build NCCS Core analysis outputs for the 2022-only Core benchmark layer
 from __future__ import annotations
 
 import argparse
+import importlib.util
+import sys
 import time
 from pathlib import Path
 from typing import Any
@@ -12,9 +14,30 @@ from typing import Any
 import pandas as pd
 from tqdm import tqdm
 
+
+def _ensure_sibling_common_loaded() -> None:
+    common_path = Path(__file__).with_name("common.py").resolve()
+    current = sys.modules.get("common")
+    current_file = getattr(current, "__file__", None)
+    if current_file and Path(current_file).resolve() == common_path:
+        return
+    spec = importlib.util.spec_from_file_location("common", common_path)
+    if spec is None or spec.loader is None:
+        raise ImportError(f"Unable to load common module from {common_path}")
+    module = importlib.util.module_from_spec(spec)
+    sys.modules["common"] = module
+    spec.loader.exec_module(module)
+
+
+_ensure_sibling_common_loaded()
+
 from common import (
-    ANALYSIS_META_PREFIX,
+    ANALYSIS_COVERAGE_PREFIX,
+    ANALYSIS_DOCUMENTATION_PREFIX,
     ANALYSIS_PREFIX,
+    ANALYSIS_VARIABLE_MAPPING_PREFIX,
+    BMF_CATALOG_URL,
+    CORE_CATALOG_URL,
     DEFAULT_S3_BUCKET,
     DEFAULT_S3_REGION,
     META_DIR,
@@ -47,6 +70,7 @@ from ingest._shared.analysis_support import (
     normalize_ein,
     numeric_from_text,
 )
+from utils.paths import DATA as DATA_ROOT
 
 CORE_ANALYSIS_TAX_YEAR = 2022
 _REPO_ROOT = Path(__file__).resolve().parents[3]
@@ -54,36 +78,36 @@ CORE_CLEANED_NET_MARGIN_MIN_REVENUE = 1000.0
 CORE_CLEANED_NET_MARGIN_MAX_ABS_RATIO = 10.0
 
 AVAILABLE_VARIABLE_METADATA = [
-    {"canonical_variable": "analysis_total_revenue_amount", "variable_role": "direct", "draft_variable": "Total revenue", "source_rule": "Scope-aware direct Core revenue field", "provenance_column": "analysis_total_revenue_amount_source_column", "notes": "PZ/PC revenue totals and PF books revenue are kept separate upstream, then harmonized here."},
-    {"canonical_variable": "analysis_total_expense_amount", "variable_role": "direct", "draft_variable": "Total expense", "source_rule": "Scope-aware direct Core expense field", "provenance_column": "analysis_total_expense_amount_source_column", "notes": "Expense totals come directly from the filtered Core benchmark files."},
-    {"canonical_variable": "analysis_total_assets_amount", "variable_role": "direct", "draft_variable": "Total assets", "source_rule": "Scope-aware direct Core asset field", "provenance_column": "analysis_total_assets_amount_source_column", "notes": "Uses EOY total assets for PC/PZ and PF book-value total assets."},
-    {"canonical_variable": "analysis_net_asset_amount", "variable_role": "direct", "draft_variable": "Net asset", "source_rule": "Scope-aware direct Core net-asset field", "provenance_column": "analysis_net_asset_amount_source_column", "notes": "Net-asset or fund-balance concept remains source-faithful."},
-    {"canonical_variable": "analysis_calculated_surplus_amount", "variable_role": "calculated", "draft_variable": "Surplus", "source_rule": "Prefer source direct surplus where available, else revenue minus expense", "provenance_column": "analysis_calculated_surplus_amount_source_column", "notes": "PZ and PF carry direct surplus-like fields; PC falls back to revenue minus expense."},
-    {"canonical_variable": "analysis_calculated_net_margin_ratio", "variable_role": "calculated", "draft_variable": "Net margin", "source_rule": "analysis_calculated_surplus_amount / positive analysis_total_revenue_amount", "provenance_column": "analysis_calculated_net_margin_ratio_source_column", "notes": "Null when revenue is missing, zero, or negative."},
-    {"canonical_variable": "analysis_calculated_cleaned_net_margin_ratio", "variable_role": "calculated", "draft_variable": "Net margin (cleaned)", "source_rule": f"analysis_calculated_net_margin_ratio when analysis_total_revenue_amount >= {CORE_CLEANED_NET_MARGIN_MIN_REVENUE:.0f} and abs(ratio) <= {CORE_CLEANED_NET_MARGIN_MAX_ABS_RATIO:g}", "provenance_column": "analysis_calculated_cleaned_net_margin_ratio_source_column", "notes": "Convenience field that suppresses tiny-denominator and extreme-ratio outliers while preserving the raw ratio separately."},
-    {"canonical_variable": "analysis_calculated_months_of_reserves", "variable_role": "calculated", "draft_variable": "Months of reserves", "source_rule": "(analysis_net_asset_amount / positive analysis_total_expense_amount) * 12", "provenance_column": "analysis_calculated_months_of_reserves_source_column", "notes": "Only calculated when expense is present and positive."},
-    {"canonical_variable": "analysis_program_service_revenue_amount", "variable_role": "direct", "draft_variable": "Program service revenue", "source_rule": "Core program-service fields by scope", "provenance_column": "analysis_program_service_revenue_amount_source_column", "notes": "Promoted draft-aligned Core program-service revenue field."},
-    {"canonical_variable": "analysis_program_service_revenue_candidate_amount", "variable_role": "direct", "draft_variable": "Program service revenue candidate", "source_rule": "Core program-service candidate fields by scope", "provenance_column": "analysis_program_service_revenue_candidate_amount_source_column", "notes": "Source-faithful supporting field retained alongside the promoted draft-aligned variable."},
-    {"canonical_variable": "analysis_calculated_total_contributions_amount", "variable_role": "direct", "draft_variable": "Total contributions", "source_rule": "Core contribution fields by scope", "provenance_column": "analysis_calculated_total_contributions_amount_source_column", "notes": "Promoted draft-aligned total-contributions field from the best available Core contribution concept."},
-    {"canonical_variable": "analysis_contribution_candidate_amount", "variable_role": "direct", "draft_variable": "Contribution candidate", "source_rule": "Core contribution candidate fields by scope", "provenance_column": "analysis_contribution_candidate_amount_source_column", "notes": "Source-faithful supporting field retained alongside the promoted draft-aligned variable."},
-    {"canonical_variable": "analysis_gifts_grants_received_candidate_amount", "variable_role": "direct", "draft_variable": "Gifts/grants received candidate", "source_rule": "Schedule A public-support gift/grant contribution candidates when present", "provenance_column": "analysis_gifts_grants_received_candidate_amount_source_column", "notes": "Kept distinct from contribution and grants-paid concepts."},
-    {"canonical_variable": "analysis_grants_paid_candidate_amount", "variable_role": "calculated", "draft_variable": "Grants paid candidate", "source_rule": "Row-wise sum of Core grant-paid components, or PF contribution-paid books field", "provenance_column": "analysis_grants_paid_candidate_amount_source_column", "notes": "Distinct grant-paid concept preserved for analysts."},
-    {"canonical_variable": "analysis_ntee_code", "variable_role": "enriched", "draft_variable": "NTEE filed classification code", "source_rule": "Exact-year BMF, then nearest-year BMF, then IRS EO BMF EIN fallback; unresolved rows are marked UNKNOWN", "provenance_column": "analysis_ntee_code_source_column", "notes": "Classification enrichment only; unresolved rows remain explicitly unknown rather than blank."},
-    {"canonical_variable": "analysis_subsection_code", "variable_role": "enriched", "draft_variable": "Subsection code", "source_rule": "Exact-year BMF, then nearest-year BMF, then IRS EO BMF EIN fallback", "provenance_column": "analysis_subsection_code_source_column", "notes": "Supports political-organization classification."},
-    {"canonical_variable": "analysis_calculated_ntee_broad_code", "variable_role": "calculated", "draft_variable": "Broad NTEE field classification code", "source_rule": "First letter of analysis_ntee_code", "provenance_column": "analysis_calculated_ntee_broad_code_source_column", "notes": "Broad field code for field-composition analyses."},
-    {"canonical_variable": "analysis_is_hospital", "variable_role": "proxy", "draft_variable": "Hospital flag", "source_rule": "Direct Core flag when present, else NTEE proxy", "provenance_column": "analysis_is_hospital_source_column", "notes": "Source-backed hospital flag used before name-based imputation."},
-    {"canonical_variable": "analysis_is_university", "variable_role": "proxy", "draft_variable": "University flag", "source_rule": "Direct Core flag when present, else NTEE proxy", "provenance_column": "analysis_is_university_source_column", "notes": "Source-backed university flag used before name-based imputation."},
-    {"canonical_variable": "analysis_is_political_org", "variable_role": "proxy", "draft_variable": "Political organization flag", "source_rule": "Subsection proxy from analysis_subsection_code", "provenance_column": "analysis_is_political_org_source_column", "notes": "Source-backed political proxy used before name-based imputation."},
-    {"canonical_variable": "analysis_imputed_is_hospital", "variable_role": "imputed", "draft_variable": "Hospital flag", "source_rule": "Canonical source-backed flag, then high-confidence name match, then default False", "provenance_column": "analysis_imputed_is_hospital_source_column", "notes": "Complete exclusion-ready hospital flag."},
-    {"canonical_variable": "analysis_imputed_is_university", "variable_role": "imputed", "draft_variable": "University flag", "source_rule": "Canonical source-backed flag, then high-confidence name match, then default False", "provenance_column": "analysis_imputed_is_university_source_column", "notes": "Complete exclusion-ready university flag."},
-    {"canonical_variable": "analysis_imputed_is_political_org", "variable_role": "imputed", "draft_variable": "Political organization flag", "source_rule": "Canonical source-backed flag, then high-confidence name match, then default False", "provenance_column": "analysis_imputed_is_political_org_source_column", "notes": "Complete exclusion-ready political flag."},
+    {"canonical_variable": "analysis_total_revenue_amount", "variable_role": "direct", "analysis_requirement": "Total revenue", "source_rule": "Scope-aware direct Core revenue field", "provenance_column": "analysis_total_revenue_amount_source_column", "notes": "PZ/PC revenue totals and PF books revenue are kept separate upstream, then harmonized here."},
+    {"canonical_variable": "analysis_total_expense_amount", "variable_role": "direct", "analysis_requirement": "Total expense", "source_rule": "Scope-aware direct Core expense field", "provenance_column": "analysis_total_expense_amount_source_column", "notes": "Expense totals come directly from the filtered Core benchmark files."},
+    {"canonical_variable": "analysis_total_assets_amount", "variable_role": "direct", "analysis_requirement": "Total assets", "source_rule": "Scope-aware direct Core asset field", "provenance_column": "analysis_total_assets_amount_source_column", "notes": "Uses EOY total assets for PC/PZ and PF book-value total assets."},
+    {"canonical_variable": "analysis_net_asset_amount", "variable_role": "direct", "analysis_requirement": "Net asset", "source_rule": "Scope-aware direct Core net-asset field", "provenance_column": "analysis_net_asset_amount_source_column", "notes": "Net-asset or fund-balance concept remains source-faithful."},
+    {"canonical_variable": "analysis_calculated_surplus_amount", "variable_role": "calculated", "analysis_requirement": "Surplus", "source_rule": "Prefer source direct surplus where available, else revenue minus expense", "provenance_column": "analysis_calculated_surplus_amount_source_column", "notes": "PZ and PF carry direct surplus-like fields; PC falls back to revenue minus expense."},
+    {"canonical_variable": "analysis_calculated_net_margin_ratio", "variable_role": "calculated", "analysis_requirement": "Net margin", "source_rule": "analysis_calculated_surplus_amount / positive analysis_total_revenue_amount", "provenance_column": "analysis_calculated_net_margin_ratio_source_column", "notes": "Null when revenue is missing, zero, or negative."},
+    {"canonical_variable": "analysis_calculated_cleaned_net_margin_ratio", "variable_role": "calculated", "analysis_requirement": "Net margin (cleaned)", "source_rule": f"analysis_calculated_net_margin_ratio when analysis_total_revenue_amount >= {CORE_CLEANED_NET_MARGIN_MIN_REVENUE:.0f} and abs(ratio) <= {CORE_CLEANED_NET_MARGIN_MAX_ABS_RATIO:g}", "provenance_column": "analysis_calculated_cleaned_net_margin_ratio_source_column", "notes": "Convenience field that suppresses tiny-denominator and extreme-ratio outliers while preserving the raw ratio separately."},
+    {"canonical_variable": "analysis_calculated_months_of_reserves", "variable_role": "calculated", "analysis_requirement": "Months of reserves", "source_rule": "(analysis_net_asset_amount / positive analysis_total_expense_amount) * 12", "provenance_column": "analysis_calculated_months_of_reserves_source_column", "notes": "Only calculated when expense is present and positive."},
+    {"canonical_variable": "analysis_program_service_revenue_amount", "variable_role": "direct", "analysis_requirement": "Program service revenue", "source_rule": "Core program-service fields by scope", "provenance_column": "analysis_program_service_revenue_amount_source_column", "notes": "Promoted requirement-aligned Core program-service revenue field."},
+    {"canonical_variable": "analysis_program_service_revenue_candidate_amount", "variable_role": "direct", "analysis_requirement": "Program service revenue candidate", "source_rule": "Core program-service candidate fields by scope", "provenance_column": "analysis_program_service_revenue_candidate_amount_source_column", "notes": "Source-faithful supporting field retained alongside the promoted requirement-aligned variable."},
+    {"canonical_variable": "analysis_calculated_total_contributions_amount", "variable_role": "direct", "analysis_requirement": "Total contributions", "source_rule": "Core contribution fields by scope", "provenance_column": "analysis_calculated_total_contributions_amount_source_column", "notes": "Promoted requirement-aligned total-contributions field from the best available Core contribution concept."},
+    {"canonical_variable": "analysis_contribution_candidate_amount", "variable_role": "direct", "analysis_requirement": "Contribution candidate", "source_rule": "Core contribution candidate fields by scope", "provenance_column": "analysis_contribution_candidate_amount_source_column", "notes": "Source-faithful supporting field retained alongside the promoted requirement-aligned variable."},
+    {"canonical_variable": "analysis_gifts_grants_received_candidate_amount", "variable_role": "direct", "analysis_requirement": "Gifts/grants received candidate", "source_rule": "Schedule A public-support gift/grant contribution candidates when present", "provenance_column": "analysis_gifts_grants_received_candidate_amount_source_column", "notes": "Kept distinct from contribution and grants-paid concepts."},
+    {"canonical_variable": "analysis_grants_paid_candidate_amount", "variable_role": "calculated", "analysis_requirement": "Grants paid candidate", "source_rule": "Row-wise sum of Core grant-paid components, or PF contribution-paid books field", "provenance_column": "analysis_grants_paid_candidate_amount_source_column", "notes": "Distinct grant-paid concept preserved for analysts."},
+    {"canonical_variable": "analysis_ntee_code", "variable_role": "enriched", "analysis_requirement": "NTEE filed classification code", "source_rule": "Exact-year BMF, then nearest-year BMF, then IRS EO BMF EIN fallback; unresolved rows are marked UNKNOWN", "provenance_column": "analysis_ntee_code_source_column", "notes": "Classification enrichment only; unresolved rows remain explicitly unknown rather than blank."},
+    {"canonical_variable": "analysis_subsection_code", "variable_role": "enriched", "analysis_requirement": "Subsection code", "source_rule": "Exact-year BMF, then nearest-year BMF, then IRS EO BMF EIN fallback", "provenance_column": "analysis_subsection_code_source_column", "notes": "Supports political-organization classification."},
+    {"canonical_variable": "analysis_calculated_ntee_broad_code", "variable_role": "calculated", "analysis_requirement": "Broad NTEE field classification code", "source_rule": "First letter of analysis_ntee_code", "provenance_column": "analysis_calculated_ntee_broad_code_source_column", "notes": "Broad field code for field-composition analyses."},
+    {"canonical_variable": "analysis_is_hospital", "variable_role": "proxy", "analysis_requirement": "Hospital flag", "source_rule": "Direct Core flag when present, else NTEE proxy", "provenance_column": "analysis_is_hospital_source_column", "notes": "Source-backed hospital flag used before name-based imputation."},
+    {"canonical_variable": "analysis_is_university", "variable_role": "proxy", "analysis_requirement": "University flag", "source_rule": "Direct Core flag when present, else NTEE proxy", "provenance_column": "analysis_is_university_source_column", "notes": "Source-backed university flag used before name-based imputation."},
+    {"canonical_variable": "analysis_is_political_org", "variable_role": "proxy", "analysis_requirement": "Political organization flag", "source_rule": "Subsection proxy from analysis_subsection_code", "provenance_column": "analysis_is_political_org_source_column", "notes": "Source-backed political proxy used before name-based imputation."},
+    {"canonical_variable": "analysis_imputed_is_hospital", "variable_role": "imputed", "analysis_requirement": "Hospital flag", "source_rule": "Canonical source-backed flag, then high-confidence name match, then default False", "provenance_column": "analysis_imputed_is_hospital_source_column", "notes": "Complete exclusion-ready hospital flag."},
+    {"canonical_variable": "analysis_imputed_is_university", "variable_role": "imputed", "analysis_requirement": "University flag", "source_rule": "Canonical source-backed flag, then high-confidence name match, then default False", "provenance_column": "analysis_imputed_is_university_source_column", "notes": "Complete exclusion-ready university flag."},
+    {"canonical_variable": "analysis_imputed_is_political_org", "variable_role": "imputed", "analysis_requirement": "Political organization flag", "source_rule": "Canonical source-backed flag, then high-confidence name match, then default False", "provenance_column": "analysis_imputed_is_political_org_source_column", "notes": "Complete exclusion-ready political flag."},
 ]
 
 UNAVAILABLE_VARIABLES = [
-    {"canonical_variable": "analysis_other_contributions_amount", "availability_status": "unavailable", "variable_role": "unavailable", "draft_variable": "Other contributions", "source_rule": "Core does not provide a directly aligned field in the current pipeline.", "notes": "Unavailable by design."},
-    {"canonical_variable": "analysis_calculated_grants_total_amount", "availability_status": "unavailable", "variable_role": "unavailable", "draft_variable": "Grants total", "source_rule": "Grant-received and grant-paid concepts remain separate in Core.", "notes": "Use the distinct candidate fields instead."},
-    {"canonical_variable": "analysis_foundation_grants_amount", "availability_status": "unavailable", "variable_role": "unavailable", "draft_variable": "Foundation grants", "source_rule": "No current direct Core mapping.", "notes": "Unavailable by design."},
-    {"canonical_variable": "analysis_government_grants_amount", "availability_status": "unavailable", "variable_role": "unavailable", "draft_variable": "Government grants", "source_rule": "No current direct Core mapping.", "notes": "Unavailable by design."},
+    {"canonical_variable": "analysis_other_contributions_amount", "availability_status": "unavailable", "variable_role": "unavailable", "analysis_requirement": "Other contributions", "source_rule": "Core does not provide a directly aligned field in the current pipeline.", "notes": "Unavailable by design."},
+    {"canonical_variable": "analysis_calculated_grants_total_amount", "availability_status": "unavailable", "variable_role": "unavailable", "analysis_requirement": "Grants total", "source_rule": "Grant-received and grant-paid concepts remain separate in Core.", "notes": "Use the distinct candidate fields instead."},
+    {"canonical_variable": "analysis_foundation_grants_amount", "availability_status": "unavailable", "variable_role": "unavailable", "analysis_requirement": "Foundation grants", "source_rule": "No current direct Core mapping.", "notes": "Unavailable by design."},
+    {"canonical_variable": "analysis_government_grants_amount", "availability_status": "unavailable", "variable_role": "unavailable", "analysis_requirement": "Government grants", "source_rule": "No current direct Core mapping.", "notes": "Unavailable by design."},
 ]
 
 
@@ -94,10 +118,15 @@ def _ensure_parent_dirs(*paths: Path) -> None:
 
 
 def _repo_relative_display(path: Path) -> str:
+    resolved = path.resolve()
     try:
-        return path.resolve().relative_to(_REPO_ROOT).as_posix()
+        return f"SWB_321_DATA_ROOT/{resolved.relative_to(DATA_ROOT.resolve()).as_posix()}"
     except ValueError:
-        return path.resolve().as_posix()
+        pass
+    try:
+        return resolved.relative_to(_REPO_ROOT).as_posix()
+    except ValueError:
+        return resolved.as_posix()
 
 
 def _match_source_variant(path: Path) -> tuple[str, str, str]:
@@ -565,16 +594,23 @@ def _write_mapping_markdown(mapping_path: Path) -> None:
         "- `analysis_ntee_code` uses an explicit `UNKNOWN` sentinel when every classification source is blank.",
         "- `analysis_calculated_months_of_reserves` writes `0` for zero-assets/zero-expense rows and `inf` for positive-assets/zero-expense rows.",
         "",
+        "## Coverage Evidence",
+        "",
+        f"- Generated coverage CSV: `{_repo_relative_display(analysis_variable_coverage_path())}`",
+        f"- Published S3 variable mapping object: `{ANALYSIS_VARIABLE_MAPPING_PREFIX}/{analysis_variable_mapping_path().name}`",
+        f"- Published S3 coverage object: `{ANALYSIS_COVERAGE_PREFIX}/{analysis_variable_coverage_path().name}`",
+        "- Coverage CSVs are generated by the analysis step and published as quality evidence.",
+        "",
         "## Extracted Variables",
         "",
-        "|canonical_variable|variable_role|draft_variable|source_rule|provenance_column|notes|",
+        "|canonical_variable|variable_role|analysis_requirement|source_rule|provenance_column|notes|",
         "|---|---|---|---|---|---|",
     ]
     for row in AVAILABLE_VARIABLE_METADATA:
-        lines.append(f"|{row['canonical_variable']}|{row['variable_role']}|{row['draft_variable']}|{row['source_rule']}|{row['provenance_column']}|{row['notes']}|")
-    lines.extend(["", "## Unavailable Variables", "", "|canonical_variable|availability_status|draft_variable|notes|", "|---|---|---|---|"])
+        lines.append(f"|{row['canonical_variable']}|{row['variable_role']}|{row['analysis_requirement']}|{row['source_rule']}|{row['provenance_column']}|{row['notes']}|")
+    lines.extend(["", "## Unavailable Variables", "", "|canonical_variable|availability_status|analysis_requirement|notes|", "|---|---|---|---|"])
     for row in UNAVAILABLE_VARIABLES:
-        lines.append(f"|{row['canonical_variable']}|unavailable|{row['draft_variable']}|{row['notes']}|")
+        lines.append(f"|{row['canonical_variable']}|unavailable|{row['analysis_requirement']}|{row['notes']}|")
     mapping_path.write_text("\n".join(lines) + "\n", encoding="utf-8")
 
 
@@ -618,7 +654,7 @@ The main artifact classes are:
 - Silver filtered artifacts: benchmark-filtered Core outputs plus a combined filtered Core parquet.
 - Final analysis artifacts: the row-level analysis parquet, geography metrics parquet, coverage CSV, mapping Markdown, and this processing doc.
 
-This pipeline follows the `CODING_RULES.md` filtered-only combine contract:
+This pipeline follows a filtered-only combine contract (combine stages use filtered inputs only):
 
 - benchmark admission happens upstream in step 05
 - the final analysis build reads only filtered Core outputs
@@ -646,6 +682,17 @@ This pipeline follows the `CODING_RULES.md` filtered-only combine contract:
 | 08 | `08_upload_analysis_outputs.py` | Upload analysis outputs and verify local-vs-S3 byte parity | Analysis artifacts and docs | Silver analysis objects | S3 |
 
 ## How Data Is Retrieved
+
+## Exact Source Locations
+
+- NCCS Core catalog page: `{CORE_CATALOG_URL}`
+- NCCS BMF bridge catalog page: `{BMF_CATALOG_URL}`
+
+## Raw Source Dictionaries
+
+- NCCS Core public charity dictionary: `documentation/final_preprocessing_docs/technical_docs/source_dictionaries/nccs_990_core/CORE-HRMN_dd.csv`
+- NCCS Core private foundation dictionary: `documentation/final_preprocessing_docs/technical_docs/source_dictionaries/nccs_990_core/DD-PF-HRMN-V0.csv`
+- NCCS harmonized BMF bridge dictionary: `documentation/final_preprocessing_docs/technical_docs/source_dictionaries/nccs_990_core/harmonized_data_dictionary.xlsx`
 
 ### Step 01 and Step 02: release discovery and raw download
 
@@ -683,7 +730,9 @@ This preserves:
 - Silver filtered Core prefix: `silver/nccs_990/core/`
 - Silver filtered Core metadata prefix: `silver/nccs_990/core/metadata/`
 - Official Core analysis prefix: `silver/nccs_990/core/analysis/`
-- Official Core analysis metadata prefix: `silver/nccs_990/core/analysis/metadata/`
+- Analysis documentation prefix: `{ANALYSIS_DOCUMENTATION_PREFIX}`
+- Analysis variable mapping prefix: `{ANALYSIS_VARIABLE_MAPPING_PREFIX}`
+- Analysis coverage prefix: `{ANALYSIS_COVERAGE_PREFIX}`
 
 ## Step-By-Step Transformation
 
@@ -754,9 +803,9 @@ The Core analysis layer extracts direct or source-faithful candidate fields for:
 
 Where the same concept differs across `pc`, `pz`, and `pf`, the step uses scope-aware rules rather than pretending the columns are identical across Core families.
 
-### Draft-aligned promoted fields
+### Requirement-aligned promoted fields
 
-The current Core analysis package also promotes these cleanly supportable draft-aligned fields:
+The current Core analysis package also promotes these cleanly supportable requirement-aligned fields:
 
 - `analysis_program_service_revenue_amount`
 - `analysis_calculated_total_contributions_amount`
@@ -817,6 +866,14 @@ The metrics include counts, unique EIN counts, financial sums, normalized averag
 
 The coverage CSV records populated counts and fill rates for the available Core analysis variables.
 
+## Coverage Evidence
+
+- Generated coverage CSV: `{_repo_relative_display(analysis_variable_coverage_path())}`
+- Published S3 documentation object: `{ANALYSIS_DOCUMENTATION_PREFIX}/{analysis_data_processing_doc_path().name}`
+- Published S3 variable mapping object: `{ANALYSIS_VARIABLE_MAPPING_PREFIX}/{analysis_variable_mapping_path().name}`
+- Published S3 coverage object: `{ANALYSIS_COVERAGE_PREFIX}/{analysis_variable_coverage_path().name}`
+- Coverage CSVs are generated by step 07 and published as authoritative quality evidence.
+
 The mapping Markdown documents which variables are:
 
 - direct
@@ -855,9 +912,9 @@ This package is analogous in structure to GT and efile, while keeping Core-speci
 - Core candidate revenue-source fields are kept source-faithful instead of being forced into GT semantics.
 - Zero-expense reserve rows are made explicit rather than remaining silently null, and unresolved NTEE rows are marked `UNKNOWN`.
 
-## Draft Alignment Appendix
+## Analysis requirement alignment appendix
 
-| draft_variable | source_specific_output | status | rule_or_reason |
+| analysis_requirement | source_specific_output | status | rule_or_reason |
 | --- | --- | --- | --- |
 | Total revenue | analysis_total_revenue_amount | direct | Scope-aware direct Core revenue extraction |
 | Total expense | analysis_total_expense_amount | direct | Scope-aware direct Core expense extraction |
@@ -1033,7 +1090,9 @@ def main() -> None:
     parser.add_argument("--bmf-staging-dir", type=Path, default=DEFAULT_BMF_STAGING_DIR)
     parser.add_argument("--irs-bmf-raw-dir", type=Path, default=DEFAULT_IRS_BMF_RAW_DIR)
     parser.add_argument("--analysis-prefix", default=ANALYSIS_PREFIX)
-    parser.add_argument("--analysis-meta-prefix", default=ANALYSIS_META_PREFIX)
+    parser.add_argument("--analysis-documentation-prefix", default=ANALYSIS_DOCUMENTATION_PREFIX)
+    parser.add_argument("--analysis-variable-mapping-prefix", default=ANALYSIS_VARIABLE_MAPPING_PREFIX)
+    parser.add_argument("--analysis-coverage-prefix", default=ANALYSIS_COVERAGE_PREFIX)
     parser.add_argument("--tax-year", type=int, default=CORE_ANALYSIS_TAX_YEAR)
     args = parser.parse_args()
 
@@ -1044,7 +1103,9 @@ def main() -> None:
     print(f"[analysis] Region: {args.region}", flush=True)
     print(f"[analysis] Tax year: {args.tax_year}", flush=True)
     print(f"[analysis] Analysis prefix: {args.analysis_prefix}", flush=True)
-    print(f"[analysis] Analysis metadata prefix: {args.analysis_meta_prefix}", flush=True)
+    print(f"[analysis] Analysis documentation prefix: {args.analysis_documentation_prefix}", flush=True)
+    print(f"[analysis] Analysis variable mapping prefix: {args.analysis_variable_mapping_prefix}", flush=True)
+    print(f"[analysis] Analysis coverage prefix: {args.analysis_coverage_prefix}", flush=True)
     build_analysis_outputs(
         staging_dir=args.staging_dir,
         metadata_dir=args.metadata_dir,

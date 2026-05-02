@@ -1,0 +1,258 @@
+{
+  "core_catalog_url": "https://nccs.urban.org/nccs/catalogs/catalog-core.html",
+  "bmf_catalog_url": "https://nccs.urban.org/nccs/catalogs/catalog-bmf.html",
+  "tax_year": 2022,
+  "year_selection": "latest_common",
+  "latest_common_year": 2022,
+  "benchmark_states": [
+    "AZ",
+    "MN",
+    "MT",
+    "SD"
+  ],
+  "discovered_at_utc": "2026-03-20T22:41:54Z",
+  "assets": [
+    {
+      "asset_type": "501c3_charities_pz",
+      "asset_group": "core_csv",
+      "family": "501c3_charities",
+      "scope": "pz",
+      "source_url": "https://nccsdata.s3.amazonaws.com/harmonized/core/501c3-pz/CORE-2022-501C3-CHARITIES-PZ-HRMN.csv",
+      "filename": "CORE-2022-501C3-CHARITIES-PZ-HRMN.csv",
+      "year": 2022,
+      "year_basis": "latest_common",
+      "benchmark_state": null,
+      "source_content_type": "text/csv",
+      "source_content_length_bytes": 33236336,
+      "source_last_modified": "Tue, 04 Mar 2025 16:36:00 GMT"
+    },
+    {
+      "asset_type": "501c3_charities_pc",
+      "asset_group": "core_csv",
+      "family": "501c3_charities",
+      "scope": "pc",
+      "source_url": "https://nccsdata.s3.amazonaws.com/harmonized/core/501c3-pc/CORE-2022-501C3-CHARITIES-PC-HRMN.csv",
+      "filename": "CORE-2022-501C3-CHARITIES-PC-HRMN.csv",
+      "year": 2022,
+      "year_basis": "latest_common",
+      "benchmark_state": null,
+      "source_content_type": "text/csv",
+      "source_content_length_bytes": 19238005,
+      "source_last_modified": "Tue, 04 Mar 2025 16:55:37 GMT"
+    },
+    {
+      "asset_type": "501ce_nonprofit_pz",
+      "asset_group": "core_csv",
+      "family": "501ce_nonprofit",
+      "scope": "pz",
+      "source_url": "https://nccsdata.s3.amazonaws.com/harmonized/core/501ce-pz/CORE-2022-501CE-NONPROFIT-PZ-HRMN.csv",
+      "filename": "CORE-2022-501CE-NONPROFIT-PZ-HRMN.csv",
+      "year": 2022,
+      "year_basis": "latest_common",
+      "benchmark_state": null,
+      "source_content_type": "text/csv",
+      "source_content_length_bytes": 12469680,
+      "source_last_modified": "Tue, 04 Mar 2025 16:57:56 GMT"
+    },
+    {
+      "asset_type": "501ce_nonprofit_pc",
+      "asset_group": "core_csv",
+      "family": "501ce_nonprofit",
+      "scope": "pc",
+      "source_url": "https://nccsdata.s3.amazonaws.com/harmonized/core/501ce-pc/CORE-2022-501CE-NONPROFIT-PC-HRMN.csv",
+      "filename": "CORE-2022-501CE-NONPROFIT-PC-HRMN.csv",
+      "year": 2022,
+      "year_basis": "latest_common",
+      "benchmark_state": null,
+      "source_content_type": "text/csv",
+      "source_content_length_bytes": 7597326,
+      "source_last_modified": "Tue, 04 Mar 2025 16:59:19 GMT"
+    },
+    {
+      "asset_type": "501c3_privfound_pf",
+      "asset_group": "core_csv",
+      "family": "501c3_privfound",
+      "scope": "pf",
+      "source_url": "https://nccsdata.s3.amazonaws.com/harmonized/core/501c3-pf/marts/CORE-2022-501C3-PRIVFOUND-PF-HRMN-V0.csv",
+      "filename": "CORE-2022-501C3-PRIVFOUND-PF-HRMN-V0.csv",
+      "year": 2022,
+      "year_basis": "latest_common",
+      "benchmark_state": null,
+      "source_content_type": "text/csv",
+      "source_content_length_bytes": 60221148,
+      "source_last_modified": "Tue, 22 Apr 2025 02:10:59 GMT"
+    },
+    {
+      "asset_type": "core_dictionary_pc_pz",
+      "asset_group": "core_dictionary",
+      "family": "core",
+      "scope": "dictionary",
+      "source_url": "https://nccsdata.s3.amazonaws.com/harmonized/core/CORE-HRMN_dd.csv",
+      "filename": "CORE-HRMN_dd.csv",
+      "year": null,
+      "year_basis": "reference",
+      "benchmark_state": null,
+      "source_content_type": "binary/octet-stream",
+      "source_content_length_bytes": 149914,
+      "source_last_modified": "Mon, 22 Jul 2024 18:54:01 GMT"
+    },
+    {
+      "asset_type": "core_dictionary_pf",
+      "asset_group": "core_dictionary",
+      "family": "501c3_privfound",
+      "scope": "dictionary",
+      "source_url": "https://nccsdata.s3.us-east-1.amazonaws.com/harmonized/core/501c3-pf/dd/DD-PF-HRMN-V0.csv",
+      "filename": "DD-PF-HRMN-V0.csv",
+      "year": null,
+      "year_basis": "reference",
+      "benchmark_state": null,
+      "source_content_type": "text/csv",
+      "source_content_length_bytes": 60919,
+      "source_last_modified": "Tue, 22 Apr 2025 02:10:50 GMT"
+    },
+    {
+      "asset_type": "bmf_dictionary",
+      "asset_group": "bmf_dictionary",
+      "family": "unified_bmf",
+      "scope": "dictionary",
+      "source_url": "https://nccsdata.s3.amazonaws.com/harmonized/harmonized_data_dictionary.xlsx",
+      "filename": "harmonized_data_dictionary.xlsx",
+      "year": null,
+      "year_basis": "reference",
+      "benchmark_state": null,
+      "source_content_type": "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+      "source_content_length_bytes": 68223,
+      "source_last_modified": "Fri, 21 Jun 2024 16:47:52 GMT"
+    },
+    {
+      "asset_type": "bmf_state_csv",
+      "asset_group": "bmf_state_csv",
+      "family": "unified_bmf",
+      "scope": "state",
+      "source_url": "https://nccsdata.s3.amazonaws.com/harmonized/bmf/unified/AZ_BMF_V1.1.csv",
+      "filename": "AZ_BMF_V1.1.csv",
+      "year": null,
+      "year_basis": "reference",
+      "benchmark_state": "AZ",
+      "source_content_type": "text/csv",
+      "source_content_length_bytes": 21127297,
+      "source_last_modified": "Tue, 04 Mar 2025 18:56:15 GMT"
+    },
+    {
+      "asset_type": "bmf_state_csv",
+      "asset_group": "bmf_state_csv",
+      "family": "unified_bmf",
+      "scope": "state",
+      "source_url": "https://nccsdata.s3.amazonaws.com/harmonized/bmf/unified/MN_BMF_V1.1.csv",
+      "filename": "MN_BMF_V1.1.csv",
+      "year": null,
+      "year_basis": "reference",
+      "benchmark_state": "MN",
+      "source_content_type": "text/csv",
+      "source_content_length_bytes": 28598894,
+      "source_last_modified": "Tue, 04 Mar 2025 18:56:17 GMT"
+    },
+    {
+      "asset_type": "bmf_state_csv",
+      "asset_group": "bmf_state_csv",
+      "family": "unified_bmf",
+      "scope": "state",
+      "source_url": "https://nccsdata.s3.amazonaws.com/harmonized/bmf/unified/MT_BMF_V1.1.csv",
+      "filename": "MT_BMF_V1.1.csv",
+      "year": null,
+      "year_basis": "reference",
+      "benchmark_state": "MT",
+      "source_content_type": "text/csv",
+      "source_content_length_bytes": 7297506,
+      "source_last_modified": "Tue, 04 Mar 2025 18:56:17 GMT"
+    },
+    {
+      "asset_type": "bmf_state_csv",
+      "asset_group": "bmf_state_csv",
+      "family": "unified_bmf",
+      "scope": "state",
+      "source_url": "https://nccsdata.s3.amazonaws.com/harmonized/bmf/unified/SD_BMF_V1.1.csv",
+      "filename": "SD_BMF_V1.1.csv",
+      "year": null,
+      "year_basis": "reference",
+      "benchmark_state": "SD",
+      "source_content_type": "text/csv",
+      "source_content_length_bytes": 5225014,
+      "source_last_modified": "Tue, 04 Mar 2025 18:56:18 GMT"
+    }
+  ],
+  "source_size_cache": {
+    "https://nccsdata.s3.amazonaws.com/harmonized/core/501c3-pz/CORE-2022-501C3-CHARITIES-PZ-HRMN.csv|Tue, 04 Mar 2025 16:36:00 GMT": {
+      "source_url": "https://nccsdata.s3.amazonaws.com/harmonized/core/501c3-pz/CORE-2022-501C3-CHARITIES-PZ-HRMN.csv",
+      "source_last_modified": "Tue, 04 Mar 2025 16:36:00 GMT",
+      "source_content_length_bytes": 33236336,
+      "cached_at_utc": "2026-03-20T22:41:54Z"
+    },
+    "https://nccsdata.s3.amazonaws.com/harmonized/core/501c3-pc/CORE-2022-501C3-CHARITIES-PC-HRMN.csv|Tue, 04 Mar 2025 16:55:37 GMT": {
+      "source_url": "https://nccsdata.s3.amazonaws.com/harmonized/core/501c3-pc/CORE-2022-501C3-CHARITIES-PC-HRMN.csv",
+      "source_last_modified": "Tue, 04 Mar 2025 16:55:37 GMT",
+      "source_content_length_bytes": 19238005,
+      "cached_at_utc": "2026-03-20T22:41:54Z"
+    },
+    "https://nccsdata.s3.amazonaws.com/harmonized/core/501ce-pz/CORE-2022-501CE-NONPROFIT-PZ-HRMN.csv|Tue, 04 Mar 2025 16:57:56 GMT": {
+      "source_url": "https://nccsdata.s3.amazonaws.com/harmonized/core/501ce-pz/CORE-2022-501CE-NONPROFIT-PZ-HRMN.csv",
+      "source_last_modified": "Tue, 04 Mar 2025 16:57:56 GMT",
+      "source_content_length_bytes": 12469680,
+      "cached_at_utc": "2026-03-20T22:41:54Z"
+    },
+    "https://nccsdata.s3.amazonaws.com/harmonized/core/501ce-pc/CORE-2022-501CE-NONPROFIT-PC-HRMN.csv|Tue, 04 Mar 2025 16:59:19 GMT": {
+      "source_url": "https://nccsdata.s3.amazonaws.com/harmonized/core/501ce-pc/CORE-2022-501CE-NONPROFIT-PC-HRMN.csv",
+      "source_last_modified": "Tue, 04 Mar 2025 16:59:19 GMT",
+      "source_content_length_bytes": 7597326,
+      "cached_at_utc": "2026-03-20T22:41:54Z"
+    },
+    "https://nccsdata.s3.amazonaws.com/harmonized/core/501c3-pf/marts/CORE-2022-501C3-PRIVFOUND-PF-HRMN-V0.csv|Tue, 22 Apr 2025 02:10:59 GMT": {
+      "source_url": "https://nccsdata.s3.amazonaws.com/harmonized/core/501c3-pf/marts/CORE-2022-501C3-PRIVFOUND-PF-HRMN-V0.csv",
+      "source_last_modified": "Tue, 22 Apr 2025 02:10:59 GMT",
+      "source_content_length_bytes": 60221148,
+      "cached_at_utc": "2026-03-20T22:41:54Z"
+    },
+    "https://nccsdata.s3.amazonaws.com/harmonized/core/CORE-HRMN_dd.csv|Mon, 22 Jul 2024 18:54:01 GMT": {
+      "source_url": "https://nccsdata.s3.amazonaws.com/harmonized/core/CORE-HRMN_dd.csv",
+      "source_last_modified": "Mon, 22 Jul 2024 18:54:01 GMT",
+      "source_content_length_bytes": 149914,
+      "cached_at_utc": "2026-03-20T22:41:54Z"
+    },
+    "https://nccsdata.s3.us-east-1.amazonaws.com/harmonized/core/501c3-pf/dd/DD-PF-HRMN-V0.csv|Tue, 22 Apr 2025 02:10:50 GMT": {
+      "source_url": "https://nccsdata.s3.us-east-1.amazonaws.com/harmonized/core/501c3-pf/dd/DD-PF-HRMN-V0.csv",
+      "source_last_modified": "Tue, 22 Apr 2025 02:10:50 GMT",
+      "source_content_length_bytes": 60919,
+      "cached_at_utc": "2026-03-20T22:41:54Z"
+    },
+    "https://nccsdata.s3.amazonaws.com/harmonized/harmonized_data_dictionary.xlsx|Fri, 21 Jun 2024 16:47:52 GMT": {
+      "source_url": "https://nccsdata.s3.amazonaws.com/harmonized/harmonized_data_dictionary.xlsx",
+      "source_last_modified": "Fri, 21 Jun 2024 16:47:52 GMT",
+      "source_content_length_bytes": 68223,
+      "cached_at_utc": "2026-03-20T22:41:54Z"
+    },
+    "https://nccsdata.s3.amazonaws.com/harmonized/bmf/unified/AZ_BMF_V1.1.csv|Tue, 04 Mar 2025 18:56:15 GMT": {
+      "source_url": "https://nccsdata.s3.amazonaws.com/harmonized/bmf/unified/AZ_BMF_V1.1.csv",
+      "source_last_modified": "Tue, 04 Mar 2025 18:56:15 GMT",
+      "source_content_length_bytes": 21127297,
+      "cached_at_utc": "2026-03-20T22:41:54Z"
+    },
+    "https://nccsdata.s3.amazonaws.com/harmonized/bmf/unified/MN_BMF_V1.1.csv|Tue, 04 Mar 2025 18:56:17 GMT": {
+      "source_url": "https://nccsdata.s3.amazonaws.com/harmonized/bmf/unified/MN_BMF_V1.1.csv",
+      "source_last_modified": "Tue, 04 Mar 2025 18:56:17 GMT",
+      "source_content_length_bytes": 28598894,
+      "cached_at_utc": "2026-03-20T22:41:54Z"
+    },
+    "https://nccsdata.s3.amazonaws.com/harmonized/bmf/unified/MT_BMF_V1.1.csv|Tue, 04 Mar 2025 18:56:17 GMT": {
+      "source_url": "https://nccsdata.s3.amazonaws.com/harmonized/bmf/unified/MT_BMF_V1.1.csv",
+      "source_last_modified": "Tue, 04 Mar 2025 18:56:17 GMT",
+      "source_content_length_bytes": 7297506,
+      "cached_at_utc": "2026-03-20T22:41:54Z"
+    },
+    "https://nccsdata.s3.amazonaws.com/harmonized/bmf/unified/SD_BMF_V1.1.csv|Tue, 04 Mar 2025 18:56:18 GMT": {
+      "source_url": "https://nccsdata.s3.amazonaws.com/harmonized/bmf/unified/SD_BMF_V1.1.csv",
+      "source_last_modified": "Tue, 04 Mar 2025 18:56:18 GMT",
+      "source_content_length_bytes": 5225014,
+      "cached_at_utc": "2026-03-20T22:41:54Z"
+    }
+  }
+}

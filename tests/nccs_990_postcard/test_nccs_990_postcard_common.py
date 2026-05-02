@@ -539,7 +539,7 @@ def test_build_postcard_analysis_outputs_limits_scope_and_builds_geography_metri
         coverage_df["canonical_variable"] == "analysis_is_small_filer_support"
     ].iloc[0]
     assert small_filer_coverage["availability_status"] == "available"
-    assert small_filer_coverage["draft_variable"] == "Small-filer support flag"
+    assert small_filer_coverage["analysis_requirement"] == "Small-filer support flag"
     assert (metadata_dir / "nccs_990_postcard_analysis_variable_coverage.csv").exists()
     assert (docs_dir / "postcard_mapping.md").exists()
 

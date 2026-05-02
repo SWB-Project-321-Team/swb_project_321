@@ -20,7 +20,7 @@ Run these scripts **in order** from the repo root to fetch Form 990 data for org
 **Or run steps by hand (from repo root):**
 
 ```powershell
-cd "C:\Users\eilke\Desktop\Github Repo\swb_project_321"
+cd <repo root>
 python python/ingest/990_givingtuesday/api/01_fetch_zip_to_county.py
 python python/ingest/990_givingtuesday/api/02_fetch_bmf.py
 python python/ingest/990_givingtuesday/api/03_build_ein_list.py

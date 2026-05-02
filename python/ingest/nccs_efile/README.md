@@ -57,8 +57,8 @@ python python/run_nccs_efile.py
 - `01_data/staging/nccs_efile/nccs_efile_analysis_variables.parquet`
 - `01_data/staging/nccs_efile/nccs_efile_analysis_geography_metrics.parquet`
 - `01_data/raw/nccs_efile/metadata/nccs_efile_analysis_variable_coverage.csv`
-- `docs/analysis/nccs_efile_analysis_variable_mapping.md`
-- `docs/data_processing/nccs_efile_pipeline.md`
+- `docs/final_preprocessing_docs/technical_docs/analysis_variable_mappings/nccs_efile_analysis_variable_mapping.md`
+- `docs/final_preprocessing_docs/technical_docs/pipeline_docs/nccs_efile_pipeline.md`
 
 ## S3 layout
 
@@ -69,7 +69,9 @@ python python/run_nccs_efile.py
 - `silver/nccs_efile/comparison/tax_year=YYYY/<comparison artifacts>`
 - `silver/nccs_efile/analysis/nccs_efile_analysis_variables.parquet`
 - `silver/nccs_efile/analysis/nccs_efile_analysis_geography_metrics.parquet`
-- `silver/nccs_efile/analysis/metadata/<coverage, mapping, pipeline doc>`
+- `silver/nccs_efile/analysis/documentation/nccs_efile_pipeline.md`
+- `silver/nccs_efile/analysis/variable_mappings/nccs_efile_analysis_variable_mapping.md`
+- `silver/nccs_efile/analysis/quality/coverage/nccs_efile_analysis_variable_coverage.csv`
 
 ## Build notes
 

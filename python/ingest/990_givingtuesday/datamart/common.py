@@ -53,10 +53,10 @@ RAW_DIR = RAW_ROOT / "raw"
 META_DIR = RAW_ROOT / "metadata"
 RAW_CACHE_DIR = RAW_ROOT / "cache"
 STAGING_DIR = DATA / "staging" / "filing"
-DOCS_ANALYSIS_DIR = get_base() / "docs" / "analysis"
-DOCS_DATA_PROCESSING_DIR = get_base() / "docs" / "data_processing"
-ANALYSIS_PLAN_WORKING_DRAFT_MD = get_base() / "docs" / "Analysis plan working draft.md"
-CODING_RULES_MD = get_base() / "secrets" / "coding_rules" / "CODING_RULES.md"
+DOCS_PACKAGE_DIR = get_base() / "docs" / "final_preprocessing_docs"
+DOCS_TECHNICAL_DIR = DOCS_PACKAGE_DIR / "technical_docs"
+DOCS_ANALYSIS_DIR = DOCS_TECHNICAL_DIR / "analysis_variable_mappings"
+DOCS_DATA_PROCESSING_DIR = DOCS_TECHNICAL_DIR / "pipeline_docs"
 BMF_STAGING_DIR = DATA / "staging" / "nccs_bmf"
 IRS_BMF_RAW_DIR = DATA / "raw" / "irs_bmf"
 
@@ -113,7 +113,9 @@ BRONZE_PRESILVER_PREFIX = "bronze/givingtuesday_990/datamarts/presilver"
 SILVER_PREFIX = "silver/givingtuesday_990/filing"
 SILVER_META_PREFIX = f"{SILVER_PREFIX}/metadata"
 ANALYSIS_PREFIX = "silver/givingtuesday_990/analysis"
-ANALYSIS_META_PREFIX = f"{ANALYSIS_PREFIX}/metadata"
+ANALYSIS_DOCUMENTATION_PREFIX = f"{ANALYSIS_PREFIX}/documentation"
+ANALYSIS_VARIABLE_MAPPING_PREFIX = f"{ANALYSIS_PREFIX}/variable_mappings"
+ANALYSIS_COVERAGE_PREFIX = f"{ANALYSIS_PREFIX}/quality/coverage"
 
 DOWNLOAD_WORKERS = shared_transfers.DOWNLOAD_WORKERS_DEFAULT
 UPLOAD_WORKERS = shared_transfers.UPLOAD_WORKERS_DEFAULT
@@ -258,7 +260,7 @@ GT_BASIC_ANALYSIS_REGION_METRICS_ARTIFACT = PipelineArtifact(
 GT_BASIC_ANALYSIS_VARIABLE_COVERAGE_ARTIFACT = PipelineArtifact(
     artifact_id="gt_basic_analysis_variable_coverage",
     local_path=GT_BASIC_ANALYSIS_VARIABLE_COVERAGE_CSV,
-    s3_prefix=ANALYSIS_META_PREFIX,
+    s3_prefix=ANALYSIS_COVERAGE_PREFIX,
     content_type="text/csv",
     category="analysis_metadata",
 )
@@ -266,7 +268,7 @@ GT_BASIC_ANALYSIS_VARIABLE_COVERAGE_ARTIFACT = PipelineArtifact(
 GT_BASIC_ANALYSIS_VARIABLE_MAPPING_ARTIFACT = PipelineArtifact(
     artifact_id="gt_basic_analysis_variable_mapping",
     local_path=GT_BASIC_ANALYSIS_VARIABLE_MAPPING_MD,
-    s3_prefix=ANALYSIS_META_PREFIX,
+    s3_prefix=ANALYSIS_VARIABLE_MAPPING_PREFIX,
     content_type="text/markdown",
     category="analysis_metadata",
 )
@@ -274,7 +276,7 @@ GT_BASIC_ANALYSIS_VARIABLE_MAPPING_ARTIFACT = PipelineArtifact(
 GT_DATA_PROCESSING_DOC_ARTIFACT = PipelineArtifact(
     artifact_id="gt_data_processing_doc",
     local_path=GT_DATA_PROCESSING_DOC_MD,
-    s3_prefix=ANALYSIS_META_PREFIX,
+    s3_prefix=ANALYSIS_DOCUMENTATION_PREFIX,
     content_type="text/markdown",
     category="analysis_metadata",
 )
@@ -421,7 +423,7 @@ def load_env_from_secrets() -> None:
 
 def ensure_dirs() -> None:
     """Ensure all working directories exist."""
-    for p in (RAW_DIR, META_DIR, RAW_CACHE_DIR, STAGING_DIR, DOCS_ANALYSIS_DIR):
+    for p in (RAW_DIR, META_DIR, RAW_CACHE_DIR, STAGING_DIR, DOCS_ANALYSIS_DIR, DOCS_DATA_PROCESSING_DIR):
         p.mkdir(parents=True, exist_ok=True)
         print(f"[paths] Ready: {p}", flush=True)
 

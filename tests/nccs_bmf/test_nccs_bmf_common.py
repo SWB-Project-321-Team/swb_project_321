@@ -8,6 +8,7 @@ import sys
 from pathlib import Path
 
 import pandas as pd
+import importlib.util
 
 try:
     import pytest
@@ -19,9 +20,14 @@ _REPO_ROOT = _FILE_DIR.parent.parent
 _BMF_DIR = _REPO_ROOT / "python" / "ingest" / "nccs_bmf"
 if str(_BMF_DIR) not in sys.path:
     sys.path.insert(0, str(_BMF_DIR))
-import common as bmf_common  # noqa: E402
+_COMMON_PATH = _BMF_DIR / "common.py"
+_COMMON_SPEC = importlib.util.spec_from_file_location("nccs_bmf_common_for_tests", _COMMON_PATH)
+if _COMMON_SPEC is None or _COMMON_SPEC.loader is None:
+    raise ImportError(f"Unable to load BMF common module from {_COMMON_PATH}")
+bmf_common = importlib.util.module_from_spec(_COMMON_SPEC)
+sys.modules.setdefault("nccs_bmf_common_for_tests", bmf_common)
+_COMMON_SPEC.loader.exec_module(bmf_common)
 _ANALYSIS_PATH = _BMF_DIR / "07_extract_analysis_variables_local.py"
-import importlib.util
 
 _ANALYSIS_SPEC = importlib.util.spec_from_file_location("nccs_bmf_analysis_for_tests", _ANALYSIS_PATH)
 if _ANALYSIS_SPEC is None or _ANALYSIS_SPEC.loader is None:
@@ -439,7 +445,7 @@ def test_build_bmf_analysis_outputs_dedupes_duplicate_ein_year_and_builds_metric
         coverage_df["canonical_variable"] == "analysis_total_expense_amount"
     ].iloc[0]
     assert expense_coverage["availability_status"] == "unavailable"
-    assert expense_coverage["draft_variable"] == "Total expense"
+    assert expense_coverage["analysis_requirement"] == "Total expense"
     assets_coverage = coverage_df.loc[
         coverage_df["canonical_variable"] == "analysis_total_assets_amount"
     ].iloc[0]

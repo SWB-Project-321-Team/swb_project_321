@@ -1,0 +1,45 @@
+{
+  "build_options": {
+    "bucket": "swb-321-irs990-teos",
+    "meta_prefix": "bronze/givingtuesday_990/datamarts/metadata",
+    "raw_prefix": "bronze/givingtuesday_990/datamarts/raw",
+    "region": "us-east-2",
+    "required_dataset_count": 4
+  },
+  "created_at_utc": "2026-03-28T19:37:16Z",
+  "failures": 0,
+  "input_signature": {
+    "catalog_csv": {
+      "head_sha1": "ada6ec5d6f98d508e0d94cdfe504906adeabb9de",
+      "mtime_ns": 1774725339223939300,
+      "path": "C:\\Users\\eilke\\Desktop\\Github Repo\\swb_project_321\\data\\321_Black_Hills_Area_Community_Foundation_2025_08\\01_data\\raw\\givingtuesday_990\\datamarts\\metadata\\datamart_catalog.csv",
+      "size_bytes": 14798
+    },
+    "raw::2025_07_10_All_Years_990_990ez_990pf_990n_Combined_DataMart.csv": {
+      "head_sha1": "3a9fac0d275ceafb826a714eecbaad536e26052a",
+      "mtime_ns": 1774726384629674600,
+      "path": "C:\\Users\\eilke\\Desktop\\Github Repo\\swb_project_321\\data\\321_Black_Hills_Area_Community_Foundation_2025_08\\01_data\\raw\\givingtuesday_990\\datamarts\\raw\\2025_07_10_All_Years_990_990ez_990pf_990n_Combined_DataMart.csv",
+      "size_bytes": 2140103678
+    },
+    "raw::2025_08_29_All_Years_990PFStandardFields.csv": {
+      "head_sha1": "df1a4f0e3cc0d49bbcf43aaa31fb40880e07a416",
+      "mtime_ns": 1774725879098961100,
+      "path": "C:\\Users\\eilke\\Desktop\\Github Repo\\swb_project_321\\data\\321_Black_Hills_Area_Community_Foundation_2025_08\\01_data\\raw\\givingtuesday_990\\datamarts\\raw\\2025_08_29_All_Years_990PFStandardFields.csv",
+      "size_bytes": 677317763
+    },
+    "raw::2025_10_18_All_Years_990StandardFields.csv": {
+      "head_sha1": "51989ab8857eb166b57e24023730b27957991767",
+      "mtime_ns": 1774726621800050700,
+      "path": "C:\\Users\\eilke\\Desktop\\Github Repo\\swb_project_321\\data\\321_Black_Hills_Area_Community_Foundation_2025_08\\01_data\\raw\\givingtuesday_990\\datamarts\\raw\\2025_10_18_All_Years_990StandardFields.csv",
+      "size_bytes": 2302094678
+    },
+    "raw::2025_10_28_All_Years_990EZStandardFields.csv": {
+      "head_sha1": "e50dc513f9863a5dabbb0061af55d5a1bc86ff25",
+      "mtime_ns": 1774726122472035100,
+      "path": "C:\\Users\\eilke\\Desktop\\Github Repo\\swb_project_321\\data\\321_Black_Hills_Area_Community_Foundation_2025_08\\01_data\\raw\\givingtuesday_990\\datamarts\\raw\\2025_10_28_All_Years_990EZStandardFields.csv",
+      "size_bytes": 1432510202
+    }
+  },
+  "report_csv": "C:\\Users\\eilke\\Desktop\\Github Repo\\swb_project_321\\data\\321_Black_Hills_Area_Community_Foundation_2025_08\\01_data\\raw\\givingtuesday_990\\datamarts\\metadata\\size_verification_report.csv",
+  "verified_dataset_count": 4
+}

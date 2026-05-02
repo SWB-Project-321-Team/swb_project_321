@@ -48,8 +48,8 @@ python python/run_nccs_990_postcard.py
 - `01_data/staging/nccs_990/postcard/nccs_990_postcard_analysis_variables.parquet`
 - `01_data/staging/nccs_990/postcard/nccs_990_postcard_analysis_geography_metrics.parquet`
 - `01_data/raw/nccs_990/postcard/metadata/nccs_990_postcard_analysis_variable_coverage.csv`
-- `docs/analysis/nccs_990_postcard_analysis_variable_mapping.md`
-- `docs/data_processing/nccs_990_postcard_pipeline.md`
+- `docs/final_preprocessing_docs/technical_docs/analysis_variable_mappings/nccs_990_postcard_analysis_variable_mapping.md`
+- `docs/final_preprocessing_docs/technical_docs/pipeline_docs/nccs_990_postcard_pipeline.md`
 
 ## S3 layout
 
@@ -61,7 +61,9 @@ python python/run_nccs_990_postcard.py
 - `silver/nccs_990/postcard/snapshot_year=YYYY/filter_manifest_snapshot_year=YYYY_tax_year_start=2022.csv`
 - `silver/nccs_990/postcard/analysis/nccs_990_postcard_analysis_variables.parquet`
 - `silver/nccs_990/postcard/analysis/nccs_990_postcard_analysis_geography_metrics.parquet`
-- `silver/nccs_990/postcard/analysis/metadata/<coverage, mapping, pipeline doc>`
+- `silver/nccs_990/postcard/analysis/documentation/nccs_990_postcard_pipeline.md`
+- `silver/nccs_990/postcard/analysis/variable_mappings/nccs_990_postcard_analysis_variable_mapping.md`
+- `silver/nccs_990/postcard/analysis/quality/coverage/nccs_990_postcard_analysis_variable_coverage.csv`
 
 ## Filtering notes
 

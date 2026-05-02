@@ -5,6 +5,8 @@ Step 08: Build NCCS efile analysis outputs for the 2022-2024 analysis window.
 from __future__ import annotations
 
 import argparse
+import importlib.util
+import sys
 import time
 from pathlib import Path
 from typing import Any
@@ -12,13 +14,35 @@ from typing import Any
 import pandas as pd
 from tqdm import tqdm
 
+
+def _ensure_sibling_common_loaded() -> None:
+    common_path = Path(__file__).with_name("common.py").resolve()
+    current = sys.modules.get("common")
+    current_file = getattr(current, "__file__", None)
+    if current_file and Path(current_file).resolve() == common_path:
+        return
+    spec = importlib.util.spec_from_file_location("common", common_path)
+    if spec is None or spec.loader is None:
+        raise ImportError(f"Unable to load common module from {common_path}")
+    module = importlib.util.module_from_spec(spec)
+    sys.modules["common"] = module
+    spec.loader.exec_module(module)
+
+
+_ensure_sibling_common_loaded()
+
 from common import (
-    ANALYSIS_META_PREFIX,
+    ANALYSIS_COVERAGE_PREFIX,
+    ANALYSIS_DOCUMENTATION_PREFIX,
     ANALYSIS_PREFIX,
+    ANALYSIS_VARIABLE_MAPPING_PREFIX,
     ANALYSIS_TAX_YEAR_MAX,
     ANALYSIS_TAX_YEAR_MIN,
     DEFAULT_S3_BUCKET,
     DEFAULT_S3_REGION,
+    EFILE_CATALOG_URL,
+    EFILE_DATASET_URL,
+    EFILE_PUBLIC_BASE_URL,
     META_DIR,
     STAGING_DIR,
     analysis_data_processing_doc_path,
@@ -46,6 +70,7 @@ from ingest._shared.analysis_support import (
     numeric_from_text,
     series_has_value,
 )
+from utils.paths import DATA as DATA_ROOT
 
 
 UNAVAILABLE_VARIABLES = [
@@ -53,7 +78,7 @@ UNAVAILABLE_VARIABLES = [
         "canonical_variable": "analysis_program_service_revenue_amount",
         "availability_status": "unavailable",
         "variable_role": "unavailable",
-        "draft_variable": "Program service revenue",
+        "analysis_requirement": "Program service revenue",
         "source_rule": "Not present in the current efile benchmark artifact.",
         "notes": "Keep unavailable rather than backfilling from GT.",
     },
@@ -61,7 +86,7 @@ UNAVAILABLE_VARIABLES = [
         "canonical_variable": "analysis_calculated_total_contributions_amount",
         "availability_status": "unavailable",
         "variable_role": "unavailable",
-        "draft_variable": "Total contributions",
+        "analysis_requirement": "Total contributions",
         "source_rule": "Contribution-component fields are not present in the current efile benchmark artifact.",
         "notes": "Keep unavailable rather than backfilling from GT.",
     },
@@ -69,7 +94,7 @@ UNAVAILABLE_VARIABLES = [
         "canonical_variable": "analysis_other_contributions_amount",
         "availability_status": "unavailable",
         "variable_role": "unavailable",
-        "draft_variable": "Other contributions",
+        "analysis_requirement": "Other contributions",
         "source_rule": "Contribution-component fields are not present in the current efile benchmark artifact.",
         "notes": "Keep unavailable rather than backfilling from GT.",
     },
@@ -77,7 +102,7 @@ UNAVAILABLE_VARIABLES = [
         "canonical_variable": "analysis_calculated_grants_total_amount",
         "availability_status": "unavailable",
         "variable_role": "unavailable",
-        "draft_variable": "Grants (total amount)",
+        "analysis_requirement": "Grants (total amount)",
         "source_rule": "Grant-component fields are not present in the current efile benchmark artifact.",
         "notes": "Keep unavailable rather than backfilling from GT.",
     },
@@ -89,7 +114,7 @@ AVAILABLE_VARIABLE_METADATA = [
     {
         "canonical_variable": "analysis_total_revenue_amount",
         "variable_role": "direct",
-        "draft_variable": "Total revenue",
+        "analysis_requirement": "Total revenue",
         "source_rule": "Direct from harm_revenue_amount",
         "provenance_column": "analysis_total_revenue_amount_source_column",
         "notes": "Efile total revenue direct field.",
@@ -97,7 +122,7 @@ AVAILABLE_VARIABLE_METADATA = [
     {
         "canonical_variable": "analysis_total_expense_amount",
         "variable_role": "direct",
-        "draft_variable": "Total expense",
+        "analysis_requirement": "Total expense",
         "source_rule": "Direct from harm_expenses_amount",
         "provenance_column": "analysis_total_expense_amount_source_column",
         "notes": "Efile total expense direct field.",
@@ -105,31 +130,31 @@ AVAILABLE_VARIABLE_METADATA = [
     {
         "canonical_variable": "analysis_total_assets_amount",
         "variable_role": "direct",
-        "draft_variable": "Total assets",
+        "analysis_requirement": "Total assets",
         "source_rule": "Direct from harm_assets_amount",
         "provenance_column": "analysis_total_assets_amount_source_column",
-        "notes": "Direct asset field used for the draft's total-assets questions.",
+        "notes": "Direct asset field used for total-assets questions in this analysis scope.",
     },
     {
         "canonical_variable": "analysis_net_asset_amount",
         "variable_role": "proxy",
-        "draft_variable": "Net asset",
+        "analysis_requirement": "Net asset",
         "source_rule": "Asset-based proxy carried from harm_assets_amount",
         "provenance_column": "analysis_net_asset_amount_source_column",
-        "notes": "Conservative proxy preserved for draft financial-performance work.",
+        "notes": "Conservative proxy preserved for financial-performance analysis.",
     },
     {
         "canonical_variable": "analysis_calculated_surplus_amount",
         "variable_role": "direct",
-        "draft_variable": "Surplus",
-        "source_rule": "Direct from harm_income_amount, carried as the draft surplus metric",
+        "analysis_requirement": "Surplus",
+        "source_rule": "Direct from harm_income_amount, carried as the surplus metric for financial-performance analysis",
         "provenance_column": "analysis_calculated_surplus_amount_source_column",
         "notes": "Current-year revenue-less-expense amount already produced upstream.",
     },
     {
         "canonical_variable": "analysis_calculated_net_margin_ratio",
         "variable_role": "calculated",
-        "draft_variable": "Net margin",
+        "analysis_requirement": "Net margin",
         "source_rule": "analysis_calculated_surplus_amount / positive analysis_total_revenue_amount",
         "provenance_column": "analysis_calculated_net_margin_ratio_source_column",
         "notes": "Null when revenue is missing, zero, or negative.",
@@ -137,7 +162,7 @@ AVAILABLE_VARIABLE_METADATA = [
     {
         "canonical_variable": "analysis_calculated_months_of_reserves",
         "variable_role": "calculated",
-        "draft_variable": "Months of reserves",
+        "analysis_requirement": "Months of reserves",
         "source_rule": "(analysis_net_asset_amount / positive analysis_total_expense_amount) * 12",
         "provenance_column": "analysis_calculated_months_of_reserves_source_column",
         "notes": "Uses the conservative asset-based net-asset proxy.",
@@ -145,7 +170,7 @@ AVAILABLE_VARIABLE_METADATA = [
     {
         "canonical_variable": "analysis_ntee_code",
         "variable_role": "enriched",
-        "draft_variable": "NTEE filed classification code",
+        "analysis_requirement": "NTEE filed classification code",
         "source_rule": "NCCS BMF exact-year, then nearest-year, then IRS EO BMF EIN fallback",
         "provenance_column": "analysis_ntee_code_source_column",
         "notes": "Classification enrichment only, not a row-admission filter.",
@@ -153,7 +178,7 @@ AVAILABLE_VARIABLE_METADATA = [
     {
         "canonical_variable": "analysis_subsection_code",
         "variable_role": "enriched",
-        "draft_variable": "Subsection code",
+        "analysis_requirement": "Subsection code",
         "source_rule": "NCCS BMF exact-year, then nearest-year, then IRS EO BMF EIN fallback",
         "provenance_column": "analysis_subsection_code_source_column",
         "notes": "Supports political-organization classification.",
@@ -161,7 +186,7 @@ AVAILABLE_VARIABLE_METADATA = [
     {
         "canonical_variable": "analysis_calculated_ntee_broad_code",
         "variable_role": "calculated",
-        "draft_variable": "Broad NTEE field classification code",
+        "analysis_requirement": "Broad NTEE field classification code",
         "source_rule": "First letter of analysis_ntee_code",
         "provenance_column": "analysis_calculated_ntee_broad_code_source_column",
         "notes": "Broad field category used in field-composition analyses.",
@@ -169,7 +194,7 @@ AVAILABLE_VARIABLE_METADATA = [
     {
         "canonical_variable": "analysis_is_hospital",
         "variable_role": "direct",
-        "draft_variable": "Hospital flag",
+        "analysis_requirement": "Hospital flag",
         "source_rule": "Direct from efile hospital flag",
         "provenance_column": "analysis_is_hospital_source_column",
         "notes": "Canonical efile source-backed hospital flag.",
@@ -177,7 +202,7 @@ AVAILABLE_VARIABLE_METADATA = [
     {
         "canonical_variable": "analysis_is_university",
         "variable_role": "direct",
-        "draft_variable": "University flag",
+        "analysis_requirement": "University flag",
         "source_rule": "Direct from efile school/university flag",
         "provenance_column": "analysis_is_university_source_column",
         "notes": "Canonical efile source-backed university flag.",
@@ -185,7 +210,7 @@ AVAILABLE_VARIABLE_METADATA = [
     {
         "canonical_variable": "analysis_is_political_org",
         "variable_role": "proxy",
-        "draft_variable": "Political organization flag",
+        "analysis_requirement": "Political organization flag",
         "source_rule": "Source-backed subsection proxy",
         "provenance_column": "analysis_is_political_org_source_column",
         "notes": "Canonical political-organization proxy for exclusion analyses.",
@@ -201,10 +226,15 @@ def _ensure_parent_dirs(*paths: Path) -> None:
 
 def _repo_relative_display(path: Path) -> str:
     """Render repo-local paths portably for generated docs."""
+    resolved = path.resolve()
     try:
-        return path.resolve().relative_to(_REPO_ROOT).as_posix()
+        return f"SWB_321_DATA_ROOT/{resolved.relative_to(DATA_ROOT.resolve()).as_posix()}"
     except ValueError:
-        return path.resolve().as_posix()
+        pass
+    try:
+        return resolved.relative_to(_REPO_ROOT).as_posix()
+    except ValueError:
+        return resolved.as_posix()
 
 
 def _build_direct_numeric(
@@ -379,7 +409,7 @@ def _build_coverage_rows(
                     "canonical_variable": variable_name,
                     "availability_status": "available",
                     "variable_role": metadata_row["variable_role"],
-                    "draft_variable": metadata_row["draft_variable"],
+                    "analysis_requirement": metadata_row["analysis_requirement"],
                     "tax_year": tax_year,
                     "form_type": form_type,
                     "row_count": row_count,
@@ -394,7 +424,7 @@ def _build_coverage_rows(
                 "canonical_variable": unavailable["canonical_variable"],
                 "availability_status": unavailable["availability_status"],
                 "variable_role": unavailable["variable_role"],
-                "draft_variable": unavailable["draft_variable"],
+                "analysis_requirement": unavailable["analysis_requirement"],
                 "tax_year": "all",
                 "form_type": "all",
                 "row_count": int(len(analysis_df)),
@@ -416,23 +446,29 @@ def _write_mapping_markdown(mapping_path: Path, metric_rows: list[dict[str, str]
         f"- Region metrics output: `{_repo_relative_display(analysis_geography_metrics_output_path())}`",
         f"- Coverage report: `{_repo_relative_display(analysis_variable_coverage_path())}`",
         "- Scope: `2022-2024` only",
-        "- Coding rules: [`CODING_RULES.md`](../../secrets/coding_rules/CODING_RULES.md)",
+        "",
+        "## Coverage Evidence",
+        "",
+        f"- Generated coverage CSV: `{_repo_relative_display(analysis_variable_coverage_path())}`",
+        f"- Published S3 variable mapping object: `{ANALYSIS_VARIABLE_MAPPING_PREFIX}/{analysis_variable_mapping_path().name}`",
+        f"- Published S3 coverage object: `{ANALYSIS_COVERAGE_PREFIX}/{analysis_variable_coverage_path().name}`",
+        "- Coverage CSVs are generated by the analysis step and published as quality evidence.",
         "",
         "## Extracted Variables",
         "",
-        "|canonical_variable|variable_role|draft_variable|source_rule|provenance_column|notes|",
+        "|canonical_variable|variable_role|analysis_requirement|source_rule|provenance_column|notes|",
         "|---|---|---|---|---|---|",
     ]
     for row in metric_rows:
-        lines.append(f"|{row['canonical_variable']}|{row['variable_role']}|{row['draft_variable']}|{row['source_rule']}|{row['provenance_column']}|{row['notes']}|")
-    lines.extend(["", "## Unavailable Variables", "", "|canonical_variable|availability_status|draft_variable|notes|", "|---|---|---|---|"])
+        lines.append(f"|{row['canonical_variable']}|{row['variable_role']}|{row['analysis_requirement']}|{row['source_rule']}|{row['provenance_column']}|{row['notes']}|")
+    lines.extend(["", "## Unavailable Variables", "", "|canonical_variable|availability_status|analysis_requirement|notes|", "|---|---|---|---|"])
     for row in UNAVAILABLE_VARIABLES:
-        lines.append(f"|{row['canonical_variable']}|{row['availability_status']}|{row['draft_variable']}|{row['notes']}|")
-    lines.extend(["", "## Draft Alignment Appendix", "", "|draft_variable|source_specific_output|status|rule_or_reason|", "|---|---|---|---|"])
+        lines.append(f"|{row['canonical_variable']}|{row['availability_status']}|{row['analysis_requirement']}|{row['notes']}|")
+    lines.extend(["", "## Analysis requirement alignment appendix", "", "|analysis_requirement|source_specific_output|status|rule_or_reason|", "|---|---|---|---|"])
     for row in metric_rows:
-        lines.append(f"|{row['draft_variable']}|{row['canonical_variable']}|{row['variable_role']}|{row['source_rule']}|")
+        lines.append(f"|{row['analysis_requirement']}|{row['canonical_variable']}|{row['variable_role']}|{row['source_rule']}|")
     for row in UNAVAILABLE_VARIABLES:
-        lines.append(f"|{row['draft_variable']}|{row['canonical_variable']}|unavailable|{row['notes']}|")
+        lines.append(f"|{row['analysis_requirement']}|{row['canonical_variable']}|unavailable|{row['notes']}|")
     mapping_path.write_text("\n".join(lines) + "\n", encoding="utf-8")
 
 
@@ -479,7 +515,7 @@ The main artifact classes are:
 - Silver filtered artifacts: one benchmark-filtered annual filing parquet per tax year.
 - Final analysis artifacts: the row-level analysis parquet, region metrics parquet, coverage CSV, mapping Markdown, and this processing doc.
 
-This pipeline follows the `CODING_RULES.md` filtered-only combine contract:
+This pipeline follows a filtered-only combine contract (combine stages use filtered inputs only):
 
 - the wide table combine happens only after HEADER rows have already been admitted to benchmark geography
 - filing selection happens before downstream joins to SUMMARY and Schedule A
@@ -500,6 +536,18 @@ This pipeline follows the `CODING_RULES.md` filtered-only combine contract:
 | 09 | `09_upload_analysis_outputs.py` | Upload official analysis outputs and verify local-vs-S3 bytes | Analysis artifacts and docs | Silver analysis objects | S3 |
 
 ## How Data Is Retrieved
+
+## Exact Source Locations
+
+- NCCS efile dataset page: `{EFILE_DATASET_URL}`
+- NCCS efile catalog page: `{EFILE_CATALOG_URL}`
+- NCCS efile public data base URL: `{EFILE_PUBLIC_BASE_URL}`
+
+## Raw Source Dictionaries
+
+- NCCS efile data dictionary: `documentation/final_preprocessing_docs/technical_docs/source_dictionaries/nccs_efile/data-dictionary.html`
+- Parsed variable companion CSV: `documentation/final_preprocessing_docs/technical_docs/source_dictionaries/nccs_efile/data-dictionary_variables.csv`
+- These files document the public efile tables discovered from the NCCS efile catalog.
 
 ### Step 01: release discovery
 
@@ -555,7 +603,9 @@ This preserves:
 - Silver annual benchmark prefix: `silver/nccs_efile/`
 - Silver annual benchmark metadata prefix: `silver/nccs_efile/metadata/`
 - Official S3 analysis prefix: `silver/nccs_efile/analysis/`
-- Official S3 analysis metadata prefix: `silver/nccs_efile/analysis/metadata/`
+- Analysis documentation prefix: `{ANALYSIS_DOCUMENTATION_PREFIX}`
+- Analysis variable mapping prefix: `{ANALYSIS_VARIABLE_MAPPING_PREFIX}`
+- Analysis coverage prefix: `{ANALYSIS_COVERAGE_PREFIX}`
 
 ## Step-By-Step Transformation
 
@@ -680,6 +730,14 @@ Metrics include:
 
 The coverage CSV records populated counts and fill rates by variable and by `tax_year + form_type` slice.
 
+## Coverage Evidence
+
+- Generated coverage CSV: `{_repo_relative_display(analysis_variable_coverage_path())}`
+- Published S3 documentation object: `{ANALYSIS_DOCUMENTATION_PREFIX}/{analysis_data_processing_doc_path().name}`
+- Published S3 variable mapping object: `{ANALYSIS_VARIABLE_MAPPING_PREFIX}/{analysis_variable_mapping_path().name}`
+- Published S3 coverage object: `{ANALYSIS_COVERAGE_PREFIX}/{analysis_variable_coverage_path().name}`
+- Coverage CSVs are generated by step 08 and published as authoritative quality evidence.
+
 The mapping Markdown documents which variables are:
 
 - direct
@@ -725,9 +783,9 @@ This package is the canonical efile analysis-ready layer for `2022-2024`.
 - The direct hospital and university fields are source-sparse because the underlying efile flags are sparse. The imputed versions are complete because they continue through proxy/name/default logic.
 - The main runner currently executes sequentially rather than exposing GT-style start-step/end-step selection.
 
-## Draft Alignment Appendix
+## Analysis requirement alignment appendix
 
-| draft_variable | source_specific_output | status | rule_or_reason |
+| analysis_requirement | source_specific_output | status | rule_or_reason |
 | --- | --- | --- | --- |
 | Total revenue | analysis_total_revenue_amount | direct | Direct from `harm_revenue_amount` |
 | Total expense | analysis_total_expense_amount | direct | Direct from `harm_expenses_amount` |
@@ -940,7 +998,9 @@ def main() -> None:
     parser.add_argument("--bucket", default=DEFAULT_S3_BUCKET, help="Unused here but logged to mirror pipeline conventions")
     parser.add_argument("--region", default=DEFAULT_S3_REGION, help="Unused here but logged to mirror pipeline conventions")
     parser.add_argument("--analysis-prefix", default=ANALYSIS_PREFIX, help="Logged official analysis S3 prefix")
-    parser.add_argument("--analysis-meta-prefix", default=ANALYSIS_META_PREFIX, help="Logged official analysis metadata S3 prefix")
+    parser.add_argument("--analysis-documentation-prefix", default=ANALYSIS_DOCUMENTATION_PREFIX, help="Logged official analysis documentation S3 prefix")
+    parser.add_argument("--analysis-variable-mapping-prefix", default=ANALYSIS_VARIABLE_MAPPING_PREFIX, help="Logged official analysis variable mapping S3 prefix")
+    parser.add_argument("--analysis-coverage-prefix", default=ANALYSIS_COVERAGE_PREFIX, help="Logged official analysis coverage S3 prefix")
     args = parser.parse_args()
 
     start = time.perf_counter()
@@ -949,7 +1009,9 @@ def main() -> None:
     print(f"[analysis] Metadata dir: {args.metadata_dir}", flush=True)
     print(f"[analysis] Staging dir: {args.staging_dir}", flush=True)
     print(f"[analysis] Official analysis prefix: {args.analysis_prefix}", flush=True)
-    print(f"[analysis] Official analysis metadata prefix: {args.analysis_meta_prefix}", flush=True)
+    print(f"[analysis] Official analysis documentation prefix: {args.analysis_documentation_prefix}", flush=True)
+    print(f"[analysis] Official analysis variable mapping prefix: {args.analysis_variable_mapping_prefix}", flush=True)
+    print(f"[analysis] Official analysis coverage prefix: {args.analysis_coverage_prefix}", flush=True)
     summary = build_analysis_outputs(metadata_dir=args.metadata_dir, staging_dir=args.staging_dir)
     print(f"[analysis] Summary: {summary}", flush=True)
     print_elapsed(start, "Step 08")

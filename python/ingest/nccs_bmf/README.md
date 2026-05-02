@@ -39,11 +39,13 @@ Additional analysis outputs:
 - `01_data/staging/nccs_bmf/nccs_bmf_analysis_geography_metrics.parquet`
 - `01_data/staging/nccs_bmf/nccs_bmf_analysis_field_metrics.parquet`
 - `01_data/raw/nccs_bmf/metadata/nccs_bmf_analysis_variable_coverage.csv`
-- `docs/analysis/nccs_bmf_analysis_variable_mapping.md`
-- `docs/data_processing/nccs_bmf_pipeline.md`
+- `docs/final_preprocessing_docs/technical_docs/analysis_variable_mappings/nccs_bmf_analysis_variable_mapping.md`
+- `docs/final_preprocessing_docs/technical_docs/pipeline_docs/nccs_bmf_pipeline.md`
 
 Official analysis S3 layout:
 - `silver/nccs_bmf/analysis/nccs_bmf_analysis_variables.parquet`
 - `silver/nccs_bmf/analysis/nccs_bmf_analysis_geography_metrics.parquet`
 - `silver/nccs_bmf/analysis/nccs_bmf_analysis_field_metrics.parquet`
-- `silver/nccs_bmf/analysis/metadata/<coverage, mapping, pipeline doc>`
+- `silver/nccs_bmf/analysis/documentation/nccs_bmf_pipeline.md`
+- `silver/nccs_bmf/analysis/variable_mappings/nccs_bmf_analysis_variable_mapping.md`
+- `silver/nccs_bmf/analysis/quality/coverage/nccs_bmf_analysis_variable_coverage.csv`

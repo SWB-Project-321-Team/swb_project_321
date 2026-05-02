@@ -58,8 +58,10 @@ RAW_ROOT = DATA / "raw" / "nccs_efile"
 EFILE_RAW_DIR = RAW_ROOT / "raw"
 META_DIR = RAW_ROOT / "metadata"
 STAGING_DIR = DATA / "staging" / "nccs_efile"
-DOCS_ANALYSIS_DIR = get_base() / "docs" / "analysis"
-DOCS_DATA_PROCESSING_DIR = get_base() / "docs" / "data_processing"
+DOCS_PACKAGE_DIR = get_base() / "docs" / "final_preprocessing_docs"
+DOCS_TECHNICAL_DIR = DOCS_PACKAGE_DIR / "technical_docs"
+DOCS_ANALYSIS_DIR = DOCS_TECHNICAL_DIR / "analysis_variable_mappings"
+DOCS_DATA_PROCESSING_DIR = DOCS_TECHNICAL_DIR / "pipeline_docs"
 
 LATEST_RELEASE_JSON = META_DIR / "latest_release.json"
 EFILE_DATASET_SNAPSHOT = META_DIR / "dataset_efile.html"
@@ -72,7 +74,9 @@ META_PREFIX = "bronze/nccs_efile/metadata"
 SILVER_PREFIX = "silver/nccs_efile"
 COMPARISON_SILVER_PREFIX = f"{SILVER_PREFIX}/comparison"
 ANALYSIS_PREFIX = f"{SILVER_PREFIX}/analysis"
-ANALYSIS_META_PREFIX = f"{ANALYSIS_PREFIX}/metadata"
+ANALYSIS_DOCUMENTATION_PREFIX = f"{ANALYSIS_PREFIX}/documentation"
+ANALYSIS_VARIABLE_MAPPING_PREFIX = f"{ANALYSIS_PREFIX}/variable_mappings"
+ANALYSIS_COVERAGE_PREFIX = f"{ANALYSIS_PREFIX}/quality/coverage"
 
 GEOID_REFERENCE_CSV = _CORE_COMMON.GEOID_REFERENCE_CSV
 ZIP_TO_COUNTY_CSV = _CORE_COMMON.ZIP_TO_COUNTY_CSV
@@ -592,7 +596,7 @@ def build_efile_year_to_benchmark(
     The annualized output intentionally contains only the fields needed for the
     combined pipeline plus the benchmark geography and efile selection metadata.
 
-    Per CODING_RULES.md, benchmark admission happens upstream on HEADER rows
+    Per the filtered-only combine contract, benchmark admission happens upstream on HEADER rows
     before the wider SUMMARY and Schedule A table combine. HEADER carries the
     filing identity, ranking timestamps, and ZIP-based geography needed to make
     that admission decision. The downstream joins then run only on the retained

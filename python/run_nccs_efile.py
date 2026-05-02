@@ -41,7 +41,9 @@ def main() -> None:
     parser.add_argument("--meta-prefix", default=None)
     parser.add_argument("--silver-prefix", default=None)
     parser.add_argument("--analysis-prefix", default=None)
-    parser.add_argument("--analysis-meta-prefix", default=None)
+    parser.add_argument("--analysis-documentation-prefix", default=None)
+    parser.add_argument("--analysis-variable-mapping-prefix", default=None)
+    parser.add_argument("--analysis-coverage-prefix", default=None)
     parser.add_argument("--comparison-prefix", default=None)
     parser.add_argument("--core-staging-root", default=None)
     parser.add_argument("--geoid-reference", default=None)
@@ -147,7 +149,9 @@ def main() -> None:
         ("--bucket", args.bucket),
         ("--region", args.region),
         ("--analysis-prefix", args.analysis_prefix),
-        ("--analysis-meta-prefix", args.analysis_meta_prefix),
+        ("--analysis-documentation-prefix", args.analysis_documentation_prefix),
+        ("--analysis-variable-mapping-prefix", args.analysis_variable_mapping_prefix),
+        ("--analysis-coverage-prefix", args.analysis_coverage_prefix),
     ):
         _append_arg(step_08_args, flag, value)
     steps.append(("08_extract_analysis_variables_local", STEP_08, step_08_args))
@@ -159,7 +163,9 @@ def main() -> None:
         ("--metadata-dir", args.metadata_dir),
         ("--staging-dir", args.staging_dir),
         ("--analysis-prefix", args.analysis_prefix),
-        ("--analysis-meta-prefix", args.analysis_meta_prefix),
+        ("--analysis-documentation-prefix", args.analysis_documentation_prefix),
+        ("--analysis-variable-mapping-prefix", args.analysis_variable_mapping_prefix),
+        ("--analysis-coverage-prefix", args.analysis_coverage_prefix),
     ):
         _append_arg(step_09_args, flag, value)
     if args.overwrite:

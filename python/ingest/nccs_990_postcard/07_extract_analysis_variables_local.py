@@ -5,6 +5,8 @@ Step 07: Build NCCS postcard analysis outputs for the 2022-2024 analysis window.
 from __future__ import annotations
 
 import argparse
+import importlib.util
+import sys
 import time
 from pathlib import Path
 from typing import Any
@@ -12,15 +14,36 @@ from typing import Any
 import pandas as pd
 from tqdm import tqdm
 
+
+def _ensure_sibling_common_loaded() -> None:
+    common_path = Path(__file__).with_name("common.py").resolve()
+    current = sys.modules.get("common")
+    current_file = getattr(current, "__file__", None)
+    if current_file and Path(current_file).resolve() == common_path:
+        return
+    spec = importlib.util.spec_from_file_location("common", common_path)
+    if spec is None or spec.loader is None:
+        raise ImportError(f"Unable to load common module from {common_path}")
+    module = importlib.util.module_from_spec(spec)
+    sys.modules["common"] = module
+    spec.loader.exec_module(module)
+
+
+_ensure_sibling_common_loaded()
+
 from common import (
-    ANALYSIS_META_PREFIX,
+    ANALYSIS_COVERAGE_PREFIX,
+    ANALYSIS_DOCUMENTATION_PREFIX,
     ANALYSIS_PREFIX,
+    ANALYSIS_VARIABLE_MAPPING_PREFIX,
     ANALYSIS_TAX_YEAR_MAX,
     ANALYSIS_TAX_YEAR_MIN,
     DEFAULT_S3_BUCKET,
     DEFAULT_S3_REGION,
     META_DIR,
     POSTCARD_TAX_YEAR_START_DEFAULT,
+    POSTCARD_DATASET_URL,
+    RAW_BASE_URL,
     STAGING_DIR,
     analysis_data_processing_doc_path,
     analysis_geography_metrics_output_path,
@@ -46,33 +69,50 @@ from ingest._shared.analysis_support import (
     normalize_bool_text,
     series_has_value,
 )
+from utils.paths import DATA as DATA_ROOT
+
+
+_REPO_ROOT = Path(__file__).resolve().parents[3]
+
+
+def _portable_path(path: Path) -> str:
+    """Render generated documentation paths without machine-local prefixes."""
+    resolved = path.resolve()
+    try:
+        return f"SWB_321_DATA_ROOT/{resolved.relative_to(DATA_ROOT.resolve()).as_posix()}"
+    except ValueError:
+        pass
+    try:
+        return resolved.relative_to(_REPO_ROOT).as_posix()
+    except ValueError:
+        return resolved.as_posix()
 
 
 UNAVAILABLE_VARIABLES = [
-    {"canonical_variable": "analysis_total_revenue_amount", "variable_role": "unavailable", "draft_variable": "Total revenue", "notes": "Postcard does not carry this financial-performance or revenue-source field."},
-    {"canonical_variable": "analysis_program_service_revenue_amount", "variable_role": "unavailable", "draft_variable": "Program service revenue", "notes": "Postcard does not carry this financial-performance or revenue-source field."},
-    {"canonical_variable": "analysis_calculated_total_contributions_amount", "variable_role": "unavailable", "draft_variable": "Total contributions", "notes": "Postcard does not carry this financial-performance or revenue-source field."},
-    {"canonical_variable": "analysis_calculated_grants_total_amount", "variable_role": "unavailable", "draft_variable": "Grants (total amount)", "notes": "Postcard does not carry this financial-performance or revenue-source field."},
-    {"canonical_variable": "analysis_total_expense_amount", "variable_role": "unavailable", "draft_variable": "Total expense", "notes": "Postcard does not carry this financial-performance or revenue-source field."},
-    {"canonical_variable": "analysis_net_asset_amount", "variable_role": "unavailable", "draft_variable": "Net asset", "notes": "Postcard does not carry this financial-performance or revenue-source field."},
-    {"canonical_variable": "analysis_calculated_surplus_amount", "variable_role": "unavailable", "draft_variable": "Surplus", "notes": "Postcard does not carry this financial-performance or revenue-source field."},
-    {"canonical_variable": "analysis_calculated_net_margin_ratio", "variable_role": "unavailable", "draft_variable": "Net margin", "notes": "Postcard does not carry this financial-performance or revenue-source field."},
-    {"canonical_variable": "analysis_calculated_months_of_reserves", "variable_role": "unavailable", "draft_variable": "Months of reserves", "notes": "Postcard does not carry this financial-performance or revenue-source field."},
+    {"canonical_variable": "analysis_total_revenue_amount", "variable_role": "unavailable", "analysis_requirement": "Total revenue", "notes": "Postcard does not carry this financial-performance or revenue-source field."},
+    {"canonical_variable": "analysis_program_service_revenue_amount", "variable_role": "unavailable", "analysis_requirement": "Program service revenue", "notes": "Postcard does not carry this financial-performance or revenue-source field."},
+    {"canonical_variable": "analysis_calculated_total_contributions_amount", "variable_role": "unavailable", "analysis_requirement": "Total contributions", "notes": "Postcard does not carry this financial-performance or revenue-source field."},
+    {"canonical_variable": "analysis_calculated_grants_total_amount", "variable_role": "unavailable", "analysis_requirement": "Grants (total amount)", "notes": "Postcard does not carry this financial-performance or revenue-source field."},
+    {"canonical_variable": "analysis_total_expense_amount", "variable_role": "unavailable", "analysis_requirement": "Total expense", "notes": "Postcard does not carry this financial-performance or revenue-source field."},
+    {"canonical_variable": "analysis_net_asset_amount", "variable_role": "unavailable", "analysis_requirement": "Net asset", "notes": "Postcard does not carry this financial-performance or revenue-source field."},
+    {"canonical_variable": "analysis_calculated_surplus_amount", "variable_role": "unavailable", "analysis_requirement": "Surplus", "notes": "Postcard does not carry this financial-performance or revenue-source field."},
+    {"canonical_variable": "analysis_calculated_net_margin_ratio", "variable_role": "unavailable", "analysis_requirement": "Net margin", "notes": "Postcard does not carry this financial-performance or revenue-source field."},
+    {"canonical_variable": "analysis_calculated_months_of_reserves", "variable_role": "unavailable", "analysis_requirement": "Months of reserves", "notes": "Postcard does not carry this financial-performance or revenue-source field."},
 ]
 
 AVAILABLE_VARIABLE_METADATA = [
-    {"canonical_variable": "analysis_ntee_code", "variable_role": "enriched", "draft_variable": "NTEE filed classification code", "source_rule": "NCCS BMF exact-year, then nearest-year, then IRS EO BMF EIN fallback", "provenance_column": "analysis_ntee_code_source_column", "notes": "Classification enrichment only."},
-    {"canonical_variable": "analysis_subsection_code", "variable_role": "enriched", "draft_variable": "Subsection code", "source_rule": "NCCS BMF exact-year, then nearest-year, then IRS EO BMF EIN fallback", "provenance_column": "analysis_subsection_code_source_column", "notes": "Supports political-organization classification."},
-    {"canonical_variable": "analysis_calculated_ntee_broad_code", "variable_role": "calculated", "draft_variable": "Broad NTEE field classification code", "source_rule": "First letter of analysis_ntee_code", "provenance_column": "analysis_calculated_ntee_broad_code_source_column", "notes": "Broad NTEE field category."},
-    {"canonical_variable": "analysis_is_hospital", "variable_role": "proxy", "draft_variable": "Hospital flag", "source_rule": "NTEE proxy from resolved NTEE code", "provenance_column": "analysis_is_hospital_source_column", "notes": "Source-backed classification proxy."},
-    {"canonical_variable": "analysis_is_university", "variable_role": "proxy", "draft_variable": "University flag", "source_rule": "NTEE proxy from resolved NTEE code", "provenance_column": "analysis_is_university_source_column", "notes": "Source-backed classification proxy."},
-    {"canonical_variable": "analysis_is_political_org", "variable_role": "proxy", "draft_variable": "Political organization flag", "source_rule": "Subsection proxy from resolved subsection code", "provenance_column": "analysis_is_political_org_source_column", "notes": "Source-backed classification proxy."},
-    {"canonical_variable": "analysis_imputed_is_hospital", "variable_role": "proxy", "draft_variable": "Hospital flag", "source_rule": "Canonical proxy, then high-confidence name match, then default False", "provenance_column": "analysis_imputed_is_hospital_source_column", "notes": "Complete analysis-ready hospital flag."},
-    {"canonical_variable": "analysis_imputed_is_university", "variable_role": "proxy", "draft_variable": "University flag", "source_rule": "Canonical proxy, then high-confidence name match, then default False", "provenance_column": "analysis_imputed_is_university_source_column", "notes": "Complete analysis-ready university flag."},
-    {"canonical_variable": "analysis_imputed_is_political_org", "variable_role": "proxy", "draft_variable": "Political organization flag", "source_rule": "Canonical proxy, then high-confidence name match, then default False", "provenance_column": "analysis_imputed_is_political_org_source_column", "notes": "Complete analysis-ready political flag."},
-    {"canonical_variable": "analysis_gross_receipts_under_25000", "variable_role": "direct", "draft_variable": "Gross receipts under $25K flag", "source_rule": "Direct postcard field", "provenance_column": "analysis_gross_receipts_under_25000_source_column", "notes": "Small-filer support field."},
-    {"canonical_variable": "analysis_terminated", "variable_role": "direct", "draft_variable": "Terminated flag", "source_rule": "Direct postcard field", "provenance_column": "analysis_terminated_source_column", "notes": "Entity status support field."},
-    {"canonical_variable": "analysis_is_small_filer_support", "variable_role": "direct", "draft_variable": "Small-filer support flag", "source_rule": "Constant postcard_pipeline_scope", "provenance_column": "analysis_is_small_filer_support_source_column", "notes": "Documents that postcard is being used only as a small-filer support layer."},
+    {"canonical_variable": "analysis_ntee_code", "variable_role": "enriched", "analysis_requirement": "NTEE filed classification code", "source_rule": "NCCS BMF exact-year, then nearest-year, then IRS EO BMF EIN fallback", "provenance_column": "analysis_ntee_code_source_column", "notes": "Classification enrichment only."},
+    {"canonical_variable": "analysis_subsection_code", "variable_role": "enriched", "analysis_requirement": "Subsection code", "source_rule": "NCCS BMF exact-year, then nearest-year, then IRS EO BMF EIN fallback", "provenance_column": "analysis_subsection_code_source_column", "notes": "Supports political-organization classification."},
+    {"canonical_variable": "analysis_calculated_ntee_broad_code", "variable_role": "calculated", "analysis_requirement": "Broad NTEE field classification code", "source_rule": "First letter of analysis_ntee_code", "provenance_column": "analysis_calculated_ntee_broad_code_source_column", "notes": "Broad NTEE field category."},
+    {"canonical_variable": "analysis_is_hospital", "variable_role": "proxy", "analysis_requirement": "Hospital flag", "source_rule": "NTEE proxy from resolved NTEE code", "provenance_column": "analysis_is_hospital_source_column", "notes": "Source-backed classification proxy."},
+    {"canonical_variable": "analysis_is_university", "variable_role": "proxy", "analysis_requirement": "University flag", "source_rule": "NTEE proxy from resolved NTEE code", "provenance_column": "analysis_is_university_source_column", "notes": "Source-backed classification proxy."},
+    {"canonical_variable": "analysis_is_political_org", "variable_role": "proxy", "analysis_requirement": "Political organization flag", "source_rule": "Subsection proxy from resolved subsection code", "provenance_column": "analysis_is_political_org_source_column", "notes": "Source-backed classification proxy."},
+    {"canonical_variable": "analysis_imputed_is_hospital", "variable_role": "proxy", "analysis_requirement": "Hospital flag", "source_rule": "Canonical proxy, then high-confidence name match, then default False", "provenance_column": "analysis_imputed_is_hospital_source_column", "notes": "Complete analysis-ready hospital flag."},
+    {"canonical_variable": "analysis_imputed_is_university", "variable_role": "proxy", "analysis_requirement": "University flag", "source_rule": "Canonical proxy, then high-confidence name match, then default False", "provenance_column": "analysis_imputed_is_university_source_column", "notes": "Complete analysis-ready university flag."},
+    {"canonical_variable": "analysis_imputed_is_political_org", "variable_role": "proxy", "analysis_requirement": "Political organization flag", "source_rule": "Canonical proxy, then high-confidence name match, then default False", "provenance_column": "analysis_imputed_is_political_org_source_column", "notes": "Complete analysis-ready political flag."},
+    {"canonical_variable": "analysis_gross_receipts_under_25000", "variable_role": "direct", "analysis_requirement": "Gross receipts under $25K flag", "source_rule": "Direct postcard field", "provenance_column": "analysis_gross_receipts_under_25000_source_column", "notes": "Small-filer support field."},
+    {"canonical_variable": "analysis_terminated", "variable_role": "direct", "analysis_requirement": "Terminated flag", "source_rule": "Direct postcard field", "provenance_column": "analysis_terminated_source_column", "notes": "Entity status support field."},
+    {"canonical_variable": "analysis_is_small_filer_support", "variable_role": "direct", "analysis_requirement": "Small-filer support flag", "source_rule": "Constant postcard_pipeline_scope", "provenance_column": "analysis_is_small_filer_support_source_column", "notes": "Documents that postcard is being used only as a small-filer support layer."},
 ]
 
 
@@ -146,30 +186,37 @@ def _write_mapping_markdown(mapping_path: Path) -> None:
         "# NCCS 990 Postcard Analysis Variable Mapping",
         "",
         "- Source family: `nccs_990_postcard`",
-        f"- Analysis output: `{analysis_variables_output_path()}`",
-        f"- Geography metrics output: `{analysis_geography_metrics_output_path()}`",
-        f"- Coverage report: `{analysis_variable_coverage_path()}`",
+        f"- Analysis output: `{_portable_path(analysis_variables_output_path())}`",
+        f"- Geography metrics output: `{_portable_path(analysis_geography_metrics_output_path())}`",
+        f"- Coverage report: `{_portable_path(analysis_variable_coverage_path())}`",
         "- Scope: `2022-2024` retained postcard tax years",
+        "",
+        "## Coverage Evidence",
+        "",
+        f"- Generated coverage CSV: `{_portable_path(analysis_variable_coverage_path())}`",
+        f"- Published S3 variable mapping object: `{ANALYSIS_VARIABLE_MAPPING_PREFIX}/{analysis_variable_mapping_path().name}`",
+        f"- Published S3 coverage object: `{ANALYSIS_COVERAGE_PREFIX}/{analysis_variable_coverage_path().name}`",
+        "- Coverage CSVs are generated by the analysis step and published as quality evidence.",
         "",
         "## Available Variables",
         "",
-        "|canonical_variable|variable_role|draft_variable|source_rule|provenance_column|notes|",
+        "|canonical_variable|variable_role|analysis_requirement|source_rule|provenance_column|notes|",
         "|---|---|---|---|---|---|",
         "",
         "## Unavailable Variables",
         "",
-        "|canonical_variable|availability_status|draft_variable|notes|",
+        "|canonical_variable|availability_status|analysis_requirement|notes|",
         "|---|---|---|---|",
     ]
     for row in AVAILABLE_VARIABLE_METADATA:
-        lines.append(f"|{row['canonical_variable']}|{row['variable_role']}|{row['draft_variable']}|{row['source_rule']}|{row['provenance_column']}|{row['notes']}|")
+        lines.append(f"|{row['canonical_variable']}|{row['variable_role']}|{row['analysis_requirement']}|{row['source_rule']}|{row['provenance_column']}|{row['notes']}|")
     for row in UNAVAILABLE_VARIABLES:
-        lines.append(f"|{row['canonical_variable']}|unavailable|{row['draft_variable']}|{row['notes']}|")
-    lines.extend(["", "## Draft Alignment Appendix", "", "|draft_variable|source_specific_output|status|rule_or_reason|", "|---|---|---|---|"])
+        lines.append(f"|{row['canonical_variable']}|unavailable|{row['analysis_requirement']}|{row['notes']}|")
+    lines.extend(["", "## Analysis requirement alignment appendix", "", "|analysis_requirement|source_specific_output|status|rule_or_reason|", "|---|---|---|---|"])
     for row in AVAILABLE_VARIABLE_METADATA:
-        lines.append(f"|{row['draft_variable']}|{row['canonical_variable']}|{row['variable_role']}|{row['source_rule']}|")
+        lines.append(f"|{row['analysis_requirement']}|{row['canonical_variable']}|{row['variable_role']}|{row['source_rule']}|")
     for row in UNAVAILABLE_VARIABLES:
-        lines.append(f"|{row['draft_variable']}|{row['canonical_variable']}|unavailable|{row['notes']}|")
+        lines.append(f"|{row['analysis_requirement']}|{row['canonical_variable']}|unavailable|{row['notes']}|")
     mapping_path.write_text("\n".join(lines) + "\n", encoding="utf-8")
 
 
@@ -214,7 +261,7 @@ The main artifact classes are:
 - Silver filtered artifacts: retained postcard derivatives built from benchmark-scoped monthly rows.
 - Final analysis artifacts: the row-level analysis parquet, geography metrics parquet, coverage CSV, mapping Markdown, and this processing doc.
 
-This pipeline follows the `CODING_RULES.md` filtered-only combine contract:
+This pipeline follows a filtered-only combine contract (combine stages use filtered inputs only):
 
 - each monthly raw file is filtered chunk-by-chunk before retained rows are combined
 - the latest-snapshot EIN dedupe happens only after geography admission
@@ -234,6 +281,18 @@ This pipeline follows the `CODING_RULES.md` filtered-only combine contract:
 | 08 | `08_upload_analysis_outputs.py` | Upload official analysis outputs and metadata to the Silver analysis prefix | Analysis artifacts and docs | Silver analysis objects | S3 |
 
 ## How Data Is Retrieved
+
+## Exact Source Locations
+
+- NCCS postcard dataset page: `{POSTCARD_DATASET_URL}`
+- NCCS postcard raw monthly base URL: `{RAW_BASE_URL}`
+- Monthly source files use the pattern `{RAW_BASE_URL.rstrip('/')}/YYYY-MM-E-POSTCARD.csv`.
+
+## Raw Source Dictionaries
+
+- IRS 990-N/e-Postcard dictionary: `documentation/final_preprocessing_docs/technical_docs/source_dictionaries/irs_990n_postcard/990n-data-dictionary.pdf`
+- Raw e-Postcard header companion: `documentation/final_preprocessing_docs/technical_docs/source_dictionaries/irs_990n_postcard/2026-03-E-POSTCARD_header_dictionary.csv`
+- The companion CSV records the current raw snapshot header; field definitions come from the IRS 990-N dictionary.
 
 ### Step 01: snapshot discovery
 
@@ -264,24 +323,26 @@ This preserves:
 
 ### Local directories
 
-- Local raw monthly CSV directory: `{raw_dir}`
-- Local metadata directory: `{META_DIR}`
-- Local staging directory: `{STAGING_DIR}`
+- Local raw monthly CSV directory: `{_portable_path(raw_dir)}`
+- Local metadata directory: `{_portable_path(META_DIR)}`
+- Local staging directory: `{_portable_path(STAGING_DIR)}`
 
 ### Analysis artifacts
 
-- Row-level analysis parquet: `{analysis_variables_output_path()}`
-- Geography metrics parquet: `{analysis_geography_metrics_output_path()}`
-- Coverage CSV: `{analysis_variable_coverage_path()}`
-- Mapping doc: `{analysis_variable_mapping_path()}`
-- Data-processing doc: `{analysis_data_processing_doc_path()}`
+- Row-level analysis parquet: `{_portable_path(analysis_variables_output_path())}`
+- Geography metrics parquet: `{_portable_path(analysis_geography_metrics_output_path())}`
+- Coverage CSV: `{_portable_path(analysis_variable_coverage_path())}`
+- Mapping doc: `{_portable_path(analysis_variable_mapping_path())}`
+- Data-processing doc: `{_portable_path(analysis_data_processing_doc_path())}`
 
 ### S3 layout
 
 - Silver filtered postcard prefix: `silver/nccs_990/postcard/`
 - Silver filtered metadata prefix: `silver/nccs_990/postcard/metadata/`
 - Official S3 analysis prefix: `silver/nccs_990/postcard/analysis/`
-- Official S3 analysis metadata prefix: `silver/nccs_990/postcard/analysis/metadata/`
+- Analysis documentation prefix: `{ANALYSIS_DOCUMENTATION_PREFIX}`
+- Analysis variable mapping prefix: `{ANALYSIS_VARIABLE_MAPPING_PREFIX}`
+- Analysis coverage prefix: `{ANALYSIS_COVERAGE_PREFIX}`
 
 ## Step-By-Step Transformation
 
@@ -394,6 +455,14 @@ Metrics include:
 
 The coverage CSV records fill rates for the available postcard classification and support variables by retained tax year.
 
+## Coverage Evidence
+
+- Generated coverage CSV: `{_portable_path(analysis_variable_coverage_path())}`
+- Published S3 documentation object: `{ANALYSIS_DOCUMENTATION_PREFIX}/{analysis_data_processing_doc_path().name}`
+- Published S3 variable mapping object: `{ANALYSIS_VARIABLE_MAPPING_PREFIX}/{analysis_variable_mapping_path().name}`
+- Published S3 coverage object: `{ANALYSIS_COVERAGE_PREFIX}/{analysis_variable_coverage_path().name}`
+- Coverage CSVs are generated by step 07 and published as authoritative quality evidence.
+
 Unsupported financial variables remain explicitly marked unavailable rather than being backfilled from GT or efile.
 
 The upload step prints explicit local-vs-S3 byte comparisons for each analysis artifact and raises if any remote byte count differs from local bytes.
@@ -423,9 +492,9 @@ This package is intended for supplemental small-filer geography, counts, and cla
 - Because postcard does not carry the GT/efile financial fields, revenue, expense, assets, surplus, net margin, reserves, and contribution/grant variables remain explicitly unavailable.
 - The main runner currently executes sequentially rather than exposing GT-style start-step/end-step selection.
 
-## Draft Alignment Appendix
+## Analysis requirement alignment appendix
 
-| draft_variable | source_specific_output | status | rule_or_reason |
+| analysis_requirement | source_specific_output | status | rule_or_reason |
 | --- | --- | --- | --- |
 | NTEE filed classification code | analysis_ntee_code | enriched | Exact-year, nearest-year, then IRS EO BMF fallback |
 | Broad NTEE field classification code | analysis_calculated_ntee_broad_code | calculated | First letter of resolved NTEE code |
@@ -558,7 +627,7 @@ def build_analysis_outputs(
                     "canonical_variable": variable_name,
                     "availability_status": "available",
                     "variable_role": metadata_row["variable_role"],
-                    "draft_variable": metadata_row["draft_variable"],
+                    "analysis_requirement": metadata_row["analysis_requirement"],
                     "tax_year": tax_year,
                     "row_count": row_count,
                     "populated_count": populated_count,
@@ -572,7 +641,7 @@ def build_analysis_outputs(
                 "canonical_variable": row["canonical_variable"],
                 "availability_status": "unavailable",
                 "variable_role": row["variable_role"],
-                "draft_variable": row["draft_variable"],
+                "analysis_requirement": row["analysis_requirement"],
                 "tax_year": "all",
                 "row_count": int(len(analysis_df)),
                 "populated_count": 0,
@@ -607,7 +676,9 @@ def main() -> None:
     parser.add_argument("--bucket", default=DEFAULT_S3_BUCKET, help="Unused here but logged to mirror pipeline conventions")
     parser.add_argument("--region", default=DEFAULT_S3_REGION, help="Unused here but logged to mirror pipeline conventions")
     parser.add_argument("--analysis-prefix", default=ANALYSIS_PREFIX, help="Logged official analysis S3 prefix")
-    parser.add_argument("--analysis-meta-prefix", default=ANALYSIS_META_PREFIX, help="Logged official analysis metadata prefix")
+    parser.add_argument("--analysis-documentation-prefix", default=ANALYSIS_DOCUMENTATION_PREFIX, help="Logged official analysis documentation prefix")
+    parser.add_argument("--analysis-variable-mapping-prefix", default=ANALYSIS_VARIABLE_MAPPING_PREFIX, help="Logged official analysis variable mapping prefix")
+    parser.add_argument("--analysis-coverage-prefix", default=ANALYSIS_COVERAGE_PREFIX, help="Logged official analysis coverage prefix")
     args = parser.parse_args()
 
     start = time.perf_counter()
@@ -616,7 +687,9 @@ def main() -> None:
     print(f"[analysis] Metadata dir: {args.metadata_dir}", flush=True)
     print(f"[analysis] Staging dir: {args.staging_dir}", flush=True)
     print(f"[analysis] Official analysis prefix: {args.analysis_prefix}", flush=True)
-    print(f"[analysis] Official analysis metadata prefix: {args.analysis_meta_prefix}", flush=True)
+    print(f"[analysis] Official analysis documentation prefix: {args.analysis_documentation_prefix}", flush=True)
+    print(f"[analysis] Official analysis variable mapping prefix: {args.analysis_variable_mapping_prefix}", flush=True)
+    print(f"[analysis] Official analysis coverage prefix: {args.analysis_coverage_prefix}", flush=True)
     summary = build_analysis_outputs(metadata_dir=args.metadata_dir, staging_dir=args.staging_dir)
     print(f"[analysis] Summary: {summary}", flush=True)
     print_elapsed(start, "Step 07")

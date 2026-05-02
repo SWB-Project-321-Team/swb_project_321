@@ -1,0 +1,70 @@
+{
+  "postcard_dataset_url": "https://nccs.urban.org/nccs/datasets/postcard/",
+  "raw_base_url": "https://nccsdata.s3.us-east-1.amazonaws.com/raw/e-postcard/",
+  "linked_download_url": "https://nccsdata.s3.us-east-1.amazonaws.com/raw/e-postcard/2024-12-E-POSTCARD.csv",
+  "linked_snapshot_month": "2024-12",
+  "snapshot_year": 2026,
+  "snapshot_year_selection": "latest",
+  "latest_snapshot_month": "2026-03",
+  "available_snapshot_months": [
+    "2026-01",
+    "2026-02",
+    "2026-03"
+  ],
+  "discovered_at_utc": "2026-03-23T20:40:18Z",
+  "assets": [
+    {
+      "asset_group": "postcard_csv",
+      "asset_type": "postcard_snapshot_csv",
+      "snapshot_year": 2026,
+      "snapshot_month": "2026-01",
+      "source_url": "https://nccsdata.s3.us-east-1.amazonaws.com/raw/e-postcard/2026-01-E-POSTCARD.csv",
+      "filename": "2026-01-E-POSTCARD.csv",
+      "source_content_type": "binary/octet-stream",
+      "source_content_length_bytes": 377496069,
+      "source_last_modified": "Thu, 01 Jan 2026 13:02:10 GMT"
+    },
+    {
+      "asset_group": "postcard_csv",
+      "asset_type": "postcard_snapshot_csv",
+      "snapshot_year": 2026,
+      "snapshot_month": "2026-02",
+      "source_url": "https://nccsdata.s3.us-east-1.amazonaws.com/raw/e-postcard/2026-02-E-POSTCARD.csv",
+      "filename": "2026-02-E-POSTCARD.csv",
+      "source_content_type": "binary/octet-stream",
+      "source_content_length_bytes": 377607602,
+      "source_last_modified": "Sun, 01 Feb 2026 13:02:23 GMT"
+    },
+    {
+      "asset_group": "postcard_csv",
+      "asset_type": "postcard_snapshot_csv",
+      "snapshot_year": 2026,
+      "snapshot_month": "2026-03",
+      "source_url": "https://nccsdata.s3.us-east-1.amazonaws.com/raw/e-postcard/2026-03-E-POSTCARD.csv",
+      "filename": "2026-03-E-POSTCARD.csv",
+      "source_content_type": "binary/octet-stream",
+      "source_content_length_bytes": 379901679,
+      "source_last_modified": "Sun, 01 Mar 2026 13:01:58 GMT"
+    }
+  ],
+  "source_size_cache": {
+    "https://nccsdata.s3.us-east-1.amazonaws.com/raw/e-postcard/2026-01-E-POSTCARD.csv|Thu, 01 Jan 2026 13:02:10 GMT": {
+      "source_url": "https://nccsdata.s3.us-east-1.amazonaws.com/raw/e-postcard/2026-01-E-POSTCARD.csv",
+      "source_last_modified": "Thu, 01 Jan 2026 13:02:10 GMT",
+      "source_content_length_bytes": 377496069,
+      "cached_at_utc": "2026-03-23T20:40:18Z"
+    },
+    "https://nccsdata.s3.us-east-1.amazonaws.com/raw/e-postcard/2026-02-E-POSTCARD.csv|Sun, 01 Feb 2026 13:02:23 GMT": {
+      "source_url": "https://nccsdata.s3.us-east-1.amazonaws.com/raw/e-postcard/2026-02-E-POSTCARD.csv",
+      "source_last_modified": "Sun, 01 Feb 2026 13:02:23 GMT",
+      "source_content_length_bytes": 377607602,
+      "cached_at_utc": "2026-03-23T20:40:18Z"
+    },
+    "https://nccsdata.s3.us-east-1.amazonaws.com/raw/e-postcard/2026-03-E-POSTCARD.csv|Sun, 01 Mar 2026 13:01:58 GMT": {
+      "source_url": "https://nccsdata.s3.us-east-1.amazonaws.com/raw/e-postcard/2026-03-E-POSTCARD.csv",
+      "source_last_modified": "Sun, 01 Mar 2026 13:01:58 GMT",
+      "source_content_length_bytes": 379901679,
+      "cached_at_utc": "2026-03-23T20:40:18Z"
+    }
+  }
+}
