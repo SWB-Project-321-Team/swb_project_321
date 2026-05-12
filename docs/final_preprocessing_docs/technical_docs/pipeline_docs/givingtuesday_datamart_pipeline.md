@@ -824,25 +824,44 @@ using:
 - `PROGSERVREVE` for `990EZ`
 - null for `990PF`
 
+#### Total contributions (Section 3 Q9)
+
+Step 13 extracts:
+
+- `analysis_total_contributions_amount`
+
+using:
+
+- `TOTACASHCONT` for `990` (IRS Part VIII Line 1h total contributions)
+- `CONGIFGRAETC` for `990EZ` (IRS Part I Line 1 contributions, gifts, grants, and similar amounts received)
+- `STREACGRTOIN` for `990PF` (Part I Line 1: contributions, gifts, grants, and similar amounts received)
+
+Do not sum `NONCASCONTRI` or `ALLOOTHECONT` into total contributions; those lines overlap Line 1h on Form 990.
+
 #### Direct-source contribution and grant components
 
-Step 13 carries GT source component fields such as:
+Step 13 carries GT source component fields aligned with Form 990 Part VIII Line 1 sub-lines:
 
-- `analysis_cash_contributions_amount`
-- `analysis_noncash_contributions_amount`
-- `analysis_other_contributions_amount`
-- `analysis_foundation_grants_amount`
-- `analysis_government_grants_amount`
-- `analysis_other_grant_component_amount`
+- `analysis_cash_contributions_amount` (Line 1h via `TOTACASHCONT`; same source as `analysis_total_contributions_amount` for 990 only)
+- `analysis_noncash_contributions_amount` (Line 1g memo via `NONCASCONTRI`; subset of Line 1h)
+- `analysis_federated_campaigns_amount` (Line 1a via `FEDERACAMPAI`; institutional channel)
+- `analysis_membership_dues_amount` (Line 1b via `MEMBERDUESUE`; likely-individual channel)
+- `analysis_fundraising_events_contributions_amount` (Line 1c via `FUNDRAEVENTS`; likely-individual channel)
+- `analysis_related_org_contributions_amount` (Line 1d via `RELATEORGANI`; institutional channel)
+- `analysis_government_grants_amount` (Line 1e via `GOVERNGRANTS`; the only Line 1 sub-component the IRS labels as unambiguously institutional)
+- `analysis_other_contributions_amount` (Line 1f via `ALLOOTHECONT`; the deliberately-mixed bucket lumping individual gifts with private foundation grants, DAF distributions, corporate gifts, and bequests; cannot be split further without Schedule B)
+
+These sub-line fields are populated only on full Form 990 filings. Form 990-EZ and Form 990-PF do not separately report Line 1 sub-components and stay null for those columns; their contributions appear only as `analysis_total_contributions_amount` (Line 1 / Part I Line 1 totals).
 
 #### Calculated totals
 
 Step 13 calculates:
 
-- `analysis_calculated_total_contributions_amount`
-  - `TOTACASHCONT + NONCASCONTRI + ALLOOTHECONT`
 - `analysis_calculated_grants_total_amount`
-  - `FOREGRANTOTA + GOVERNGRANTS + GRANTOORORGA`
+  - `FEDERACAMPAI + RELATEORGANI + GOVERNGRANTS` (Form 990 Part VIII Line 1a + Line 1d + Line 1e)
+  - the institutional-channel contributions aggregate; the closest defensible match for the analysis plan label **Other contributions (foundation grants etc.)** in Section 3 Q9 because it is the sum of the Line 1 sub-components that the IRS form structure identifies as coming from organizations rather than individuals
+  - earlier versions of this aggregate accidentally summed `FOREGRANTOTA` and `GRANTOORORGA`, which are Form 990 Part IX (grants paid out by the filer) rather than Line 1 contributions received; that mix has been removed
+  - Form 990-EZ and Form 990-PF stay null for this aggregate because those forms do not separately report Line 1 sub-components
 - `analysis_calculated_grants_share_of_revenue_ratio`
   - `analysis_calculated_grants_total_amount / analysis_total_revenue_amount`
   - null when total revenue is missing, zero, or negative
@@ -1278,24 +1297,28 @@ The final GT analysis parquet currently contains the following columns.
 | `analysis_total_expense_amount_source_column`                     | Provenance column for `analysis_total_expense_amount`.                     | Written in step 13; records the exact GT source field used for that row: `TOTEXPCURYEA`, `TOTALEEXPENS`, or `ARETEREXPNSS`.                                                                                                    |
 | `analysis_program_service_revenue_amount`                         | Filing program service revenue amount.                                     | Direct-source, form-aware mapping in step 13: `TOTPROSERREV` for `990`, `PROGSERVREVE` for `990EZ`, and null for `990PF`.                                                                                                      |
 | `analysis_program_service_revenue_amount_source_column`           | Provenance column for `analysis_program_service_revenue_amount`.           | Written in step 13; records whether the row used `TOTPROSERREV`, `PROGSERVREVE`, or remained blank.                                                                                                                            |
+| `analysis_total_contributions_amount`                             | Total contributions for Q9 revenue-source comparisons.                     | Form-aware mapping in step 13: `TOTACASHCONT` for `990` and `990EZ`; `STREACGRTOIN` for `990PF`. Not a sum of contribution sub-lines (avoids double-counting).                                                                  |
+| `analysis_total_contributions_amount_source_column`               | Provenance column for `analysis_total_contributions_amount`.               | Written in step 13; records `TOTACASHCONT`, `STREACGRTOIN`, or blank.                                                                                                                                                         |
 | `analysis_calculated_surplus_amount`                              | Filing surplus amount used in the net-margin calculation.                  | Calculated in step 13 as `analysis_total_revenue_amount - analysis_total_expense_amount`, using the final form-aware revenue and expense mappings.                                                                              |
 | `analysis_calculated_surplus_amount_source_column`                | Provenance column for `analysis_calculated_surplus_amount`.                | Written in step 13; records `derived:analysis_total_revenue_amount-minus-analysis_total_expense_amount` when the calculation is populated.                                                                                       |
 | `analysis_cash_contributions_amount`                              | GT cash contributions component.                                           | Direct GT source field `TOTACASHCONT`.                                                                                                                                                                                         |
 | `analysis_cash_contributions_amount_source_column`                | Provenance column for `analysis_cash_contributions_amount`.                | Written in step 13; records `TOTACASHCONT` when populated.                                                                                                                                                                     |
 | `analysis_noncash_contributions_amount`                           | GT noncash contributions component.                                        | Direct GT source field `NONCASCONTRI`.                                                                                                                                                                                         |
 | `analysis_noncash_contributions_amount_source_column`             | Provenance column for `analysis_noncash_contributions_amount`.             | Written in step 13; records `NONCASCONTRI` when populated.                                                                                                                                                                     |
-| `analysis_other_contributions_amount`                             | GT other contributions component.                                          | Direct GT source field `ALLOOTHECONT`.                                                                                                                                                                                         |
-| `analysis_other_contributions_amount_source_column`               | Provenance column for `analysis_other_contributions_amount`.               | Written in step 13; records `ALLOOTHECONT` when populated.                                                                                                                                                                     |
-| `analysis_foundation_grants_amount`                               | GT foundation-grants component.                                            | Direct GT source field `FOREGRANTOTA`.                                                                                                                                                                                         |
-| `analysis_foundation_grants_amount_source_column`                 | Provenance column for `analysis_foundation_grants_amount`.                 | Written in step 13; records `FOREGRANTOTA` when populated.                                                                                                                                                                     |
-| `analysis_government_grants_amount`                               | GT government-grants component.                                            | Direct GT source field `GOVERNGRANTS`.                                                                                                                                                                                         |
+| `analysis_federated_campaigns_amount`                             | Form 990 Part VIII Line 1a, federated-campaign contributions received.     | Direct GT source field `FEDERACAMPAI`. Form 990 only; 990-EZ and 990-PF do not separately report this sub-line.                                                                                                                |
+| `analysis_federated_campaigns_amount_source_column`               | Provenance column for `analysis_federated_campaigns_amount`.               | Written in step 13; records `FEDERACAMPAI` when populated.                                                                                                                                                                     |
+| `analysis_membership_dues_amount`                                 | Form 990 Part VIII Line 1b, membership dues received.                      | Direct GT source field `MEMBERDUESUE`. Form 990 only; 990-EZ and 990-PF do not separately report this sub-line.                                                                                                                |
+| `analysis_membership_dues_amount_source_column`                   | Provenance column for `analysis_membership_dues_amount`.                   | Written in step 13; records `MEMBERDUESUE` when populated.                                                                                                                                                                     |
+| `analysis_fundraising_events_contributions_amount`                | Form 990 Part VIII Line 1c, contributions from fundraising events.         | Direct GT source field `FUNDRAEVENTS`. Form 990 only; 990-EZ and 990-PF do not separately report this sub-line.                                                                                                                |
+| `analysis_fundraising_events_contributions_amount_source_column`  | Provenance column for `analysis_fundraising_events_contributions_amount`.  | Written in step 13; records `FUNDRAEVENTS` when populated.                                                                                                                                                                     |
+| `analysis_related_org_contributions_amount`                       | Form 990 Part VIII Line 1d, related-organization contributions received.   | Direct GT source field `RELATEORGANI`. Form 990 only; 990-EZ and 990-PF do not separately report this sub-line.                                                                                                                |
+| `analysis_related_org_contributions_amount_source_column`         | Provenance column for `analysis_related_org_contributions_amount`.         | Written in step 13; records `RELATEORGANI` when populated.                                                                                                                                                                     |
+| `analysis_government_grants_amount`                               | Form 990 Part VIII Line 1e, government grants received.                    | Direct GT source field `GOVERNGRANTS`. Form 990 only; 990-EZ and 990-PF do not separately report this sub-line. The only Line 1 sub-component that is unambiguously institutional in the IRS line-item structure.             |
 | `analysis_government_grants_amount_source_column`                 | Provenance column for `analysis_government_grants_amount`.                 | Written in step 13; records `GOVERNGRANTS` when populated.                                                                                                                                                                     |
-| `analysis_other_grant_component_amount`                           | GT other-grant component.                                                  | Direct GT source field `GRANTOORORGA`.                                                                                                                                                                                         |
-| `analysis_other_grant_component_amount_source_column`             | Provenance column for `analysis_other_grant_component_amount`.             | Written in step 13; records `GRANTOORORGA` when populated.                                                                                                                                                                     |
-| `analysis_calculated_total_contributions_amount`                  | Calculated total contributions amount for the filing.                      | Calculated in step 13 as the row-wise sum of `TOTACASHCONT`, `NONCASCONTRI`, and `ALLOOTHECONT`. The result stays null only when all three components are blank.                                                               |
-| `analysis_calculated_total_contributions_amount_source_column`    | Provenance column for `analysis_calculated_total_contributions_amount`.    | Written in step 13; records the derivation label `derived:TOTACASHCONT + NONCASCONTRI + ALLOOTHECONT`.                                                                                                                         |
-| `analysis_calculated_grants_total_amount`                         | Calculated total grants amount for the filing.                             | Calculated in step 13 as the row-wise sum of `FOREGRANTOTA`, `GOVERNGRANTS`, and `GRANTOORORGA`. The result stays null only when all three components are blank.                                                               |
-| `analysis_calculated_grants_total_amount_source_column`           | Provenance column for `analysis_calculated_grants_total_amount`.           | Written in step 13; records the derivation label `derived:FOREGRANTOTA + GOVERNGRANTS + GRANTOORORGA`.                                                                                                                         |
+| `analysis_other_contributions_amount`                             | Form 990 Part VIII Line 1f, all other contributions, gifts, grants.        | Direct GT source field `ALLOOTHECONT`. Mixed bucket: lumps individual gifts together with private foundation grants, DAF distributions, corporate gifts, and bequests. Cannot be decomposed without Schedule B.               |
+| `analysis_other_contributions_amount_source_column`               | Provenance column for `analysis_other_contributions_amount`.               | Written in step 13; records `ALLOOTHECONT` when populated.                                                                                                                                                                     |
+| `analysis_calculated_grants_total_amount`                         | Institutional-channel contributions aggregate (Section 3 Q9).              | Calculated in step 13 as the row-wise sum of `FEDERACAMPAI`, `RELATEORGANI`, and `GOVERNGRANTS` (Form 990 Part VIII Line 1a + 1d + 1e). The closest defensible match for the analysis plan label "Other contributions (foundation grants etc.)" because it is the sum of the Line 1 sub-components that the IRS line-item structure identifies as institutional. Form 990 only; 990-EZ and 990-PF stay null. Earlier versions summed `FOREGRANTOTA` and `GRANTOORORGA` (Part IX grants paid out); that mix has been removed.|
+| `analysis_calculated_grants_total_amount_source_column`           | Provenance column for `analysis_calculated_grants_total_amount`.           | Written in step 13; records the derivation label `derived:FEDERACAMPAI + RELATEORGANI + GOVERNGRANTS`.                                                                                                                          |
 | `analysis_calculated_grants_share_of_revenue_ratio`               | Filing-level grants dependency ratio.                                      | Calculated in step 13 as `analysis_calculated_grants_total_amount / analysis_total_revenue_amount`; null when total revenue is missing, zero, or negative.                                                                     |
 | `analysis_calculated_grants_share_of_revenue_ratio_source_column` | Provenance column for `analysis_calculated_grants_share_of_revenue_ratio`. | Written in step 13; records that the ratio was derived from GT grants total and GT total revenue.                                                                                                                              |
 | `analysis_grants_share_of_revenue_quality_flag`                   | Row-level usability flag for the filing-level grants-share ratio.          | Calculated in step 13 to classify each row as `valid_0_to_1`, `gt_1_source_anomaly`, `nonpositive_revenue`, or `missing_component` based on the availability of grants total, total revenue, and the resulting ratio behavior. |

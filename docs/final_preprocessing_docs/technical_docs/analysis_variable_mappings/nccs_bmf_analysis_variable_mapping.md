@@ -32,10 +32,10 @@ This file is the analysis-ready data dictionary for the NCCS BMF analysis datase
 |analysis_imputed_is_hospital|imputed|Hospital flag|analysis_is_hospital, then conservative name fallback, then default false|analysis_imputed_is_hospital_source_column|Complete hospital flag for analysis exclusions.|
 |analysis_imputed_is_university|imputed|University flag|analysis_is_university, then conservative name fallback, then default false|analysis_imputed_is_university_source_column|Complete university flag for analysis exclusions.|
 |analysis_imputed_is_political_org|imputed|Political organization flag|analysis_is_political_org, then conservative name fallback, then default false|analysis_imputed_is_political_org_source_column|Complete political-organization flag for analysis exclusions.|
-|analysis_program_service_revenue_amount|unavailable|Program service revenue|BMF does not carry this 990-style revenue-source field.|
-|analysis_calculated_total_contributions_amount|unavailable|Total contributions|BMF does not carry this 990-style revenue-source field.|
-|analysis_other_contributions_amount|unavailable|Other contributions|BMF does not carry this 990-style revenue-source field.|
-|analysis_calculated_grants_total_amount|unavailable|Grants (total amount)|BMF does not carry this 990-style revenue-source field.|
+|analysis_program_service_revenue_amount|unavailable|Program service revenue|BMF does not carry this 990-style revenue-source field.|GivingTuesday Step 13 publishes **`analysis_program_service_revenue_amount`** for detailed filings.|
+|analysis_calculated_total_contributions_amount|unavailable|Total contributions|BMF does not carry this 990-style revenue-source field.|GivingTuesday Step 13 publishes **`analysis_total_contributions_amount`** (same analytic concept; different column name).|
+|analysis_other_contributions_amount|unavailable|Other contributions|BMF does not carry GT Part VIII Line 1f-style component fields.|Section 3 Q9 “foundation grants etc.” aggregate is **`analysis_calculated_grants_total_amount`** in GT, not `ALLOOTHECONT`.|
+|analysis_calculated_grants_total_amount|unavailable|Grants (total amount)|BMF does not carry this 990-style revenue-source field.|GivingTuesday Step 13 publishes **`analysis_calculated_grants_total_amount`** (`FOREGRANTOTA` + `GOVERNGRANTS` + `GRANTOORORGA`).|
 |analysis_total_expense_amount|unavailable|Total expense|BMF does not carry this expense field.|
 |analysis_net_asset_amount|unavailable|Net asset|BMF does not provide a direct net-asset field in the current pipeline.|
 |analysis_calculated_surplus_amount|unavailable|Surplus|BMF does not carry a direct revenue-minus-expense surplus field in the current pipeline.|
@@ -58,10 +58,10 @@ This file is the analysis-ready data dictionary for the NCCS BMF analysis datase
 |Hospital flag|analysis_imputed_is_hospital|imputed|analysis_is_hospital, then conservative name fallback, then default false|
 |University flag|analysis_imputed_is_university|imputed|analysis_is_university, then conservative name fallback, then default false|
 |Political organization flag|analysis_imputed_is_political_org|imputed|analysis_is_political_org, then conservative name fallback, then default false|
-|Program service revenue|analysis_program_service_revenue_amount|unavailable|BMF does not carry this 990-style revenue-source field.|
-|Total contributions|analysis_calculated_total_contributions_amount|unavailable|BMF does not carry this 990-style revenue-source field.|
-|Other contributions|analysis_other_contributions_amount|unavailable|BMF does not carry this 990-style revenue-source field.|
-|Grants (total amount)|analysis_calculated_grants_total_amount|unavailable|BMF does not carry this 990-style revenue-source field.|
+|Program service revenue|analysis_program_service_revenue_amount|unavailable|BMF does not carry this field; GT Step 13 publishes **`analysis_program_service_revenue_amount`**|
+|Total contributions|analysis_calculated_total_contributions_amount|unavailable|BMF does not carry this field; GT Step 13 publishes **`analysis_total_contributions_amount`**|
+|Other contributions|analysis_other_contributions_amount|unavailable|BMF does not carry GT Line 1f components; Q9 grants aggregate in GT is **`analysis_calculated_grants_total_amount`**|
+|Grants (total amount)|analysis_calculated_grants_total_amount|unavailable|BMF does not carry this field; GT Step 13 publishes **`analysis_calculated_grants_total_amount`**|
 |Total expense|analysis_total_expense_amount|unavailable|BMF does not carry this expense field.|
 |Net asset|analysis_net_asset_amount|unavailable|BMF does not provide a direct net-asset field in the current pipeline.|
 |Surplus|analysis_calculated_surplus_amount|unavailable|BMF does not carry a direct revenue-minus-expense surplus field in the current pipeline.|

@@ -195,6 +195,8 @@ The current Core analysis package also promotes these cleanly supportable requir
 
 These stay tied to their source-faithful candidate fields rather than being silently redefined with GT-style semantics.
 
+**Cross-family naming:** Core promotes total contributions as `analysis_calculated_total_contributions_amount`. The GivingTuesday Step 13 dataset uses `analysis_total_contributions_amount` for 990 Line 1h / 990-EZ Part I Line 1 / PF Part I Line 1 totals — the same analytic concept for benchmark filings, but a different published column name.
+
 ### Calculated metrics
 
 The main calculated metrics are:
@@ -306,7 +308,7 @@ This package is analogous in structure to GT and efile, while keeping Core-speci
 | Surplus | analysis_calculated_surplus_amount | calculated | Scope-aware surplus rule from Core source fields |
 | Net margin | analysis_calculated_net_margin_ratio | calculated | Surplus divided by positive total revenue |
 | Program service revenue | analysis_program_service_revenue_amount | direct | Promoted from the Core program-service candidate field |
-| Total contributions | analysis_calculated_total_contributions_amount | direct | Promoted from the Core contribution candidate field |
+| Total contributions | analysis_calculated_total_contributions_amount | direct | Promoted from the Core contribution candidate field (GivingTuesday Step 13 uses analysis_total_contributions_amount) |
 | NTEE filed classification code | analysis_ntee_code | enriched | Exact-year BMF, then nearest-year BMF, then IRS EO BMF fallback |
 | Broad NTEE field classification code | analysis_calculated_ntee_broad_code | calculated | First letter of final resolved NTEE code |
 | Political organization flag | analysis_is_political_org | proxy | Resolved from subsection classification |

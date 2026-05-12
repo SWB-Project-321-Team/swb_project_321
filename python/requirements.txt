@@ -11,3 +11,9 @@ duckdb>=1.5.0
 pyarrow>=10.0.0
 requests>=2.25.0
 tqdm>=4.62.0
+
+# Analysis/reporting dependencies.
+matplotlib>=3.5.0
+scipy>=1.8.0
+seaborn>=0.12.0
+statsmodels>=0.14.0

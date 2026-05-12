@@ -93,10 +93,10 @@ def _portable_path(path: Path) -> str:
 
 
 UNAVAILABLE_VARIABLES = [
-    {"canonical_variable": "analysis_program_service_revenue_amount", "variable_role": "unavailable", "analysis_requirement": "Program service revenue", "notes": "BMF does not carry this 990-style revenue-source field."},
-    {"canonical_variable": "analysis_calculated_total_contributions_amount", "variable_role": "unavailable", "analysis_requirement": "Total contributions", "notes": "BMF does not carry this 990-style revenue-source field."},
-    {"canonical_variable": "analysis_other_contributions_amount", "variable_role": "unavailable", "analysis_requirement": "Other contributions", "notes": "BMF does not carry this 990-style revenue-source field."},
-    {"canonical_variable": "analysis_calculated_grants_total_amount", "variable_role": "unavailable", "analysis_requirement": "Grants (total amount)", "notes": "BMF does not carry this 990-style revenue-source field."},
+    {"canonical_variable": "analysis_program_service_revenue_amount", "variable_role": "unavailable", "analysis_requirement": "Program service revenue", "notes": "BMF does not carry this 990-style revenue-source field; GivingTuesday Step 13 publishes analysis_program_service_revenue_amount for detailed filings."},
+    {"canonical_variable": "analysis_calculated_total_contributions_amount", "variable_role": "unavailable", "analysis_requirement": "Total contributions", "notes": "BMF does not carry this 990-style revenue-source field; GivingTuesday Step 13 publishes analysis_total_contributions_amount (990 Line 1h / 990-EZ Part I Line 1 / PF Part I Line 1)."},
+    {"canonical_variable": "analysis_other_contributions_amount", "variable_role": "unavailable", "analysis_requirement": "Other contributions", "notes": "BMF does not carry GT Part VIII Line 1f component fields; Section 3 Q9 'foundation grants etc.' aggregate is analysis_calculated_grants_total_amount in GT, not this column."},
+    {"canonical_variable": "analysis_calculated_grants_total_amount", "variable_role": "unavailable", "analysis_requirement": "Grants (total amount)", "notes": "BMF does not carry this 990-style revenue-source field; GivingTuesday Step 13 publishes analysis_calculated_grants_total_amount as the institutional-channel aggregate (Form 990 Part VIII Line 1a + 1d + 1e: FEDERACAMPAI + RELATEORGANI + GOVERNGRANTS)."},
     {"canonical_variable": "analysis_total_expense_amount", "variable_role": "unavailable", "analysis_requirement": "Total expense", "notes": "BMF does not carry this expense field."},
     {"canonical_variable": "analysis_net_asset_amount", "variable_role": "unavailable", "analysis_requirement": "Net asset", "notes": "BMF does not provide a direct net-asset field in the current pipeline."},
     {"canonical_variable": "analysis_calculated_surplus_amount", "variable_role": "unavailable", "analysis_requirement": "Surplus", "notes": "BMF does not carry a direct revenue-minus-expense surplus field in the current pipeline."},
@@ -686,9 +686,9 @@ The row-level analysis dataset is the canonical BMF analysis-ready file for `202
 | Political organization flag | analysis_is_political_org | proxy | Resolved from final subsection code |
 | Total expense | analysis_total_expense_amount | unavailable | BMF does not carry this expense field |
 | Net asset | analysis_net_asset_amount | unavailable | BMF does not provide a direct net-asset field in the current pipeline |
-| Program service revenue | analysis_program_service_revenue_amount | unavailable | BMF does not carry this 990-style revenue-source field |
-| Total contributions | analysis_calculated_total_contributions_amount | unavailable | BMF does not carry this 990-style revenue-source field |
-| Grants (total amount) | analysis_calculated_grants_total_amount | unavailable | BMF does not carry this 990-style revenue-source field |
+| Program service revenue | analysis_program_service_revenue_amount | unavailable | BMF does not carry this field; GT Step 13 publishes analysis_program_service_revenue_amount |
+| Total contributions | analysis_calculated_total_contributions_amount | unavailable | BMF does not carry this field; GT Step 13 publishes analysis_total_contributions_amount |
+| Grants (total amount) | analysis_calculated_grants_total_amount | unavailable | BMF does not carry this field; GT Step 13 publishes analysis_calculated_grants_total_amount |
 """
     doc_path.write_text(doc.strip() + "\n", encoding="utf-8")
 

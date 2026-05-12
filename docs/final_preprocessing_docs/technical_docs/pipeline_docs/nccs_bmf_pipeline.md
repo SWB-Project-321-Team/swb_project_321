@@ -352,5 +352,5 @@ The row-level analysis dataset is the canonical BMF analysis-ready file for `202
 | Total expense | analysis_total_expense_amount | unavailable | BMF does not carry this expense field |
 | Net asset | analysis_net_asset_amount | unavailable | BMF does not provide a direct net-asset field in the current pipeline |
 | Program service revenue | analysis_program_service_revenue_amount | unavailable | BMF does not carry this 990-style revenue-source field |
-| Total contributions | analysis_calculated_total_contributions_amount | unavailable | BMF does not carry this 990-style revenue-source field |
+| Total contributions | analysis_calculated_total_contributions_amount | unavailable | BMF does not carry this 990-style revenue-source field; GivingTuesday Step 13 publishes **`analysis_total_contributions_amount`** |
 | Grants (total amount) | analysis_calculated_grants_total_amount | unavailable | BMF does not carry this 990-style revenue-source field |

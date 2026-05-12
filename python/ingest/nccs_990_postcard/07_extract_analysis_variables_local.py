@@ -90,9 +90,9 @@ def _portable_path(path: Path) -> str:
 
 UNAVAILABLE_VARIABLES = [
     {"canonical_variable": "analysis_total_revenue_amount", "variable_role": "unavailable", "analysis_requirement": "Total revenue", "notes": "Postcard does not carry this financial-performance or revenue-source field."},
-    {"canonical_variable": "analysis_program_service_revenue_amount", "variable_role": "unavailable", "analysis_requirement": "Program service revenue", "notes": "Postcard does not carry this financial-performance or revenue-source field."},
-    {"canonical_variable": "analysis_calculated_total_contributions_amount", "variable_role": "unavailable", "analysis_requirement": "Total contributions", "notes": "Postcard does not carry this financial-performance or revenue-source field."},
-    {"canonical_variable": "analysis_calculated_grants_total_amount", "variable_role": "unavailable", "analysis_requirement": "Grants (total amount)", "notes": "Postcard does not carry this financial-performance or revenue-source field."},
+    {"canonical_variable": "analysis_program_service_revenue_amount", "variable_role": "unavailable", "analysis_requirement": "Program service revenue", "notes": "Postcard does not carry this revenue-source field; GivingTuesday Step 13 publishes analysis_program_service_revenue_amount for detailed filings."},
+    {"canonical_variable": "analysis_calculated_total_contributions_amount", "variable_role": "unavailable", "analysis_requirement": "Total contributions", "notes": "Postcard does not carry this revenue-source field; GivingTuesday Step 13 publishes analysis_total_contributions_amount (990 Line 1h / 990-EZ Part I Line 1 / PF Part I Line 1)."},
+    {"canonical_variable": "analysis_calculated_grants_total_amount", "variable_role": "unavailable", "analysis_requirement": "Grants (total amount)", "notes": "Postcard does not carry this revenue-source field; GivingTuesday Step 13 publishes analysis_calculated_grants_total_amount as the institutional-channel aggregate (Form 990 Part VIII Line 1a + 1d + 1e: FEDERACAMPAI + RELATEORGANI + GOVERNGRANTS)."},
     {"canonical_variable": "analysis_total_expense_amount", "variable_role": "unavailable", "analysis_requirement": "Total expense", "notes": "Postcard does not carry this financial-performance or revenue-source field."},
     {"canonical_variable": "analysis_net_asset_amount", "variable_role": "unavailable", "analysis_requirement": "Net asset", "notes": "Postcard does not carry this financial-performance or revenue-source field."},
     {"canonical_variable": "analysis_calculated_surplus_amount", "variable_role": "unavailable", "analysis_requirement": "Surplus", "notes": "Postcard does not carry this financial-performance or revenue-source field."},
@@ -504,9 +504,9 @@ This package is intended for supplemental small-filer geography, counts, and cla
 | Total revenue | analysis_total_revenue_amount | unavailable | Postcard does not carry this financial-performance field |
 | Total expense | analysis_total_expense_amount | unavailable | Postcard does not carry this financial-performance field |
 | Net asset | analysis_net_asset_amount | unavailable | Postcard does not carry this financial-performance field |
-| Program service revenue | analysis_program_service_revenue_amount | unavailable | Postcard does not carry this revenue-source field |
-| Total contributions | analysis_calculated_total_contributions_amount | unavailable | Postcard does not carry this revenue-source field |
-| Grants (total amount) | analysis_calculated_grants_total_amount | unavailable | Postcard does not carry this revenue-source field |
+| Program service revenue | analysis_program_service_revenue_amount | unavailable | Postcard does not carry this field; GT Step 13 publishes analysis_program_service_revenue_amount |
+| Total contributions | analysis_calculated_total_contributions_amount | unavailable | Postcard does not carry this field; GT Step 13 publishes analysis_total_contributions_amount |
+| Grants (total amount) | analysis_calculated_grants_total_amount | unavailable | Postcard does not carry this field; GT Step 13 publishes analysis_calculated_grants_total_amount |
 """
     doc_path.write_text(doc.strip() + "\n", encoding="utf-8")
 

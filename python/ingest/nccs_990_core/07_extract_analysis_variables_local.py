@@ -88,7 +88,7 @@ AVAILABLE_VARIABLE_METADATA = [
     {"canonical_variable": "analysis_calculated_months_of_reserves", "variable_role": "calculated", "analysis_requirement": "Months of reserves", "source_rule": "(analysis_net_asset_amount / positive analysis_total_expense_amount) * 12", "provenance_column": "analysis_calculated_months_of_reserves_source_column", "notes": "Only calculated when expense is present and positive."},
     {"canonical_variable": "analysis_program_service_revenue_amount", "variable_role": "direct", "analysis_requirement": "Program service revenue", "source_rule": "Core program-service fields by scope", "provenance_column": "analysis_program_service_revenue_amount_source_column", "notes": "Promoted requirement-aligned Core program-service revenue field."},
     {"canonical_variable": "analysis_program_service_revenue_candidate_amount", "variable_role": "direct", "analysis_requirement": "Program service revenue candidate", "source_rule": "Core program-service candidate fields by scope", "provenance_column": "analysis_program_service_revenue_candidate_amount_source_column", "notes": "Source-faithful supporting field retained alongside the promoted requirement-aligned variable."},
-    {"canonical_variable": "analysis_calculated_total_contributions_amount", "variable_role": "direct", "analysis_requirement": "Total contributions", "source_rule": "Core contribution fields by scope", "provenance_column": "analysis_calculated_total_contributions_amount_source_column", "notes": "Promoted requirement-aligned total-contributions field from the best available Core contribution concept."},
+    {"canonical_variable": "analysis_calculated_total_contributions_amount", "variable_role": "direct", "analysis_requirement": "Total contributions", "source_rule": "Core contribution fields by scope", "provenance_column": "analysis_calculated_total_contributions_amount_source_column", "notes": "Promoted requirement-aligned total-contributions field from the best available Core contribution concept. Cross-family naming: GivingTuesday Step 13 publishes the same analytic concept as analysis_total_contributions_amount (990 Line 1h / 990-EZ Part I Line 1 / PF Part I Line 1)."},
     {"canonical_variable": "analysis_contribution_candidate_amount", "variable_role": "direct", "analysis_requirement": "Contribution candidate", "source_rule": "Core contribution candidate fields by scope", "provenance_column": "analysis_contribution_candidate_amount_source_column", "notes": "Source-faithful supporting field retained alongside the promoted requirement-aligned variable."},
     {"canonical_variable": "analysis_gifts_grants_received_candidate_amount", "variable_role": "direct", "analysis_requirement": "Gifts/grants received candidate", "source_rule": "Schedule A public-support gift/grant contribution candidates when present", "provenance_column": "analysis_gifts_grants_received_candidate_amount_source_column", "notes": "Kept distinct from contribution and grants-paid concepts."},
     {"canonical_variable": "analysis_grants_paid_candidate_amount", "variable_role": "calculated", "analysis_requirement": "Grants paid candidate", "source_rule": "Row-wise sum of Core grant-paid components, or PF contribution-paid books field", "provenance_column": "analysis_grants_paid_candidate_amount_source_column", "notes": "Distinct grant-paid concept preserved for analysts."},
@@ -104,10 +104,9 @@ AVAILABLE_VARIABLE_METADATA = [
 ]
 
 UNAVAILABLE_VARIABLES = [
-    {"canonical_variable": "analysis_other_contributions_amount", "availability_status": "unavailable", "variable_role": "unavailable", "analysis_requirement": "Other contributions", "source_rule": "Core does not provide a directly aligned field in the current pipeline.", "notes": "Unavailable by design."},
-    {"canonical_variable": "analysis_calculated_grants_total_amount", "availability_status": "unavailable", "variable_role": "unavailable", "analysis_requirement": "Grants total", "source_rule": "Grant-received and grant-paid concepts remain separate in Core.", "notes": "Use the distinct candidate fields instead."},
-    {"canonical_variable": "analysis_foundation_grants_amount", "availability_status": "unavailable", "variable_role": "unavailable", "analysis_requirement": "Foundation grants", "source_rule": "No current direct Core mapping.", "notes": "Unavailable by design."},
-    {"canonical_variable": "analysis_government_grants_amount", "availability_status": "unavailable", "variable_role": "unavailable", "analysis_requirement": "Government grants", "source_rule": "No current direct Core mapping.", "notes": "Unavailable by design."},
+    {"canonical_variable": "analysis_other_contributions_amount", "availability_status": "unavailable", "variable_role": "unavailable", "analysis_requirement": "Other contributions (Form 990 Part VIII Line 1f)", "source_rule": "Core does not expose Line 1f directly.", "notes": "GT Step 13 carries this as the mixed individual + institutional bucket; Core sensitivity is limited to total-contributions parity."},
+    {"canonical_variable": "analysis_calculated_grants_total_amount", "availability_status": "unavailable", "variable_role": "unavailable", "analysis_requirement": "Institutional-channel contributions aggregate (Form 990 Part VIII Lines 1a + 1d + 1e)", "source_rule": "Core does not expose Line 1 sub-components directly.", "notes": "GT Step 13 publishes this as FEDERACAMPAI + RELATEORGANI + GOVERNGRANTS for 990 filers; not reproducible from Core in the current pipeline."},
+    {"canonical_variable": "analysis_government_grants_amount", "availability_status": "unavailable", "variable_role": "unavailable", "analysis_requirement": "Government grants received (Form 990 Part VIII Line 1e)", "source_rule": "No current direct Core mapping.", "notes": "Unavailable by design."},
 ]
 
 
@@ -812,6 +811,8 @@ The current Core analysis package also promotes these cleanly supportable requir
 
 These stay tied to their source-faithful candidate fields rather than being silently redefined with GT-style semantics.
 
+**Cross-family naming:** Core promotes total contributions as `analysis_calculated_total_contributions_amount`. The GivingTuesday Step 13 dataset uses `analysis_total_contributions_amount` for 990 Line 1h / 990-EZ Part I Line 1 / PF Part I Line 1 totals — the same analytic concept for benchmark filings, but a different published column name.
+
 ### Calculated metrics
 
 The main calculated metrics are:
@@ -923,7 +924,7 @@ This package is analogous in structure to GT and efile, while keeping Core-speci
 | Surplus | analysis_calculated_surplus_amount | calculated | Scope-aware surplus rule from Core source fields |
 | Net margin | analysis_calculated_net_margin_ratio | calculated | Surplus divided by positive total revenue |
 | Program service revenue | analysis_program_service_revenue_amount | direct | Promoted from the Core program-service candidate field |
-| Total contributions | analysis_calculated_total_contributions_amount | direct | Promoted from the Core contribution candidate field |
+| Total contributions | analysis_calculated_total_contributions_amount | direct | Promoted from the Core contribution candidate field (GivingTuesday Step 13 uses analysis_total_contributions_amount) |
 | NTEE filed classification code | analysis_ntee_code | enriched | Exact-year BMF, then nearest-year BMF, then IRS EO BMF fallback |
 | Broad NTEE field classification code | analysis_calculated_ntee_broad_code | calculated | First letter of final resolved NTEE code |
 | Political organization flag | analysis_is_political_org | proxy | Resolved from subsection classification |

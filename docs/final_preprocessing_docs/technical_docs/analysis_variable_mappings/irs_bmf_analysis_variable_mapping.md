@@ -31,10 +31,10 @@ This file is the analysis-ready data dictionary for the IRS EO BMF analysis data
 |analysis_imputed_is_hospital|imputed|Hospital flag|analysis_is_hospital, then conservative name fallback, then default false|analysis_imputed_is_hospital_source_column|Complete hospital flag for analysis exclusions.|
 |analysis_imputed_is_university|imputed|University flag|analysis_is_university, then conservative name fallback, then default false|analysis_imputed_is_university_source_column|Complete university flag for analysis exclusions.|
 |analysis_imputed_is_political_org|imputed|Political organization flag|analysis_is_political_org, then conservative name fallback, then default false|analysis_imputed_is_political_org_source_column|Complete political-organization flag for analysis exclusions.|
-|analysis_program_service_revenue_amount|unavailable|Program service revenue|Unavailable|n/a|IRS EO BMF does not carry this 990-style revenue-source field.|
-|analysis_calculated_total_contributions_amount|unavailable|Total contributions|Unavailable|n/a|IRS EO BMF does not carry this 990-style revenue-source field.|
-|analysis_other_contributions_amount|unavailable|Other contributions|Unavailable|n/a|IRS EO BMF does not carry this 990-style revenue-source field.|
-|analysis_calculated_grants_total_amount|unavailable|Grants (total amount)|Unavailable|n/a|IRS EO BMF does not carry this 990-style revenue-source field.|
+|analysis_program_service_revenue_amount|unavailable|Program service revenue|Unavailable|n/a|IRS EO BMF does not carry this 990-style revenue-source field. GivingTuesday Step 13 publishes **`analysis_program_service_revenue_amount`** for detailed filings.|
+|analysis_calculated_total_contributions_amount|unavailable|Total contributions|Unavailable|n/a|IRS EO BMF does not carry this 990-style revenue-source field. GivingTuesday Step 13 publishes **`analysis_total_contributions_amount`** for Form 990-family totals.|
+|analysis_other_contributions_amount|unavailable|Other contributions|Unavailable|n/a|IRS EO BMF does not carry GT Line 1f component semantics. Q9 grants aggregate in GT is **`analysis_calculated_grants_total_amount`**.|
+|analysis_calculated_grants_total_amount|unavailable|Grants (total amount)|Unavailable|n/a|GivingTuesday Step 13 publishes **`analysis_calculated_grants_total_amount`** where grant components exist.|
 |analysis_total_expense_amount|unavailable|Total expense|Unavailable|n/a|IRS EO BMF does not provide a direct expense field.|
 |analysis_net_asset_amount|unavailable|Net asset|Unavailable|n/a|IRS EO BMF does not provide a direct net-asset field.|
 |analysis_calculated_surplus_amount|unavailable|Surplus|Unavailable|n/a|IRS EO BMF does not provide a revenue-minus-expense surplus field.|

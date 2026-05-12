@@ -80,7 +80,7 @@ UNAVAILABLE_VARIABLES = [
         "variable_role": "unavailable",
         "analysis_requirement": "Program service revenue",
         "source_rule": "Not present in the current efile benchmark artifact.",
-        "notes": "Keep unavailable rather than backfilling from GT.",
+        "notes": "Keep unavailable rather than backfilling from GT (analysis_program_service_revenue_amount is populated in the GivingTuesday Step 13 extract).",
     },
     {
         "canonical_variable": "analysis_calculated_total_contributions_amount",
@@ -88,15 +88,15 @@ UNAVAILABLE_VARIABLES = [
         "variable_role": "unavailable",
         "analysis_requirement": "Total contributions",
         "source_rule": "Contribution-component fields are not present in the current efile benchmark artifact.",
-        "notes": "Keep unavailable rather than backfilling from GT.",
+        "notes": "GivingTuesday Step 13 publishes analysis_total_contributions_amount (990 Line 1h / 990-EZ Part I Line 1 / PF Part I Line 1); keep this slot unavailable rather than weakly backfilling from GT.",
     },
     {
         "canonical_variable": "analysis_other_contributions_amount",
         "availability_status": "unavailable",
         "variable_role": "unavailable",
-        "analysis_requirement": "Other contributions",
+        "analysis_requirement": "Other contributions (GT Part VIII Line 1f token)",
         "source_rule": "Contribution-component fields are not present in the current efile benchmark artifact.",
-        "notes": "Keep unavailable rather than backfilling from GT.",
+        "notes": "Harmonized column for ALLOOTHECONT-style component fields is unavailable here. Section 3 Q9 'foundation grants etc.' aggregate is analysis_calculated_grants_total_amount in GT, not this column.",
     },
     {
         "canonical_variable": "analysis_calculated_grants_total_amount",
@@ -104,7 +104,7 @@ UNAVAILABLE_VARIABLES = [
         "variable_role": "unavailable",
         "analysis_requirement": "Grants (total amount)",
         "source_rule": "Grant-component fields are not present in the current efile benchmark artifact.",
-        "notes": "Keep unavailable rather than backfilling from GT.",
+        "notes": "GivingTuesday Step 13 publishes analysis_calculated_grants_total_amount; this efile extract leaves it unavailable because grant components are not in the benchmark artifact.",
     },
 ]
 
@@ -778,7 +778,7 @@ This package is the canonical efile analysis-ready layer for `2022-2024`.
 
 ## Current Caveats
 
-- The current efile benchmark layer does not expose GT-style contribution or grant component fields, so those variables remain unavailable here.
+- The current efile benchmark layer does not expose GT-style contribution or grant component fields, so those variables remain unavailable here. Section 3 Q9 revenue-source totals populated from GivingTuesday use `analysis_total_contributions_amount` (total contributions) and `analysis_calculated_grants_total_amount` (plan label: other contributions / foundation grants aggregate); see `givingtuesday_basic_analysis_variable_mapping.md`.
 - `analysis_net_asset_amount` is still an asset-based proxy and should not be confused with a guaranteed raw net-asset field.
 - The direct hospital and university fields are source-sparse because the underlying efile flags are sparse. The imputed versions are complete because they continue through proxy/name/default logic.
 - The main runner currently executes sequentially rather than exposing GT-style start-step/end-step selection.
@@ -795,9 +795,9 @@ This package is the canonical efile analysis-ready layer for `2022-2024`.
 | Months of reserves | analysis_calculated_months_of_reserves | calculated | (Net-asset proxy / positive total expense) * 12 |
 | NTEE filed classification code | analysis_ntee_code | enriched | Exact-year, nearest-year, then IRS EO BMF fallback |
 | Program service revenue | analysis_program_service_revenue_amount | unavailable | Not present in the current efile benchmark artifact |
-| Total contributions | analysis_calculated_total_contributions_amount | unavailable | Contribution-component fields are not present in the current efile benchmark artifact |
-| Other contributions | analysis_other_contributions_amount | unavailable | Contribution-component fields are not present in the current efile benchmark artifact |
-| Grants (total amount) | analysis_calculated_grants_total_amount | unavailable | Grant-component fields are not present in the current efile benchmark artifact |
+| Total contributions | analysis_calculated_total_contributions_amount | unavailable | Contribution-component fields are not present here; GT Step 13 publishes analysis_total_contributions_amount |
+| Other contributions | analysis_other_contributions_amount | unavailable | Harmonized ALLOOTHECONT-style component unavailable here; Q9 grants aggregate is analysis_calculated_grants_total_amount in GT |
+| Grants (total amount) | analysis_calculated_grants_total_amount | unavailable | Grant-component fields are not present here; populated in the GT Step 13 extract |
 """
     doc_path.write_text(doc.strip() + "\n", encoding="utf-8")
 

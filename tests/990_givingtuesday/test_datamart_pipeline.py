@@ -1205,11 +1205,17 @@ def test_step13_extracts_gt_analysis_variables_and_flags_unresolved_concepts(
                 "derived_income_amount": "20",
                 "TOTPROSERREV": "60",
                 "PROGSERVREVE": "",
-                "TOTACASHCONT": "10",
+                "CONGIFGRAETC": "",
+                "TOTACASHCONT": "17",
                 "NONCASCONTRI": "5",
                 "ALLOOTHECONT": "2",
-                "FOREGRANTOTA": "3",
+                "STREACGRTOIN": "",
+                "FEDERACAMPAI": "1",
+                "MEMBERDUESUE": "",
+                "FUNDRAEVENTS": "",
+                "RELATEORGANI": "3",
                 "GOVERNGRANTS": "4",
+                "FOREGRANTOTA": "3",
                 "GRANTOORORGA": "1",
                 "OPERATHOSPIT": "Y",
                 "OPERATSCHOOL": "",
@@ -1232,12 +1238,18 @@ def test_step13_extracts_gt_analysis_variables_and_flags_unresolved_concepts(
                 "derived_income_amount": "10",
                 "TOTPROSERREV": "",
                 "PROGSERVREVE": "12",
+                "CONGIFGRAETC": "18",
                 "TOTACASHCONT": "",
                 "NONCASCONTRI": "",
                 "ALLOOTHECONT": "",
-                "FOREGRANTOTA": "",
+                "FEDERACAMPAI": "",
+                "MEMBERDUESUE": "",
+                "FUNDRAEVENTS": "",
+                "RELATEORGANI": "",
                 "GOVERNGRANTS": "",
+                "FOREGRANTOTA": "",
                 "GRANTOORORGA": "",
+                "STREACGRTOIN": "",
                 "OPERATHOSPIT": "0",
                 "OPERATSCHOOL": "X",
             },
@@ -1262,12 +1274,18 @@ def test_step13_extracts_gt_analysis_variables_and_flags_unresolved_concepts(
                 "derived_income_amount": "",
                 "TOTPROSERREV": "",
                 "PROGSERVREVE": "",
+                "CONGIFGRAETC": "",
                 "TOTACASHCONT": "",
                 "NONCASCONTRI": "",
                 "ALLOOTHECONT": "",
-                "FOREGRANTOTA": "",
+                "FEDERACAMPAI": "",
+                "MEMBERDUESUE": "",
+                "FUNDRAEVENTS": "",
+                "RELATEORGANI": "",
                 "GOVERNGRANTS": "",
+                "FOREGRANTOTA": "",
                 "GRANTOORORGA": "",
+                "STREACGRTOIN": "42",
                 "OPERATHOSPIT": "",
                 "OPERATSCHOOL": "",
             },
@@ -1289,12 +1307,18 @@ def test_step13_extracts_gt_analysis_variables_and_flags_unresolved_concepts(
                 "derived_income_amount": "20",
                 "TOTPROSERREV": "5",
                 "PROGSERVREVE": "",
+                "CONGIFGRAETC": "",
                 "TOTACASHCONT": "",
                 "NONCASCONTRI": "",
                 "ALLOOTHECONT": "",
-                "FOREGRANTOTA": "",
+                "FEDERACAMPAI": "",
+                "MEMBERDUESUE": "",
+                "FUNDRAEVENTS": "",
+                "RELATEORGANI": "",
                 "GOVERNGRANTS": "",
+                "FOREGRANTOTA": "",
                 "GRANTOORORGA": "",
+                "STREACGRTOIN": "",
                 "OPERATHOSPIT": "0",
                 "OPERATSCHOOL": "",
             },
@@ -1316,12 +1340,18 @@ def test_step13_extracts_gt_analysis_variables_and_flags_unresolved_concepts(
                 "derived_income_amount": "30",
                 "TOTPROSERREV": "8",
                 "PROGSERVREVE": "",
+                "CONGIFGRAETC": "",
                 "TOTACASHCONT": "",
                 "NONCASCONTRI": "",
                 "ALLOOTHECONT": "",
-                "FOREGRANTOTA": "",
+                "FEDERACAMPAI": "",
+                "MEMBERDUESUE": "",
+                "FUNDRAEVENTS": "",
+                "RELATEORGANI": "",
                 "GOVERNGRANTS": "",
+                "FOREGRANTOTA": "",
                 "GRANTOORORGA": "",
+                "STREACGRTOIN": "",
                 "OPERATHOSPIT": "",
                 "OPERATSCHOOL": "",
             },
@@ -1343,12 +1373,18 @@ def test_step13_extracts_gt_analysis_variables_and_flags_unresolved_concepts(
                 "derived_income_amount": "-15",
                 "TOTPROSERREV": "0",
                 "PROGSERVREVE": "",
+                "CONGIFGRAETC": "",
                 "TOTACASHCONT": "",
                 "NONCASCONTRI": "",
                 "ALLOOTHECONT": "",
-                "FOREGRANTOTA": "5",
+                "FEDERACAMPAI": "5",
+                "MEMBERDUESUE": "",
+                "FUNDRAEVENTS": "",
+                "RELATEORGANI": "",
                 "GOVERNGRANTS": "0",
-                "GRANTOORORGA": "0",
+                "FOREGRANTOTA": "",
+                "GRANTOORORGA": "",
+                "STREACGRTOIN": "",
                 "OPERATHOSPIT": "",
                 "OPERATSCHOOL": "",
             },
@@ -1484,7 +1520,7 @@ def test_step13_extracts_gt_analysis_variables_and_flags_unresolved_concepts(
     assert "analysis_imputed_is_hospital" in analysis_df.columns
     assert "analysis_imputed_is_university" in analysis_df.columns
     assert "analysis_imputed_is_political_org" in analysis_df.columns
-    assert "analysis_calculated_total_contributions_amount" in analysis_df.columns
+    assert "analysis_total_contributions_amount" in analysis_df.columns
     assert "analysis_calculated_grants_total_amount" in analysis_df.columns
     assert "analysis_calculated_grants_share_of_revenue_ratio" in analysis_df.columns
     assert "analysis_grants_share_of_revenue_quality_flag" in analysis_df.columns
@@ -1506,8 +1542,9 @@ def test_step13_extracts_gt_analysis_variables_and_flags_unresolved_concepts(
     assert analysis_df.loc[1, "analysis_calculated_surplus_amount"] == 10
     assert analysis_df.loc[0, "analysis_calculated_net_margin_ratio"] == 0.2
     assert analysis_df.loc[1, "analysis_calculated_net_margin_ratio"] == 0.2
-    assert analysis_df.loc[0, "analysis_calculated_total_contributions_amount"] == 17
-    assert pd.isna(analysis_df.loc[1, "analysis_calculated_total_contributions_amount"])
+    assert analysis_df.loc[0, "analysis_total_contributions_amount"] == 17
+    assert analysis_df.loc[1, "analysis_total_contributions_amount"] == 18
+    assert analysis_df.loc[2, "analysis_total_contributions_amount"] == 42
     assert analysis_df.loc[0, "analysis_calculated_grants_total_amount"] == 8
     assert pd.isna(analysis_df.loc[1, "analysis_calculated_grants_total_amount"])
     assert analysis_df.loc[0, "analysis_calculated_grants_share_of_revenue_ratio"] == 0.08
@@ -1548,8 +1585,10 @@ def test_step13_extracts_gt_analysis_variables_and_flags_unresolved_concepts(
         analysis_df.loc[2, "analysis_calculated_surplus_amount_source_column"]
         == "derived:analysis_total_revenue_amount-minus-analysis_total_expense_amount"
     )
-    assert analysis_df.loc[0, "analysis_calculated_total_contributions_amount_source_column"] == "derived:TOTACASHCONT+NONCASCONTRI+ALLOOTHECONT"
-    assert analysis_df.loc[0, "analysis_calculated_grants_total_amount_source_column"] == "derived:FOREGRANTOTA+GOVERNGRANTS+GRANTOORORGA"
+    assert analysis_df.loc[0, "analysis_total_contributions_amount_source_column"] == "TOTACASHCONT"
+    assert analysis_df.loc[1, "analysis_total_contributions_amount_source_column"] == "CONGIFGRAETC"
+    assert analysis_df.loc[2, "analysis_total_contributions_amount_source_column"] == "STREACGRTOIN"
+    assert analysis_df.loc[0, "analysis_calculated_grants_total_amount_source_column"] == "derived:FEDERACAMPAI+RELATEORGANI+GOVERNGRANTS"
     assert (
         analysis_df.loc[0, "analysis_calculated_grants_share_of_revenue_ratio_source_column"]
         == "derived:analysis_calculated_grants_total_amount-divided-by-analysis_total_revenue_amount"
@@ -1587,7 +1626,7 @@ def test_step13_extracts_gt_analysis_variables_and_flags_unresolved_concepts(
     unresolved_rows = coverage_df.loc[coverage_df["status"].isin(["needs_confirmation", "unavailable"])]
     assert unresolved_rows.empty
     available_variables = set(coverage_df.loc[coverage_df["status"] == "available", "variable_name"].tolist())
-    assert "analysis_calculated_total_contributions_amount" in available_variables
+    assert "analysis_total_contributions_amount" in available_variables
     assert "analysis_calculated_grants_total_amount" in available_variables
     assert "analysis_calculated_grants_share_of_revenue_ratio" in available_variables
     assert "analysis_grants_share_of_revenue_quality_flag" in available_variables
@@ -1605,11 +1644,10 @@ def test_step13_extracts_gt_analysis_variables_and_flags_unresolved_concepts(
         & (coverage_df["form_type"].astype(str) == "990PF")
     ]
     assert int(ntee_coverage["populated_rows"].iloc[0]) == 1
-    assert "What data elements will be needed?" in mapping_text
-    assert "For Limited Number Of Organizations (Form 990, EZ, PF)" in mapping_text
-    assert "CODING_RULES.md" in mapping_text
-    assert "NTEE filed classification code" in mapping_text
-    assert "nearest-year EIN fallback" in mapping_text
+    assert "GivingTuesday Basic-Only Analysis Variable Mapping" in mapping_text
+    assert "analysis_total_contributions_amount" in mapping_text
+    assert "STREACGRTOIN" in mapping_text or "990PF" in mapping_text
+    assert "NCCS nearest-year" in mapping_text
     assert "analysis_is_political_org" in mapping_text
     assert "analysis_imputed_is_hospital" in mapping_text
     assert "analysis_imputed_is_university" in mapping_text

@@ -32,7 +32,7 @@
 |analysis_calculated_months_of_reserves|calculated|Months of reserves|(analysis_net_asset_amount / positive analysis_total_expense_amount) * 12|analysis_calculated_months_of_reserves_source_column|Only calculated when expense is present and positive.|
 |analysis_program_service_revenue_amount|direct|Program service revenue|Core program-service fields by scope|analysis_program_service_revenue_amount_source_column|Promoted requirement-aligned Core program-service revenue field.|
 |analysis_program_service_revenue_candidate_amount|direct|Program service revenue candidate|Core program-service candidate fields by scope|analysis_program_service_revenue_candidate_amount_source_column|Source-faithful supporting field retained alongside the promoted requirement-aligned variable.|
-|analysis_calculated_total_contributions_amount|direct|Total contributions|Core contribution fields by scope|analysis_calculated_total_contributions_amount_source_column|Promoted requirement-aligned total-contributions field from the best available Core contribution concept.|
+|analysis_calculated_total_contributions_amount|direct|Total contributions|Core contribution fields by scope|analysis_calculated_total_contributions_amount_source_column|Promoted requirement-aligned total-contributions field from the best available Core contribution concept. Cross-family naming: GivingTuesday Step 13 publishes the same analytic concept as analysis_total_contributions_amount (990 Line 1h / 990-EZ Part I Line 1 / PF Part I Line 1).|
 |analysis_contribution_candidate_amount|direct|Contribution candidate|Core contribution candidate fields by scope|analysis_contribution_candidate_amount_source_column|Source-faithful supporting field retained alongside the promoted requirement-aligned variable.|
 |analysis_gifts_grants_received_candidate_amount|direct|Gifts/grants received candidate|Schedule A public-support gift/grant contribution candidates when present|analysis_gifts_grants_received_candidate_amount_source_column|Kept distinct from contribution and grants-paid concepts.|
 |analysis_grants_paid_candidate_amount|calculated|Grants paid candidate|Row-wise sum of Core grant-paid components, or PF contribution-paid books field|analysis_grants_paid_candidate_amount_source_column|Distinct grant-paid concept preserved for analysts.|
@@ -50,7 +50,6 @@
 
 |canonical_variable|availability_status|analysis_requirement|notes|
 |---|---|---|---|
-|analysis_other_contributions_amount|unavailable|Other contributions|Unavailable by design.|
-|analysis_calculated_grants_total_amount|unavailable|Grants total|Use the distinct candidate fields instead.|
-|analysis_foundation_grants_amount|unavailable|Foundation grants|Unavailable by design.|
-|analysis_government_grants_amount|unavailable|Government grants|Unavailable by design.|
+|analysis_other_contributions_amount|unavailable|Other contributions (Form 990 Part VIII Line 1f)|GT Step 13 carries this as the mixed individual + institutional bucket; Core sensitivity is limited to total-contributions parity.|
+|analysis_calculated_grants_total_amount|unavailable|Institutional-channel contributions aggregate (Form 990 Part VIII Lines 1a + 1d + 1e)|GT Step 13 publishes this as FEDERACAMPAI + RELATEORGANI + GOVERNGRANTS for 990 filers; not reproducible from Core in the current pipeline.|
+|analysis_government_grants_amount|unavailable|Government grants received (Form 990 Part VIII Line 1e)|Unavailable by design.|

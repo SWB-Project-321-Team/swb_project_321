@@ -66,10 +66,10 @@ def _portable_path(path: Path) -> str:
 
 
 UNAVAILABLE_VARIABLES = [
-    {"canonical_variable": "analysis_program_service_revenue_amount", "variable_role": "unavailable", "analysis_requirement": "Program service revenue", "notes": "IRS EO BMF does not carry this 990-style revenue-source field."},
-    {"canonical_variable": "analysis_calculated_total_contributions_amount", "variable_role": "unavailable", "analysis_requirement": "Total contributions", "notes": "IRS EO BMF does not carry this 990-style revenue-source field."},
-    {"canonical_variable": "analysis_other_contributions_amount", "variable_role": "unavailable", "analysis_requirement": "Other contributions", "notes": "IRS EO BMF does not carry this 990-style revenue-source field."},
-    {"canonical_variable": "analysis_calculated_grants_total_amount", "variable_role": "unavailable", "analysis_requirement": "Grants (total amount)", "notes": "IRS EO BMF does not carry this 990-style revenue-source field."},
+    {"canonical_variable": "analysis_program_service_revenue_amount", "variable_role": "unavailable", "analysis_requirement": "Program service revenue", "notes": "IRS EO BMF does not carry this 990-style revenue-source field. GivingTuesday Step 13 publishes analysis_program_service_revenue_amount for detailed filings."},
+    {"canonical_variable": "analysis_calculated_total_contributions_amount", "variable_role": "unavailable", "analysis_requirement": "Total contributions", "notes": "IRS EO BMF does not carry this 990-style revenue-source field. GivingTuesday Step 13 publishes analysis_total_contributions_amount for Form 990-family totals."},
+    {"canonical_variable": "analysis_other_contributions_amount", "variable_role": "unavailable", "analysis_requirement": "Other contributions", "notes": "IRS EO BMF does not carry GT Line 1f component semantics. Q9 grants aggregate in GT is analysis_calculated_grants_total_amount."},
+    {"canonical_variable": "analysis_calculated_grants_total_amount", "variable_role": "unavailable", "analysis_requirement": "Grants (total amount)", "notes": "GivingTuesday Step 13 publishes analysis_calculated_grants_total_amount where grant components exist."},
     {"canonical_variable": "analysis_total_expense_amount", "variable_role": "unavailable", "analysis_requirement": "Total expense", "notes": "IRS EO BMF does not provide a direct expense field."},
     {"canonical_variable": "analysis_net_asset_amount", "variable_role": "unavailable", "analysis_requirement": "Net asset", "notes": "IRS EO BMF does not provide a direct net-asset field."},
     {"canonical_variable": "analysis_calculated_surplus_amount", "variable_role": "unavailable", "analysis_requirement": "Surplus", "notes": "IRS EO BMF does not provide a revenue-minus-expense surplus field."},

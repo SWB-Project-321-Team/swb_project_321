@@ -39,10 +39,10 @@ This file is the analysis-ready data dictionary for the NCCS efile analysis data
 
 |canonical_variable|availability_status|analysis_requirement|notes|
 |---|---|---|---|
-|analysis_program_service_revenue_amount|unavailable|Program service revenue|Keep unavailable rather than backfilling from GT.|
-|analysis_calculated_total_contributions_amount|unavailable|Total contributions|Keep unavailable rather than backfilling from GT.|
-|analysis_other_contributions_amount|unavailable|Other contributions|Keep unavailable rather than backfilling from GT.|
-|analysis_calculated_grants_total_amount|unavailable|Grants (total amount)|Keep unavailable rather than backfilling from GT.|
+|analysis_program_service_revenue_amount|unavailable|Program service revenue|Keep unavailable rather than backfilling from GT (`analysis_program_service_revenue_amount` is populated in the GivingTuesday Step 13 extract).|
+|analysis_calculated_total_contributions_amount|unavailable|Total contributions|This family does not populate the harmonized slot; GivingTuesday Step 13 publishes **`analysis_total_contributions_amount`** (990 Line 1h / 990-EZ Part I Line 1 / PF Part I Line 1). Keep unavailable rather than weakly backfilling from GT.|
+|analysis_other_contributions_amount|unavailable|Other contributions (GT Part VIII Line 1f token)|Harmonized column for `ALLOOTHECONT`-style **component** fields is unavailable here. For Section 3 Q9 **“Other contributions (foundation grants etc.)”**, the GT extract uses the grants aggregate **`analysis_calculated_grants_total_amount`**, not this column name.|
+|analysis_calculated_grants_total_amount|unavailable|Grants (total amount)|GivingTuesday Step 13 publishes **`analysis_calculated_grants_total_amount`**; this efile extract leaves it unavailable because grant components are not in the benchmark artifact.|
 
 ## Analysis requirement alignment appendix
 
@@ -61,7 +61,7 @@ This file is the analysis-ready data dictionary for the NCCS efile analysis data
 |Hospital flag|analysis_is_hospital|direct|Direct from efile hospital flag|
 |University flag|analysis_is_university|direct|Direct from efile school/university flag|
 |Political organization flag|analysis_is_political_org|proxy|Source-backed subsection proxy|
-|Program service revenue|analysis_program_service_revenue_amount|unavailable|Keep unavailable rather than backfilling from GT.|
-|Total contributions|analysis_calculated_total_contributions_amount|unavailable|Keep unavailable rather than backfilling from GT.|
-|Other contributions|analysis_other_contributions_amount|unavailable|Keep unavailable rather than backfilling from GT.|
-|Grants (total amount)|analysis_calculated_grants_total_amount|unavailable|Keep unavailable rather than backfilling from GT.|
+|Program service revenue|analysis_program_service_revenue_amount|unavailable|Keep unavailable rather than backfilling from GT (`analysis_program_service_revenue_amount` is populated in the GivingTuesday Step 13 extract).|
+|Total contributions|analysis_calculated_total_contributions_amount|unavailable|GivingTuesday Step 13 uses **`analysis_total_contributions_amount`** for populated totals; this slot stays unavailable here.|
+|Other contributions (Line 1f component vs Q9 grants aggregate)|analysis_other_contributions_amount|unavailable|Q9 “foundation grants etc.” aggregate is **`analysis_calculated_grants_total_amount`** in GT; this harmonized component column stays unavailable in efile.|
+|Grants (total amount)|analysis_calculated_grants_total_amount|unavailable|Grant components absent from this artifact; see GT mapping for populated **`analysis_calculated_grants_total_amount`**.|

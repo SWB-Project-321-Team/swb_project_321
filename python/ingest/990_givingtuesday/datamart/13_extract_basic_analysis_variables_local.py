@@ -117,64 +117,143 @@ FORM_AWARE_AMOUNT_SPECS = [
         "analysis_basis": "Program service revenue for the revenue-source comparison question.",
         "notes": "GT plan says program service revenue comes from 990 and EZ. 990PF stays null here.",
     },
+    {
+        "output_column": "analysis_total_contributions_amount",
+        "source_by_form": {
+            "990": "TOTACASHCONT",
+            "990EZ": "CONGIFGRAETC",
+            "990PF": "STREACGRTOIN",
+        },
+        "analysis_basis": "Total contributions for the limited-number organization revenue-source comparison (Section 3 Q9).",
+        "notes": (
+            "Form 990: TOTACASHCONT is IRS Part VIII Line 1h (total contributions). "
+            "Form 990-EZ: CONGIFGRAETC is Part I Line 1 (contributions, gifts, grants, and similar amounts received). "
+            "Do not add NONCASCONTRI or ALLOOTHECONT on Form 990; those overlap Line 1h. "
+            "Form 990-PF: STREACGRTOIN is Part I Line 1 (contributions, gifts, grants, and similar amounts received)."
+        ),
+    },
 ]
 
 DIRECT_AMOUNT_SPECS = [
     {
         "output_column": "analysis_cash_contributions_amount",
         "source_column": "TOTACASHCONT",
-        "analysis_basis": "Contribution component exposed because total contributions remain unresolved at the requirement level.",
-        "notes": "Component only; does not synthesize a final total-contributions measure.",
+        "analysis_basis": "Form 990 Part VIII Line 1h total contributions; diagnostic duplicate of analysis_total_contributions_amount for Form 990 rows.",
+        "notes": (
+            "Same source as analysis_total_contributions_amount for Form 990 only. "
+            "Form 990-EZ total contributions use CONGIFGRAETC instead. "
+            "Not additive with NONCASCONTRI or ALLOOTHECONT on Form 990."
+        ),
     },
     {
         "output_column": "analysis_noncash_contributions_amount",
         "source_column": "NONCASCONTRI",
-        "analysis_basis": "Contribution component exposed because total contributions remain unresolved at the requirement level.",
-        "notes": "Component only; does not synthesize a final total-contributions measure.",
+        "analysis_basis": "Form 990 Part VIII Line 1g noncash contribution disclosure (subset of Line 1h).",
+        "notes": "Diagnostic only; do not add to analysis_total_contributions_amount.",
     },
     {
-        "output_column": "analysis_other_contributions_amount",
-        "source_column": "ALLOOTHECONT",
-        "analysis_basis": "Contribution component exposed for other contribution lines such as foundation grants.",
-        "notes": "Component only; do not treat as a final all-contributions total.",
+        "output_column": "analysis_federated_campaigns_amount",
+        "source_column": "FEDERACAMPAI",
+        "analysis_basis": (
+            "Form 990 Part VIII Line 1a (federated campaigns received). Institutional channel; "
+            "exposed as a Line 1 sub-component for the Section 3 Q9 donor-channel decomposition."
+        ),
+        "notes": (
+            "Subset of Line 1h. Available on Form 990 only; 990-EZ and 990-PF do not separately "
+            "report this sub-line and stay null. Rolls into analysis_calculated_grants_total_amount "
+            "(institutional-channel aggregate) along with Line 1d and Line 1e."
+        ),
     },
     {
-        "output_column": "analysis_foundation_grants_amount",
-        "source_column": "FOREGRANTOTA",
-        "analysis_basis": "Grant component exposed for grants-versus-other-revenue comparisons.",
-        "notes": "Component only; do not treat as a final all-grants total.",
+        "output_column": "analysis_membership_dues_amount",
+        "source_column": "MEMBERDUESUE",
+        "analysis_basis": (
+            "Form 990 Part VIII Line 1b membership dues and Form 990-EZ Part I Line 3 membership dues. "
+            "Only the Form 990 Line 1b amount is treated as a likely-individual donor channel for the "
+            "Section 3 Q9 donor-channel decomposition."
+        ),
+        "notes": (
+            "Subset of Line 1h on Form 990. On Form 990-EZ this is a separate revenue line rather "
+            "than a contribution sub-line, so downstream revenue-source segmentation leaves it in "
+            "residual other revenue. Diagnostic component, not part of the institutional aggregate."
+        ),
+    },
+    {
+        "output_column": "analysis_fundraising_events_contributions_amount",
+        "source_column": "FUNDRAEVENTS",
+        "analysis_basis": (
+            "Form 990 Part VIII Line 1c (contributions from fundraising events). Treated as a "
+            "likely-individual donor channel for the Section 3 Q9 donor-channel decomposition."
+        ),
+        "notes": (
+            "Subset of Line 1h. Available on Form 990 only; 990-EZ and 990-PF do not separately "
+            "report this sub-line and stay null. Diagnostic component, not part of the institutional aggregate."
+        ),
+    },
+    {
+        "output_column": "analysis_related_org_contributions_amount",
+        "source_column": "RELATEORGANI",
+        "analysis_basis": (
+            "Form 990 Part VIII Line 1d (related-organization contributions received). Institutional "
+            "channel; exposed as a Line 1 sub-component for the Section 3 Q9 donor-channel decomposition."
+        ),
+        "notes": (
+            "Subset of Line 1h. Available on Form 990 only; 990-EZ and 990-PF do not separately "
+            "report this sub-line and stay null. Rolls into analysis_calculated_grants_total_amount "
+            "(institutional-channel aggregate) along with Line 1a and Line 1e."
+        ),
     },
     {
         "output_column": "analysis_government_grants_amount",
         "source_column": "GOVERNGRANTS",
-        "analysis_basis": "Grant component exposed for grants-versus-other-revenue comparisons.",
-        "notes": "Component only; do not treat as a final all-grants total.",
+        "analysis_basis": (
+            "Form 990 Part VIII Line 1e (government grants received). The only Line 1 sub-component "
+            "that is unambiguously institutional in the IRS line-item structure."
+        ),
+        "notes": (
+            "Subset of Line 1h. Available on Form 990 only; 990-EZ and 990-PF do not separately "
+            "report this sub-line and stay null. Rolls into analysis_calculated_grants_total_amount "
+            "(institutional-channel aggregate) along with Line 1a and Line 1d."
+        ),
     },
     {
-        "output_column": "analysis_other_grant_component_amount",
-        "source_column": "GRANTOORORGA",
-        "analysis_basis": "Grant component exposed for grants-versus-other-revenue comparisons.",
-        "notes": "Component only; do not treat as a final all-grants total.",
+        "output_column": "analysis_other_contributions_amount",
+        "source_column": "ALLOOTHECONT",
+        "analysis_basis": (
+            "Form 990 Part VIII Line 1f (all other contributions, gifts, grants, and similar amounts received). "
+            "The IRS lumps individual gifts, private foundation grants, donor-advised fund distributions, "
+            "corporate gifts, and bequests into this single line. Treated as the unidentifiable "
+            "(mixed individual + institutional) channel in the Section 3 Q9 donor-channel decomposition."
+        ),
+        "notes": (
+            "Subset of Line 1h. Available on Form 990 only; 990-EZ and 990-PF do not separately "
+            "report this sub-line. Cannot be cleanly split into individual versus institutional giving "
+            "without Schedule B, which is not exposed in the GT basic datamart."
+        ),
     },
 ]
 
 DERIVED_COMPONENT_SUM_SPECS = [
     {
-        "output_column": "analysis_calculated_total_contributions_amount",
-        "source_columns": ["TOTACASHCONT", "NONCASCONTRI", "ALLOOTHECONT"],
-        "analysis_basis": "Total contributions for the limited-number organization revenue-source comparison.",
-        "notes": (
-            "Derived as the row-wise sum of cash, noncash, and other contribution components. "
-            "Blank components are treated as missing rather than as errors, and the total stays null when every component is blank."
-        ),
-    },
-    {
         "output_column": "analysis_calculated_grants_total_amount",
-        "source_columns": ["FOREGRANTOTA", "GOVERNGRANTS", "GRANTOORORGA"],
-        "analysis_basis": "Total grants amount for the grants-versus-other-revenue comparison.",
+        "source_columns": ["FEDERACAMPAI", "RELATEORGANI", "GOVERNGRANTS"],
+        "analysis_basis": (
+            "Institutional-channel contributions aggregate for the Section 3 Q9 plan concept "
+            "Other contributions (foundation grants etc.). Sum of Form 990 Part VIII Line 1a "
+            "(federated campaigns), Line 1d (related organizations), and Line 1e (government grants) "
+            "the only Line 1 sub-components that can be identified as coming from organizations rather "
+            "than individuals. Foundation grants, DAF distributions, corporate gifts, and individual "
+            "gifts all sit together in Line 1f (analysis_other_contributions_amount) and cannot be "
+            "separated without Schedule B."
+        ),
         "notes": (
-            "Derived as the row-wise sum of foundation, government, and other grant components. "
-            "Blank components are treated as missing rather than as errors, and the total stays null when every component is blank."
+            "Form 990 only; 990-EZ and 990-PF do not separately report Line 1 sub-components and stay "
+            "null for this aggregate. Earlier versions of this column summed FOREGRANTOTA and "
+            "GRANTOORORGA, which are Form 990 Part IX (grants paid out) rather than contributions "
+            "received; that mix has been removed. For mutually exclusive revenue-source segments versus "
+            "total contributions, downstream analysis subtracts this aggregate from "
+            "analysis_total_contributions_amount on 990 rows. Blank components are treated as missing; "
+            "the total stays null when every component is blank."
         ),
     },
 ]
