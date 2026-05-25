@@ -25,20 +25,22 @@ a sensitivity analysis.
 
 Under the current primary comparable-universe frame:
 
-- Analytic organization-year rows: 4,179.
-- Unique EINs: 2,155.
-- Tax years: 2022, 2023, 2024.
+- Analytic organization-year rows: 1,799.
+- Unique EINs: 1,797.
+- Tax year: 2022.
 - Regions: Black Hills, Billings, Flagstaff, Missoula, and Sioux Falls.
-- Excluded hospital/university/political organization rows: 54 rows from 35
-  EINs, removed from the full valid universe of 4,233 rows.
+- Excluded hospital/university/political organization rows: 25 rows, removed
+  from the full valid 2022 universe of 1,824 rows.
 
 The main statistical conclusion is:
 
-- Revenue-source mix differs across the five regions.
-- In the Black Hills versus pooled-benchmark follow-up, the clearest significant
-  difference is higher `government_grants_received_share` in Black Hills.
-- The narrow individual-giving proxy does not significantly differ between
-  Black Hills and pooled benchmarks after multiplicity adjustment.
+- Several raw-dollar revenue-source distributions differ across the five
+  regions in 2022, including total contributions, government grants,
+  membership dues, fundraising-event contributions, mixed / unclassified
+  contributions, and other revenue.
+- In the Black Hills versus pooled-benchmark 2022 follow-up, raw p-values show
+  Black Hills lower on total revenue and fundraising-event contributions, but
+  these do not remain significant after FDR adjustment.
 - A full-universe sensitivity that includes hospitals, universities, and
   political organizations does not change the substantive conclusion.
 
@@ -143,34 +145,62 @@ full-universe sensitivity under these labels:
 ## Revenue Variables and Derivations
 
 The analysis derives revenue-source components at the organization-year grain.
-The six main components are intended to partition revenue as cleanly as the
-available IRS basic 990-family data allows.
+The detailed components are intended to partition revenue as cleanly as the
+available IRS basic 990-family data allows:
+
+```text
+total_revenue =
+  program_service_revenue
+  + government_grants_received
+  + federated_campaigns
+  + related_org_contributions
+  + membership_dues
+  + fundraising_events_contributions
+  + mixed_unclassified_contributions
+  + residual_other_revenue
+```
 
 | Component | Meaning | Source/derivation |
 | --- | --- | --- |
-| `program_service_revenue` | Program service revenue | Form 990 / 990-EZ Line 2g through the GivingTuesday analysis field. Form 990-PF is kept missing because it does not have the same comparable concept in this file. |
-| `total_contributions` | Total contributions | GivingTuesday `analysis_total_contributions_amount`, mapped upstream from `TOTACASHCONT` for Form 990, `CONGIFGRAETC` for Form 990-EZ, and `STREACGRTOIN` for Form 990-PF. |
-| `government_grants_received` | Government grants received | Form 990 Part VIII Line 1e, `GOVERNGRANTS`, for Form 990 rows. Set to 0 for 990-EZ and 990-PF because those forms do not expose this subcomponent in the same way. |
-| `other_institutional_contributions` | Other clearly institutional contribution channels | Form 990 Part VIII Line 1a + Line 1d: federated campaigns plus related-organization contributions. |
-| `individual_likely_contributions` | Conservative likely-individual contribution proxy | Form 990 Part VIII Line 1b + Line 1c: membership dues plus fundraising-event contributions. |
-| `mixed_other_contributions` | Mixed unclassified contribution bucket | Form 990 Part VIII Line 1f, `ALLOOTHECONT`, for Form 990 rows. For 990-EZ and 990-PF, the full reported total contributions amount is routed here because those forms do not separately report the Line 1 subcomponents. |
-| `residual_other_revenue` | Revenue not captured by the five named components | `total_revenue - program_service_revenue - contribution components`. Negative residuals are retained for diagnostics but clipped at zero for composition plots/transforms. |
+| `program_service_revenue` | Program service revenue | Form 990 / 990-EZ Line 2g through the GivingTuesday analysis field. Form 990-PF is kept missing because it does not have the same comparable concept in this file. Blank supported 990/990-EZ lines are treated as zero. |
+| `total_contributions` | Total contributions | GivingTuesday `analysis_total_contributions_amount`, mapped upstream from `TOTACASHCONT` for Form 990, `CONGIFGRAETC` for Form 990-EZ, and `STREACGRTOIN` for Form 990-PF. Blank supported lines are treated as zero. |
+| `government_grants_received` | Government grants received | Form 990 Part VIII Line 1e, `GOVERNGRANTS`, for Form 990 rows. 990-EZ and 990-PF rows are excluded for this variable because those forms do not expose this subcomponent in the same way. |
+| `federated_campaigns` | Federated campaign contributions | Form 990 Part VIII Line 1a, `FEDERACAMPAI`. 990-EZ and 990-PF rows are excluded for this variable because source detail is unavailable. |
+| `related_org_contributions` | Related organization contributions | Form 990 Part VIII Line 1d, `RELATEORGANI`. 990-EZ and 990-PF rows are excluded for this variable because source detail is unavailable. |
+| `membership_dues` | Membership dues | Form 990 Part VIII Line 1b, `MEMBERDUESUE`. Individual-adjacent, not pure individual giving. 990-EZ and 990-PF rows are excluded for this variable. |
+| `fundraising_events_contributions` | Fundraising event contributions | Form 990 Part VIII Line 1c, `FUNDRAEVENTS`. Individual-adjacent, not pure individual giving. 990-EZ and 990-PF rows are excluded for this variable. |
+| `mixed_unclassified_contributions` | Mixed / unclassified contribution bucket | Form 990 Part VIII Line 1f, `ALLOOTHECONT`, for Form 990 rows. For 990-EZ and 990-PF, the full reported total contributions amount is routed here because those forms do not separately report the Line 1 subcomponents. |
+| `residual_other_revenue` | Other revenue | `total_revenue - program_service_revenue - detailed contribution components`. Negative residuals are retained for diagnostics but clipped at zero for composition plots/transforms. |
 
-The script also carries supporting amount fields:
+Older aggregate aliases remain internally for backward compatibility, but
+client-facing outputs and headline tests use the detailed categories above.
+
+The analysis distinguishes blank supported amount lines from unavailable
+form-specific fields. Blank supported lines are interpreted as reported zero;
+fields that a form cannot report are kept missing and excluded from that
+variable's tests and medians.
+
+The main raw-dollar variables tested and summarized are:
 
 - `total_revenue`
+- `program_service_revenue`
 - `total_contributions`
-- `cash_contributions`
-- `noncash_contributions`
+- `government_grants_received`
 - `federated_campaigns`
+- `related_org_contributions`
 - `membership_dues`
 - `fundraising_events_contributions`
-- `related_org_contributions`
-- `government_grants`
-- `allo_other_contributions_line_1f`
-- `calculated_institutional_contributions_total`
+- `mixed_unclassified_contributions`
+- `residual_other_revenue`
 
-For every amount variable, the script also creates a log-transformed level
+The script also carries supporting diagnostic fields, such as
+`cash_contributions`, `noncash_contributions`,
+`allo_other_contributions_line_1f`, and
+`calculated_institutional_contributions_total`. These are not treated as main
+revenue-source categories because cash/noncash describes contribution form,
+not donor source, and the other fields are reconciliation helpers.
+
+For every main raw-dollar variable, the script also creates a log-transformed level
 variable:
 
 ```text
@@ -204,10 +234,11 @@ Without Schedule B or donor-level data, the analysis cannot isolate foundation
 grants or individual gifts from Line 1f. The correct interpretation is:
 
 - `government_grants_received`: clearly government/institutional.
-- `other_institutional_contributions`: clearly institutional.
-- `individual_likely_contributions`: narrow lower-bound proxy for individual
-  giving.
-- `mixed_other_contributions`: unknown mixed bucket.
+- `federated_campaigns` and `related_org_contributions`: clearly institutional
+  channels.
+- `membership_dues` and `fundraising_events_contributions`: individual-adjacent
+  proxies, not confirmed individual giving.
+- `mixed_unclassified_contributions`: unknown mixed bucket.
 
 ## Focused Individual-vs-Institutional Contribution Analysis
 
@@ -268,17 +299,28 @@ The workflow writes:
 
 ### Primary univariate tests
 
-For each share and log-level variable, the script runs:
+For Q9, the headline tests use organization-level raw dollar values for:
 
-- Classical one-way ANOVA.
-- Welch ANOVA.
-- Rank test:
-  - Mann-Whitney U for two-group comparisons.
-  - Kruskal-Wallis for comparisons with more than two groups.
-- Permutation mean-difference test for Black Hills versus pooled benchmarks.
+- `total_revenue`
+- `program_service_revenue`
+- `total_contributions`
+- `government_grants_received`
+- `federated_campaigns`
+- `related_org_contributions`
+- `membership_dues`
+- `fundraising_events_contributions`
+- `mixed_unclassified_contributions`
 
-The headline test is the Welch ANOVA because it does not assume equal variances
-across groups.
+The primary test family is non-parametric:
+
+- Kruskal-Wallis for five-region raw-dollar comparisons.
+- Mann-Whitney U for Black Hills versus pooled benchmarks.
+- Permutation mean-difference tests as mean-based robustness checks for Black
+  Hills versus pooled benchmarks.
+
+Raw-dollar medians, means, nonzero rates, and positive-only medians are written
+so the tests can be interpreted without relying on means alone. Share-based and
+compositional tests are retained as supplemental revenue-mix context.
 
 P-values from the main family of univariate tests are adjusted using
 Benjamini-Hochberg false discovery rate correction.
@@ -308,10 +350,10 @@ These models include:
 - Tax-year controls.
 - Form-type controls.
 
-The OLS models estimate differences in continuous revenue shares or log-level
-variables. The logistic-presence models estimate whether a row reports any
-positive amount in a revenue source, separating source presence from source
-magnitude.
+The OLS models estimate differences in continuous revenue shares, raw-dollar
+variables, or log-level variables. The logistic-presence models estimate whether
+a row reports any positive amount in a revenue source, separating source
+presence from source magnitude.
 
 ### Bootstrap confidence intervals
 
@@ -334,9 +376,9 @@ row's nonnegative displayed components to sum to one.
 
 ### Year-by-year tests
 
-The script reruns primary tests separately by tax year. This prevents the pooled
-2022-2024 result from hiding a year-specific pattern or being driven by
-incomplete 2024 coverage.
+The script reruns primary tests separately by tax year when a custom multi-year
+run is requested. This prevents pooled results from hiding a year-specific
+pattern or being driven by incomplete filing coverage.
 
 ### Sensitivity analyses
 
@@ -436,7 +478,11 @@ The report is the best file to open first.
 | `results/tables/statistical_tests_regression.csv` | Clustered OLS and GLM-binomial presence models. |
 | `results/tables/statistical_tests_multivariate.csv` | Pooled PERMANOVA and MANOVA tests. |
 | `results/tables/statistical_tests_by_year_multivariate.csv` | Year-by-year PERMANOVA and MANOVA tests. |
-| `results/tables/bootstrap_mean_difference_ci.csv` | EIN cluster-bootstrap confidence intervals for main share differences. |
+| `results/tables/client_five_region_raw_level_rank_tests.csv` | Primary five-region raw-dollar Kruskal-Wallis tests. |
+| `results/tables/client_bh_vs_benchmark_raw_level_rank_tests.csv` | Primary Black Hills versus pooled benchmark raw-dollar follow-up tests. |
+| `results/tables/client_raw_level_region_summary.csv` | Raw-dollar medians, means, nonzero rates, and positive-only medians by region. |
+| `results/tables/client_raw_level_normality_diagnostics.csv` | Raw and log1p normality/skew diagnostics for the primary variables. |
+| `results/tables/bootstrap_mean_difference_ci.csv` | EIN cluster-bootstrap confidence intervals for supplemental share differences. |
 | `results/tables/individual_focus_mix_by_group.csv` | Focused Form 990 contribution-channel mix by Black Hills versus benchmarks. |
 | `results/tables/individual_focus_statistical_tests.csv` | Focused Form 990 contribution-channel tests. |
 | `results/tables/individual_focus_bootstrap_ci.csv` | Focused contribution-channel cluster-bootstrap intervals. |
@@ -473,7 +519,7 @@ python python\analysis\revenue_sources_black_hills\revenue_sources_black_hills.p
 This default run:
 
 - Uses the default project data root from `python/utils/paths.py`.
-- Includes tax years 2022, 2023, and 2024.
+- Includes tax year 2022.
 - Excludes hospitals, universities, and political organizations from the
   primary frame.
 - Runs sensitivity analyses.
@@ -513,7 +559,7 @@ Use a custom user-facing results directory:
 python python\analysis\revenue_sources_black_hills\revenue_sources_black_hills.py --results-dir C:\path\to\results
 ```
 
-Run only selected years:
+Run a custom set of years:
 
 ```powershell
 python python\analysis\revenue_sources_black_hills\revenue_sources_black_hills.py --years 2022 2023
@@ -534,17 +580,18 @@ python python\analysis\revenue_sources_black_hills\revenue_sources_black_hills.p
 
 ## Interpretation Guidance
 
-Use the five-region Welch ANOVA table to answer whether revenue-source mix
-differs anywhere across the region set. Use the Black Hills versus pooled
-benchmark follow-up table to answer what is specifically different about Black
-Hills compared with the benchmark regions together.
+Use the five-region raw-dollar Kruskal-Wallis table to answer whether reported
+revenue-source dollar distributions differ anywhere across the region set. Use
+the Black Hills versus pooled benchmark raw-dollar Mann-Whitney/permutation
+table to answer what is specifically different about Black Hills compared with
+the benchmark regions together.
 
 Read the stacked bars as aggregate-dollar mix charts, not as substitutes for
 organization-level statistical tests. A few very large organizations can
 strongly influence aggregate dollars, which is why the report includes both
 stacked bars and concentration diagnostics.
 
-Read `mixed_other_contributions` cautiously. It is not "foundation grants" and
+Read `mixed_unclassified_contributions` cautiously. It is not "foundation grants" and
 it is not "individual giving." It is the best available label for the basic
 990-family bucket that combines multiple donor types.
 
@@ -564,17 +611,21 @@ analysis is the most direct view:
 
 ## Current High-Level Findings
 
-In the current regenerated run:
-
-- All six primary revenue-source share variables differ significantly across
-  the five regions after FDR adjustment.
-- In the Black Hills versus pooled-benchmark follow-up, the significant
-  primary share difference after FDR adjustment is
-  `government_grants_received_share`, with Black Hills higher.
-- Program-service revenue share, other institutional contribution share,
-  individual-likely contribution share, mixed-other contribution share, and
-  residual-other revenue share are not significant in the Black Hills versus
-  pooled-benchmark follow-up after FDR adjustment.
+- Five-region raw-dollar Kruskal-Wallis tests are significant for
+  `total_contributions`, `government_grants_received`, `federated_campaigns`,
+  `membership_dues`, `fundraising_events_contributions`, and
+  `mixed_unclassified_contributions`.
+- Five-region raw-dollar Kruskal-Wallis tests are not significant for
+  `total_revenue`, `program_service_revenue`, or
+  `related_org_contributions`.
+- In the Black Hills versus pooled-benchmark raw-dollar follow-up, the clearest
+  direct Black Hills signal is `government_grants_received` under Mann-Whitney U.
+  The government-grants permutation mean-difference check is not significant,
+  so the result is best read as a rank/nonzero-rate difference rather than a
+  stable mean-dollar difference.
+- Supplemental source-share and compositional tests still show that revenue mix
+  differs across the comparison universe, but those tests are no longer the
+  headline Q9 method because the shares are compositional.
 - In the focused Form 990 contribution-channel analysis, Black Hills has a
   higher `institutional_clear_share_of_contrib`, lower
   `line_1f_mixed_share_of_contrib`, and no significant difference in the
@@ -586,9 +637,9 @@ In the current regenerated run:
 - The same EIN can appear in multiple tax years; the script addresses this with
   clustered standard errors, cluster bootstrap intervals, and a one-row-per-EIN
   sensitivity.
-- Many revenue-source shares are zero-inflated and non-normal; the script uses
-  Welch ANOVA, rank tests, permutation tests, logistic presence models, and
-  assumption diagnostics to triangulate.
+- Many raw-dollar variables are zero-inflated and non-normal; the script uses
+  Kruskal-Wallis, Mann-Whitney U, permutation tests, logistic presence models,
+  and assumption diagnostics to triangulate.
 - The IRS basic 990-family data cannot cleanly split Form 990 Line 1f into
   individuals, foundations, DAFs, corporations, and bequests.
 - Form 990-EZ and 990-PF do not expose the same detailed contribution

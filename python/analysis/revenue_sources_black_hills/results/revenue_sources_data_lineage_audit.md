@@ -4,6 +4,8 @@
 
 This audit traces the raw GivingTuesday 990-family fields into the harmonized variables used by the Black Hills revenue-source analysis. It was run after inspecting the raw benchmark parquet and the regenerated analysis-variable parquet.
 
+**Current status as of May 17, 2026:** reviewed against the refreshed revenue-source run. The raw-field mapping, exclusion logic, and revenue-source construction below remain current for the client-facing rank-test notebook and regenerated results folder.
+
 ## Raw Input Files
 
 | Role | File |
@@ -59,15 +61,17 @@ After regeneration, `analysis_total_contributions_amount` is populated for 3,560
 
 ## Revenue-Source Construction
 
-The downstream revenue-source analysis builds six mutually exclusive plotting segments:
+The downstream revenue-source analysis builds detailed mutually exclusive plotting segments:
 
 | Segment | Construction |
 | --- | --- |
 | `program_service_revenue` | 990/EZ program service revenue; PF missing treated as 0 only for share composition. |
 | `government_grants_received` | Form 990 `GOVERNGRANTS`; 0 for EZ/PF because those forms do not expose the same subcomponent. |
-| `other_institutional_contributions` | Form 990 `FEDERACAMPAI + RELATEORGANI`; 0 for EZ/PF. |
-| `individual_likely_contributions` | Form 990 `MEMBERDUESUE + FUNDRAEVENTS`; 0 for EZ/PF. |
-| `mixed_other_contributions` | Form 990 `ALLOOTHECONT`; full total contributions for 990-EZ and 990-PF because those forms do not expose the same Line 1 subcomponents. |
-| `residual_other_revenue` | Total revenue minus the five named components; negative residuals are flagged diagnostically and clipped only for composition plots. |
+| `federated_campaigns` | Form 990 `FEDERACAMPAI`; 0 for EZ/PF because those forms do not expose the same subcomponent. |
+| `related_org_contributions` | Form 990 `RELATEORGANI`; 0 for EZ/PF because those forms do not expose the same subcomponent. |
+| `membership_dues` | Form 990 `MEMBERDUESUE`; 0 for EZ/PF because those forms do not expose the same subcomponent. |
+| `fundraising_events_contributions` | Form 990 `FUNDRAEVENTS`; 0 for EZ/PF because those forms do not expose the same subcomponent. |
+| `mixed_unclassified_contributions` | Form 990 `ALLOOTHECONT`; full total contributions for 990-EZ and 990-PF because those forms do not expose the same Line 1 subcomponents. |
+| `residual_other_revenue` | Total revenue minus the detailed named components; negative residuals are flagged diagnostically and clipped only for composition plots. |
 
 This construction makes sense for the available raw data. The main limitation remains substantive rather than computational: Form 990 Line 1f and the entire 990-EZ/PF contribution totals cannot distinguish individual gifts from foundation, donor-advised fund, corporate, or other institutional gifts.

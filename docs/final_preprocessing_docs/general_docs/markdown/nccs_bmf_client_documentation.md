@@ -2,7 +2,9 @@
 
 ## Background
 
-The NCCS BMF dataset is used as a nonprofit registry and classification layer for annual organization counts, geography, subsection logic, and NTEE-based field composition. In this project it complements IRS EO BMF and supports downstream classification enrichment.
+The NCCS BMF dataset is a registry-style nonprofit dataset published by the National Center for Charitable Statistics at the Urban Institute. It is based on IRS exempt-organization records and provides organization identity, address/geography fields, exempt status context, NTEE classification, subsection information, and limited amount fields.
+
+In this project, NCCS BMF is used for annual nonprofit counts, organization geography, classification support, and project-region analysis. It also helps enrich classification fields for other datasets when those datasets do not contain a complete NTEE or subsection code. Like IRS EO BMF, this is a registry and classification source, not a full Form 990 financial-detail source.
 
 The detailed technical pipeline documentation is `docs/final_preprocessing_docs/technical_docs/pipeline_docs/nccs_bmf_pipeline.md`.
 
@@ -16,23 +18,41 @@ The detailed technical pipeline documentation is `docs/final_preprocessing_docs/
 
 ## Collection Method
 
-NCCS BMF is a public BMF registry dataset derived from IRS exempt-organization records. It is not a voluntary survey and it does not contain complete Form 990 filing detail.
+NCCS BMF is a public registry dataset derived from IRS exempt-organization records. It is not a voluntary survey and it does not contain complete Form 990 filing detail.
 
 ## Inclusion Criteria And Limitations
 
-The pipeline selects representative yearly BMF files, filters each year to benchmark geography, and builds the analysis-ready layer for `2022-2024`. The 2022 legacy file links to an unavailable profile dictionary, so this package includes a generated header companion and preserves that limitation explicitly.
+The pipeline selects representative yearly BMF files, keeps records located in the project counties and regions, and builds the analysis-ready layer for `2022-2024`.
+
+Important limitations:
+
+- BMF is a registry and classification source, not a complete filing-level financial source.
+- Expense, net assets, surplus, net margin, months of reserves, contribution detail, and grant detail are not available in the current BMF analysis layer.
+- The 2022 legacy file links to an unavailable profile dictionary, so this package includes a generated header companion and documents that limitation.
+- Duplicate handling for analysis is applied in the final analysis layer; the upstream yearly project-region files remain source-faithful filtered outputs.
 
 ## Download And S3 Storage
 
-The selected yearly raw BMF files and release metadata are downloaded locally, uploaded unchanged to Bronze S3 under `bronze/nccs_bmf/`, and verified with local/S3 byte checks. Filtered yearly parquets and exact-year lookup files are stored under `silver/nccs_bmf/`, and analysis documentation is stored under `silver/nccs_bmf/analysis/`.
+The selected yearly raw BMF files and release metadata are downloaded locally, uploaded unchanged to Bronze S3 under `bronze/nccs_bmf/`, and checked against expected file sizes. Filtered yearly Parquet files and exact-year lookup files are stored under `silver/nccs_bmf/`, and analysis documentation is stored under `silver/nccs_bmf/analysis/`.
 
 ## Datatype Transformation
 
-Raw annual CSV files remain unchanged in Bronze S3. The pipeline writes Parquet after benchmark filtering: yearly benchmark Parquet, exact-year lookup Parquet, row-level analysis Parquet, geography metrics Parquet, and field metrics Parquet.
+Raw annual CSV files are preserved unchanged in Bronze S3. After project-region filtering, the pipeline writes Parquet files for yearly project-region outputs, exact-year lookup files, row-level analysis outputs, geography metrics, and field metrics.
 
 ## Data Cleaning
 
-Cleaning includes annual source selection, ZIP normalization, county and benchmark-region assignment, benchmark filtering, exact-year lookup construction, analysis-only duplicate resolution, IRS/NCCS classification fallback enrichment, and imputed/proxy flags for hospital, university, and political-organization exclusions.
+The cleaning process keeps the raw NCCS BMF files unchanged, then creates project-specific analysis files:
+
+- Selects the yearly source files used for the `2022-2024` analysis window.
+- Standardizes EINs, ZIP codes, county FIPS codes, region labels, and year fields.
+- Uses project geography reference files to keep only records located in the project counties and regions.
+- Writes one filtered yearly Parquet file for each selected year.
+- Creates exact-year lookup files so classification enrichment can use the right BMF year when possible.
+- Combines only the retained project-region files for the final analysis layer.
+- When duplicate organization-year records remain in the final analysis layer, keeps one record using documented tie-break rules.
+- Builds analyst-facing NTEE and subsection fields from NCCS BMF first, then uses fallback registry information where needed.
+- Creates helper flags for hospitals, universities, and political organizations based on classification and conservative name matching.
+- Leaves unsupported Form 990 financial fields blank because BMF does not contain the needed source information.
 
 ## Analysis-Ready Outputs
 

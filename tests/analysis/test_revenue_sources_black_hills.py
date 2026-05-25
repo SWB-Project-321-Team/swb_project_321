@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import importlib.util
+import math
 import sys
 from pathlib import Path
 
@@ -153,22 +154,41 @@ def test_prepare_routes_990ez_and_990pf_contributions_to_mixed_bucket() -> None:
     prepared = revenue_analysis.prepare_givingtuesday_analysis(_synthetic_gt_frame())
 
     pf = prepared.loc[prepared["form_type"].eq("990PF")].iloc[0]
+    # Form 990-PF does not have a comparable program-service revenue concept,
+    # nor any of the Form 990 Part VIII Line 1 sub-components. Those analysis
+    # fields must stay NaN so tests and medians do not confuse "unavailable"
+    # with "reported zero".
     assert pd.isna(pf["program_service_revenue"])
+    assert pd.isna(pf["government_grants_received"])
+    assert pd.isna(pf["federated_campaigns"])
+    assert pd.isna(pf["related_org_contributions"])
+    assert pd.isna(pf["membership_dues"])
+    assert pd.isna(pf["fundraising_events_contributions"])
+    assert pd.isna(pf["other_institutional_contributions"])
+    assert pd.isna(pf["individual_likely_contributions"])
+    # The full Part I Line 1 total is the only contribution amount that is
+    # actually reported, so it is routed into the undecomposable mixed bucket.
     assert pf["total_contributions"] == 50.0
-    # 990-PF cannot be decomposed; the entire Part I Line 1 total goes into
-    # the unidentifiable mixed bucket.
-    assert pf["government_grants_received"] == 0.0
-    assert pf["other_institutional_contributions"] == 0.0
-    assert pf["individual_likely_contributions"] == 0.0
+    assert pf["mixed_unclassified_contributions"] == 50.0
     assert pf["mixed_other_contributions"] == 50.0
     assert pf["comparison_group"] == "Benchmark"
 
     ez = prepared.loc[prepared["form_type"].eq("990EZ")].iloc[0]
+    # Form 990-EZ does not expose the detailed Line 1 sub-components either, so
+    # those analysis fields are kept NaN even though program service revenue
+    # itself remains reported on Form 990-EZ.
+    assert pd.isna(ez["government_grants_received"])
+    assert pd.isna(ez["federated_campaigns"])
+    assert pd.isna(ez["related_org_contributions"])
+    assert pd.isna(ez["membership_dues"])
+    assert pd.isna(ez["fundraising_events_contributions"])
+    assert pd.isna(ez["other_institutional_contributions"])
+    assert pd.isna(ez["individual_likely_contributions"])
+    # Program service revenue is reported on 990-EZ Line 2, and the entire
+    # Part I Line 1 contributions total is routed into the mixed bucket.
+    assert ez["program_service_revenue"] == 40.0
     assert ez["total_contributions"] == 35.0
-    assert ez["government_grants_received"] == 0.0
-    assert ez["other_institutional_contributions"] == 0.0
-    assert ez["individual_likely_contributions"] == 0.0
-    # 990-EZ also cannot be decomposed; entire Line 1 total goes into mixed.
+    assert ez["mixed_unclassified_contributions"] == 35.0
     assert ez["mixed_other_contributions"] == 35.0
 
 
@@ -201,13 +221,18 @@ def test_aggregate_mix_keeps_reported_and_normalized_shares() -> None:
     assert {"share", "normalized_mix_share", "reported_component_share_sum"}.issubset(mix.columns)
     normalized_sums = mix.groupby("comparison_group")["normalized_mix_share"].sum()
     assert np.allclose(normalized_sums.dropna(), 1.0)
-    # The full set of six donor-channel components should be present in the mix.
+    # The full set of detailed donor-channel components from SOURCE_COMPONENTS
+    # should be present in the mix. This mirrors the Form 990 Part VIII Line 1
+    # decomposition the headline analysis tests against.
+    assert set(mix["component"]) >= set(revenue_analysis.SOURCE_COMPONENTS)
     assert set(mix["component"]) >= {
         "program_service_revenue",
         "government_grants_received",
-        "other_institutional_contributions",
-        "individual_likely_contributions",
-        "mixed_other_contributions",
+        "federated_campaigns",
+        "related_org_contributions",
+        "membership_dues",
+        "fundraising_events_contributions",
+        "mixed_unclassified_contributions",
         "residual_other_revenue",
     }
 
@@ -316,6 +341,10 @@ def test_synthetic_run_writes_expected_outputs_and_prints_progress(tmp_path: Pat
         data_root=data_root,
         output_dir=output_dir,
         results_dir=tmp_path / "results",
+        # Redirect the client-presentation docs into the test's tmp dir so the
+        # synthetic-fixture run never overwrites the real client deliverables
+        # in the repo's docs/ folder.
+        docs_dir=tmp_path / "docs",
         years=[2022, 2023],
         include_sensitivity=False,
         exclude_outliers=False,
@@ -332,12 +361,115 @@ def test_synthetic_run_writes_expected_outputs_and_prints_progress(tmp_path: Pat
     assert (output_dir / "figures" / "stacked_revenue_mix_black_hills_vs_benchmark.png").exists()
     assert (tmp_path / "results" / "revenue_sources_black_hills_results.md").exists()
     assert (output_dir / "revenue_sources_methods_results_summary.md").exists()
+    # The client presentation and its image assets must land in the test's tmp
+    # docs path, not the repo's real docs/ directory. This guards against the
+    # synthetic fixture overwriting the client-facing deliverables.
+    assert (tmp_path / "docs" / "Section3_Q9_2022_Client_Presentation.md").exists()
+    assert (tmp_path / "docs" / "assets" / "section3_q9_2022").is_dir()
 
 
 def test_default_results_dir_is_next_to_analysis_code() -> None:
     default_path = revenue_analysis.default_results_dir_for_output(Path("ignored"))
 
     assert default_path == _REPO_ROOT / "python" / "analysis" / "revenue_sources_black_hills" / "results"
+
+
+def test_special_org_sensitivity_slide_summarizes_significance_change() -> None:
+    comparison = pd.DataFrame(
+        [
+            {
+                "variable": "total_revenue",
+                "variable_label": "Total revenue",
+                "benchmark_region": "Sioux Falls",
+                "direction_excluded": "Black Hills lower among reporters",
+                "direction_included": "Black Hills lower among reporters",
+                "p_value_excluded": 0.0559,
+                "p_value_included": 0.0244,
+                "black_hills_positive_median_excluded": 176_760.0,
+                "benchmark_positive_median_excluded": 208_149.0,
+                "black_hills_positive_median_included": 176_966.0,
+                "benchmark_positive_median_included": 217_451.0,
+                "significance_excluded": "not significant",
+                "significance_included": "significant",
+                "direction_changed": False,
+                "significance_changed": True,
+                "any_change": True,
+            }
+        ]
+    )
+    exclusion_summary = pd.DataFrame(
+        [
+            {
+                "region_label": "Sioux Falls",
+                "full_universe_rows": 581,
+                "special_org_rows": 16,
+                "hospital_rows": 9,
+                "university_rows": 7,
+                "political_org_rows": 0,
+            }
+        ]
+    )
+    lines = revenue_analysis.build_2022_special_org_sensitivity_slide_lines(
+        comparison,
+        exclusion_summary,
+        slide_number=13,
+        first_source_slide=3,
+        last_source_slide=12,
+        special_org_ein_count=25,
+    )
+    text = "\n".join(lines)
+    assert "## Slide 13: Sensitivity" in text
+    assert "**Direction changes:** 0" in text
+    assert "**Significance-status changes:** 1" in text
+    assert "Total revenue vs Sioux Falls" in text
+
+
+def test_permutation_median_difference_matches_observed_and_runs_seeded() -> None:
+    rng = np.random.default_rng(0)
+    higher = rng.normal(loc=200_000, scale=20_000, size=60)
+    lower = rng.normal(loc=120_000, scale=20_000, size=60)
+
+    result = revenue_analysis.permutation_median_difference(
+        higher, lower, iterations=500, seed=42
+    )
+
+    assert result["iterations"] == 500
+    assert result["n_a"] == 60 and result["n_b"] == 60
+    assert result["median_difference"] == float(np.median(higher) - np.median(lower))
+    assert 0.0 < result["p_value"] <= 1.0
+    assert result["p_value"] < 0.05
+
+
+def test_permutation_median_difference_returns_nan_for_tiny_samples() -> None:
+    result = revenue_analysis.permutation_median_difference(
+        np.array([100.0]), np.array([200.0, 300.0]), iterations=10
+    )
+
+    assert math.isnan(result["median_difference"])
+    assert math.isnan(result["p_value"])
+
+
+def test_bootstrap_median_difference_ci_contains_point_estimate() -> None:
+    rng = np.random.default_rng(1)
+    higher = rng.normal(loc=50_000, scale=5_000, size=80)
+    lower = rng.normal(loc=30_000, scale=5_000, size=80)
+
+    result = revenue_analysis.bootstrap_median_difference_ci(
+        higher, lower, iterations=400, seed=2024
+    )
+
+    point = result["median_difference"]
+    assert result["ci_low"] <= point <= result["ci_high"]
+    assert result["ci_low"] > 0  # strictly positive separation should yield positive CI
+
+
+def test_format_median_gap_with_ci_handles_sign_and_missing() -> None:
+    assert (
+        revenue_analysis._format_median_gap_with_ci(-35_242, -55_000, -5_000)
+        == "-$35,242 (95% CI -$55,000 to -$5,000)"
+    )
+    assert revenue_analysis._format_median_gap_with_ci(12_345, None, None) == "+$12,345"
+    assert revenue_analysis._format_median_gap_with_ci(None, None, None) == "NA"
 
 
 def test_cli_excludes_org_type_outliers_by_default() -> None:

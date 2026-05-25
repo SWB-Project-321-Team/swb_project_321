@@ -2,27 +2,32 @@
 Assumption diagnostics for the Black Hills revenue-source analysis.
 
 The companion script ``revenue_sources_black_hills.py`` runs the substantive
-tests for Section 3 Q9: ANOVA, Welch ANOVA, permutation tests, OLS with
+tests for Section 3 Q9: Kruskal-Wallis five-region raw-dollar tests,
+Mann-Whitney U Black Hills-vs-benchmark raw-dollar tests, permutation
+mean-difference checks, supplemental share/compositional tests, OLS with
 EIN-clustered standard errors, EIN-clustered logistic presence models,
-EIN-cluster bootstrap confidence intervals, PERMANOVA on CLR-transformed
-shares, MANOVA on ALR-transformed shares, and a one-row-per-EIN independence
-sensitivity. Each of those tests has assumptions. This script empirically
-checks the assumptions on the cleaned analysis frame so the user can see
-where the violations are, how severe they are, and whether the headline
-finding survives them.
+EIN-cluster bootstrap confidence intervals, PERMANOVA-style tests on
+CLR-transformed shares, MANOVA on ALR-transformed shares, log-dollar checks,
+and a one-row-per-EIN independence sensitivity. Each
+of those tests has assumptions. This script empirically checks the assumptions
+on the cleaned analysis frame so the user can see where the caveats are, how
+severe they are, and whether the headline finding survives them.
 
 The script writes:
 
 - ``results/assumptions_check_report.md``  - human-readable findings
 - ``results/tables/assumptions_check_details.csv`` - machine-readable table
+- ``results/sample_size_diagnostics_report.md`` - 2022 presentation sample-size findings
+- ``results/tables/client_2022_sample_size_diagnostics.csv`` - pairwise 2022 diagnostics
 
 Each row in the CSV has columns ``test``, ``assumption``, ``variable``,
 ``group``, ``statistic``, ``p_value``, ``status``, and ``notes``. ``status``
 is one of ``OK``, ``CAVEAT``, or ``VIOLATED``. CAVEAT means the assumption is
-formally violated but the analysis script already mitigates it (e.g. with
-cluster-robust SEs, Welch correction, distribution-free permutation, or
-sensitivity runs); VIOLATED means there is no mitigation in place and the
-result should be interpreted with care.
+formally violated or creates an interpretation caveat but the analysis script
+already mitigates it (e.g. with cluster-robust SEs, rank tests,
+distribution-free permutation, composition-aware tests, or sensitivity runs);
+VIOLATED means there is no mitigation in place and the result should be
+interpreted with care.
 
 Run from the repository root:
 
@@ -35,6 +40,7 @@ missing, the script will tell you to run the main analysis first.
 from __future__ import annotations
 
 import argparse
+import math
 import sys
 from dataclasses import dataclass
 from pathlib import Path
@@ -52,6 +58,11 @@ if str(_PYTHON_DIR) not in sys.path:
 from utils.paths import DATA as DEFAULT_DATA_ROOT  # noqa: E402
 
 from analysis.revenue_sources_black_hills.revenue_sources_black_hills import (  # noqa: E402
+    CLIENT_PRESENTATION_VARIABLES,
+    CLIENT_RAW_LEVEL_VARIABLES,
+    CLIENT_RAW_DISPLAY_LABELS,
+    PERMUTATION_ITERATIONS_2022,
+    REGION_ORDER,
     SHARE_COMPONENTS,
     SOURCE_COMPONENTS,
     composition_matrix,
@@ -84,6 +95,9 @@ class AssumptionsPaths:
     cleaned_parquet: Path
     report_md: Path
     details_csv: Path
+    sample_size_report_md: Path
+    sample_size_csv: Path
+    pairwise_2022_summary_csv: Path
 
 
 def resolve_paths(
@@ -101,10 +115,16 @@ def resolve_paths(
     cleaned_parquet = output_dir / "cleaned_revenue_sources_analysis.parquet"
     report_md = results_dir / "assumptions_check_report.md"
     details_csv = results_dir / "tables" / "assumptions_check_details.csv"
+    sample_size_report_md = results_dir / "sample_size_diagnostics_report.md"
+    sample_size_csv = results_dir / "tables" / "client_2022_sample_size_diagnostics.csv"
+    pairwise_2022_summary_csv = results_dir / "tables" / "client_2022_pairwise_presentation_summary.csv"
     return AssumptionsPaths(
         cleaned_parquet=cleaned_parquet,
         report_md=report_md,
         details_csv=details_csv,
+        sample_size_report_md=sample_size_report_md,
+        sample_size_csv=sample_size_csv,
+        pairwise_2022_summary_csv=pairwise_2022_summary_csv,
     )
 
 
@@ -170,15 +190,15 @@ def check_independence(frame: pd.DataFrame) -> list[dict[str, object]]:
             # Independence is formally violated because EINs file in multiple years,
             # but the analysis design covers every test that uses pooled org-years
             # (cluster-robust SEs for OLS/logistic, cluster bootstrap for CIs,
-            # one-row-per-EIN sensitivity for Welch ANOVA / PERMANOVA). Treat as
-            # CAVEAT, not blocker.
+            # one-row-per-EIN sensitivity for rank tests / PERMANOVA / secondary
+            # Welch tests). Treat as CAVEAT, not blocker.
             status="CAVEAT" if obs_per_ein > 1.05 else "OK",
             notes=(
                 f"{n_rows:,} org-years from {n_eins:,} EINs ({obs_per_ein:.2f} filings/EIN). "
                 "Mitigated by EIN-clustered OLS, EIN-clustered logistic, EIN-cluster "
                 "bootstrap CIs, and a one-row-per-EIN sensitivity in the main script. "
-                "The Welch ANOVA itself does not have a cluster-robust variant; the "
-                "one-row-per-EIN sensitivity covers it."
+                "The rank and permutation tests are row-level tests, so the "
+                "one-row-per-EIN sensitivity is the cluster-aware check for those results."
             ),
         )
     )
@@ -225,21 +245,481 @@ def check_independence(frame: pd.DataFrame) -> list[dict[str, object]]:
             status = "OK"
         rows.append(
             make_row(
-                test="welch_anova_share",
+                test="rank_share_tests",
                 assumption="independence_of_observations",
                 variable=variable,
                 statistic=icc1,
                 status=status,
                 notes=(
-                    "ICC1 from one-way ANOVA decomposition by EIN. ICC near zero means org-years "
+                    "ICC1 from one-way random-effects variance decomposition by EIN. ICC near zero means org-years "
                     "behave independently for this share; larger ICC means the same EIN tends to "
-                    "report similar shares across years. Cluster-robust SEs (OLS, logistic) and "
-                    "cluster bootstrap account for this; Welch ANOVA does not, but the "
-                    "one-row-per-EIN sensitivity in the main report does."
+                    "report similar shares across years. The share tests are rank/permutation "
+                    "tests, so the one-row-per-EIN sensitivity and EIN-cluster bootstrap are "
+                    "the relevant cluster-aware checks."
                 ),
             )
         )
     return rows
+
+
+# ---------------------------------------------------------------------------
+# Rank-test sample size requirements
+# ---------------------------------------------------------------------------
+
+
+def check_rank_test_sample_sizes(frame: pd.DataFrame) -> list[dict[str, object]]:
+    """Check that the rank tests have enough observations in each group.
+
+    Kruskal-Wallis and Mann-Whitney U do not require normally distributed
+    outcomes, but they do require meaningful group sizes. This check makes the
+    sample-size assumption explicit for both the five-region and direct
+    Black Hills-vs-benchmark raw-dollar tests, with supplemental share tests.
+    """
+
+    info("Checking rank-test sample sizes.")
+    rows: list[dict[str, object]] = []
+    for variable in CLIENT_RAW_LEVEL_VARIABLES + SHARE_COMPONENTS:
+        if variable not in frame.columns:
+            continue
+        is_raw = variable in CLIENT_RAW_LEVEL_VARIABLES
+        test_suffix = "raw_dollars" if is_raw else "share"
+
+        region_counts = frame.dropna(subset=[variable]).groupby("region_label")[variable].size()
+        if not region_counts.empty:
+            min_count = int(region_counts.min())
+            if min_count >= 20:
+                status = "OK"
+            elif min_count >= 5:
+                status = "CAVEAT"
+            else:
+                status = "VIOLATED"
+            rows.append(
+                make_row(
+                    test=f"kruskal_wallis_{test_suffix}",
+                    assumption="sufficient_group_size",
+                    variable=variable,
+                    group="region_label",
+                    statistic=min_count,
+                    status=status,
+                    notes=(
+                        "Smallest five-region group size for this variable. Kruskal-Wallis is "
+                        "distribution-free but needs enough observations in each region for the "
+                        "rank approximation to be reliable."
+                    ),
+                )
+            )
+
+        comparison_counts = frame.dropna(subset=[variable]).groupby("comparison_group")[variable].size()
+        if not comparison_counts.empty:
+            min_count = int(comparison_counts.min())
+            if min_count >= 20:
+                status = "OK"
+            elif min_count >= 5:
+                status = "CAVEAT"
+            else:
+                status = "VIOLATED"
+            rows.append(
+                make_row(
+                    test=f"mann_whitney_{test_suffix}",
+                    assumption="sufficient_group_size",
+                    variable=variable,
+                    group="comparison_group",
+                    statistic=min_count,
+                    status=status,
+                    notes=(
+                        "Smaller Black Hills/benchmark sample size for this variable. Mann-Whitney "
+                        "U is distribution-free but needs enough observations in both groups for "
+                        "the asymptotic p-value to be reliable."
+                    ),
+                )
+            )
+    return rows
+
+
+# ---------------------------------------------------------------------------
+# 2022 presentation sample-size diagnostics
+# ---------------------------------------------------------------------------
+
+
+def _log10_combinations(n: int, k: int) -> float:
+    """Return log10(n choose k) without materializing a huge integer."""
+
+    if n < 0 or k < 0 or k > n:
+        return np.nan
+    return float(
+        (math.lgamma(n + 1) - math.lgamma(k + 1) - math.lgamma(n - k + 1))
+        / math.log(10)
+    )
+
+
+def _load_pairwise_2022_summary(path: Path) -> pd.DataFrame:
+    """Load the generated 2022 pairwise slide summary when it is available."""
+
+    if not path.exists():
+        return pd.DataFrame()
+    summary = pd.read_csv(path)
+    merge_columns = [
+        "variable",
+        "benchmark_region",
+        "median_difference",
+        "median_difference_ci_low",
+        "median_difference_ci_high",
+        "permutation_p_value",
+        "fdr_p_value",
+        "significant_before_fdr",
+        "significant_after_fdr",
+    ]
+    return summary[[column for column in merge_columns if column in summary.columns]].copy()
+
+
+def _sample_size_concern_level(min_positive_n: int, harmonic_positive_n: float, tie_fraction: float) -> str:
+    """Classify whether sample size is likely to limit the positive-only test."""
+
+    if min_positive_n < 2:
+        return "invalid"
+    if min_positive_n < 10 or harmonic_positive_n < 20:
+        return "high"
+    if min_positive_n < 20 or harmonic_positive_n < 40 or tie_fraction >= 0.50:
+        return "moderate"
+    return "low"
+
+
+def build_2022_sample_size_diagnostics(
+    frame: pd.DataFrame,
+    pairwise_summary: pd.DataFrame | None = None,
+) -> pd.DataFrame:
+    """Build pairwise sample-size diagnostics for the 2022 client deck.
+
+    The deck's source slides use positive-only medians and permutation tests.
+    This diagnostic table checks whether each Black Hills-vs-benchmark
+    comparison has enough positive reporters for that conditional test to be
+    informative. Low positive reporter counts are not, by themselves, a
+    permutation-test assumption violation; they are a precision and power
+    limitation.
+    """
+
+    info("Building 2022 positive-reporter sample-size diagnostics.")
+    year_frame = frame.loc[frame["tax_year"].astype(str).eq("2022")].copy()
+    benchmark_regions = [region for region in REGION_ORDER if region != "Black Hills"]
+    rows: list[dict[str, object]] = []
+
+    for variable in CLIENT_PRESENTATION_VARIABLES:
+        if variable not in year_frame.columns:
+            continue
+        label = CLIENT_RAW_DISPLAY_LABELS.get(variable, variable)
+        for benchmark_region in benchmark_regions:
+            bh_values = (
+                year_frame.loc[year_frame["region_label"].eq("Black Hills"), variable]
+                .dropna()
+                .clip(lower=0)
+            )
+            benchmark_values = (
+                year_frame.loc[year_frame["region_label"].eq(benchmark_region), variable]
+                .dropna()
+                .clip(lower=0)
+            )
+            bh_eligible_n = int(len(bh_values))
+            benchmark_eligible_n = int(len(benchmark_values))
+            bh_positive = bh_values.loc[bh_values.gt(0)].to_numpy(dtype=float)
+            benchmark_positive = benchmark_values.loc[benchmark_values.gt(0)].to_numpy(dtype=float)
+            bh_positive_n = int(len(bh_positive))
+            benchmark_positive_n = int(len(benchmark_positive))
+            total_positive_n = bh_positive_n + benchmark_positive_n
+            min_positive_n = min(bh_positive_n, benchmark_positive_n)
+            harmonic_positive_n = (
+                2.0 / ((1.0 / bh_positive_n) + (1.0 / benchmark_positive_n))
+                if bh_positive_n > 0 and benchmark_positive_n > 0
+                else 0.0
+            )
+            combined_positive = np.concatenate([bh_positive, benchmark_positive])
+            if total_positive_n:
+                value_counts = pd.Series(combined_positive).value_counts()
+                tied_observations = int(value_counts.loc[value_counts.gt(1)].sum())
+                tie_fraction = float(tied_observations / total_positive_n)
+                unique_positive_values = int(value_counts.size)
+                pooled_positive_median = float(np.median(combined_positive))
+                pooled_positive_iqr = float(
+                    np.percentile(combined_positive, 75) - np.percentile(combined_positive, 25)
+                )
+            else:
+                tie_fraction = np.nan
+                unique_positive_values = 0
+                pooled_positive_median = np.nan
+                pooled_positive_iqr = np.nan
+
+            bh_nonzero_rate = float(bh_positive_n / bh_eligible_n) if bh_eligible_n else np.nan
+            benchmark_nonzero_rate = (
+                float(benchmark_positive_n / benchmark_eligible_n) if benchmark_eligible_n else np.nan
+            )
+            log10_labelings = _log10_combinations(total_positive_n, bh_positive_n)
+            monte_carlo_se_at_alpha = math.sqrt(0.05 * 0.95 / PERMUTATION_ITERATIONS_2022)
+            concern_level = _sample_size_concern_level(
+                min_positive_n=min_positive_n,
+                harmonic_positive_n=harmonic_positive_n,
+                tie_fraction=0.0 if pd.isna(tie_fraction) else tie_fraction,
+            )
+
+            rows.append(
+                {
+                    "tax_year": "2022",
+                    "variable": variable,
+                    "variable_label": label,
+                    "comparison": f"Black Hills vs {benchmark_region}",
+                    "benchmark_region": benchmark_region,
+                    "black_hills_eligible_n": bh_eligible_n,
+                    "benchmark_eligible_n": benchmark_eligible_n,
+                    "black_hills_positive_n": bh_positive_n,
+                    "benchmark_positive_n": benchmark_positive_n,
+                    "min_positive_n": min_positive_n,
+                    "total_positive_n": total_positive_n,
+                    "harmonic_positive_n": harmonic_positive_n,
+                    "black_hills_nonzero_rate": bh_nonzero_rate,
+                    "benchmark_nonzero_rate": benchmark_nonzero_rate,
+                    "unique_positive_values": unique_positive_values,
+                    "tie_fraction_positive_values": tie_fraction,
+                    "pooled_positive_median": pooled_positive_median,
+                    "pooled_positive_iqr": pooled_positive_iqr,
+                    "log10_possible_label_permutations": log10_labelings,
+                    "monte_carlo_se_near_p_0_05": monte_carlo_se_at_alpha,
+                    "sample_size_concern": concern_level,
+                }
+            )
+
+    diagnostics = pd.DataFrame(rows)
+    if pairwise_summary is not None and not pairwise_summary.empty and not diagnostics.empty:
+        diagnostics = diagnostics.merge(
+            pairwise_summary,
+            on=["variable", "benchmark_region"],
+            how="left",
+        )
+        if {"median_difference_ci_low", "median_difference_ci_high"}.issubset(diagnostics.columns):
+            diagnostics["median_difference_ci_width"] = (
+                diagnostics["median_difference_ci_high"] - diagnostics["median_difference_ci_low"]
+            )
+            diagnostics["median_difference_ci_includes_zero"] = (
+                diagnostics["median_difference_ci_low"].le(0)
+                & diagnostics["median_difference_ci_high"].ge(0)
+            )
+            diagnostics["ci_width_to_pooled_iqr"] = diagnostics["median_difference_ci_width"] / diagnostics[
+                "pooled_positive_iqr"
+            ].replace(0, np.nan)
+        if "median_difference" in diagnostics.columns:
+            diagnostics["absolute_median_difference_to_iqr"] = diagnostics["median_difference"].abs() / diagnostics[
+                "pooled_positive_iqr"
+            ].replace(0, np.nan)
+
+    return diagnostics
+
+
+def check_2022_presentation_sample_sizes(sample_df: pd.DataFrame) -> list[dict[str, object]]:
+    """Convert 2022 sample-size diagnostics into assumption-status rows."""
+
+    rows: list[dict[str, object]] = []
+    if sample_df.empty:
+        return rows
+
+    info("Checking 2022 presentation sample-size assumptions.")
+    for row in sample_df.to_dict("records"):
+        variable = str(row["variable"])
+        comparison = str(row["comparison"])
+        min_positive_n = int(row["min_positive_n"])
+        concern = str(row["sample_size_concern"])
+        if concern == "invalid":
+            status = "VIOLATED"
+        elif concern in {"high", "moderate"}:
+            status = "CAVEAT"
+        else:
+            status = "OK"
+
+        rows.append(
+            make_row(
+                test="2022_positive_median_permutation",
+                assumption="minimum_positive_reporters_per_group",
+                variable=variable,
+                group=comparison,
+                statistic=min_positive_n,
+                status=status,
+                notes=(
+                    f"Positive reporter counts: Black Hills={int(row['black_hills_positive_n'])}, "
+                    f"{row['benchmark_region']}={int(row['benchmark_positive_n'])}. "
+                    f"Concern level={concern}. Permutation tests remain valid with small samples "
+                    "when observations are exchangeable, but low positive n limits power and makes "
+                    "the median estimate less precise. Fewer than 2 positive reporters in either "
+                    "group would make the positive-only median test unusable."
+                ),
+            )
+        )
+
+        asymptotic_status = "OK"
+        if min_positive_n < 2:
+            asymptotic_status = "VIOLATED"
+        elif min_positive_n < 20 or float(row["tie_fraction_positive_values"]) >= 0.50:
+            asymptotic_status = "CAVEAT"
+        rows.append(
+            make_row(
+                test="mann_whitney_positive_only_crosscheck",
+                assumption="asymptotic_rank_approximation",
+                variable=variable,
+                group=comparison,
+                statistic=float(row["tie_fraction_positive_values"]),
+                status=asymptotic_status,
+                notes=(
+                    f"Tied positive observations={float(row['tie_fraction_positive_values']):.1%}; "
+                    f"harmonic positive n={float(row['harmonic_positive_n']):.1f}. "
+                    "Mann-Whitney U is reported as a cross-check. The slide headline uses a "
+                    "permutation test on the median difference, so this asymptotic-rank caveat "
+                    "does not invalidate the presentation p-values."
+                ),
+            )
+        )
+
+    return rows
+
+
+def _format_percent(value: float | None) -> str:
+    if value is None or pd.isna(value):
+        return "NA"
+    return f"{float(value) * 100:.1f}%"
+
+
+def write_sample_size_report(report_md: Path, sample_df: pd.DataFrame) -> None:
+    """Write a concise report focused on the 2022 sample-size question."""
+
+    lines: list[str] = []
+    lines.append("# Q9 2022 Sample-Size Diagnostics")
+    lines.append("")
+    lines.append(
+        "This report checks whether the 2022 client-presentation tests have a sample-size problem. "
+        "The source slides use positive-only medians and a two-sided permutation test on the median "
+        "difference, so the key sample size is the number of organizations in each region that report "
+        "a positive dollar amount for that source."
+    )
+    lines.append("")
+
+    if sample_df.empty:
+        lines.append("_No diagnostics produced._")
+        report_md.parent.mkdir(parents=True, exist_ok=True)
+        report_md.write_text("\n".join(lines) + "\n", encoding="utf-8")
+        return
+
+    concern_counts = sample_df["sample_size_concern"].value_counts().to_dict()
+    lines.append("## Bottom Line")
+    lines.append("")
+    invalid = int(concern_counts.get("invalid", 0))
+    high = int(concern_counts.get("high", 0))
+    moderate = int(concern_counts.get("moderate", 0))
+    low = int(concern_counts.get("low", 0))
+    if invalid:
+        lines.append(
+            f"- {invalid} comparisons have fewer than 2 positive reporters in at least one group; "
+            "those positive-only median tests are not usable."
+        )
+    else:
+        lines.append(
+            "- No positive-only median comparison is invalidated by sample size: every comparison "
+            "has at least 2 positive reporters in both Black Hills and the benchmark region."
+        )
+    lines.append(f"- Sample-size concern counts: low={low}, moderate={moderate}, high={high}, invalid={invalid}.")
+    lines.append(
+        "- Small positive-reporter counts are not a formal permutation-test assumption violation. "
+        "They mainly reduce power and widen uncertainty, especially for rare contribution channels."
+    )
+    lines.append(
+        f"- With {PERMUTATION_ITERATIONS_2022:,} random reshuffles, the Monte Carlo standard error near "
+        "p=0.05 is about "
+        f"{math.sqrt(0.05 * 0.95 / PERMUTATION_ITERATIONS_2022):.3f}; borderline p-values can move slightly "
+        "with a different random seed, but the main issue for rare sources is the low number of positive reporters."
+    )
+    lines.append("")
+
+    limited = sample_df.loc[sample_df["sample_size_concern"].isin(["high", "moderate", "invalid"])].copy()
+    if not limited.empty:
+        concern_order = {"invalid": 0, "high": 1, "moderate": 2, "low": 3}
+        limited["_concern_order"] = limited["sample_size_concern"].map(concern_order).fillna(9)
+        limited = limited.sort_values(["_concern_order", "variable", "benchmark_region"])
+        lines.append("## Comparisons Most Limited By Sample Size")
+        lines.append("")
+        lines.append(
+            "| Source | Comparison | BH positive n | Benchmark positive n | BH reporting rate | Benchmark reporting rate | Concern |"
+        )
+        lines.append("| --- | --- | ---: | ---: | ---: | ---: | --- |")
+        for row in limited.to_dict("records"):
+            lines.append(
+                "| "
+                f"{row['variable_label']} | {row['comparison']} | "
+                f"{int(row['black_hills_positive_n'])} | {int(row['benchmark_positive_n'])} | "
+                f"{_format_percent(row['black_hills_nonzero_rate'])} | "
+                f"{_format_percent(row['benchmark_nonzero_rate'])} | "
+                f"{row['sample_size_concern']} |"
+            )
+        lines.append("")
+
+    source_summary = (
+        sample_df.groupby(["variable", "variable_label"], dropna=False)
+        .agg(
+            min_positive_n=("min_positive_n", "min"),
+            median_min_positive_n=("min_positive_n", "median"),
+            max_tie_fraction=("tie_fraction_positive_values", "max"),
+            worst_concern=(
+                "sample_size_concern",
+                lambda values: "invalid"
+                if (values == "invalid").any()
+                else "high"
+                if (values == "high").any()
+                else "moderate"
+                if (values == "moderate").any()
+                else "low",
+            ),
+        )
+        .reset_index()
+    )
+    lines.append("## Source-Level Summary")
+    lines.append("")
+    lines.append("| Source | Smallest positive n in any pair | Median of pairwise minimum n | Max tie rate | Worst concern |")
+    lines.append("| --- | ---: | ---: | ---: | --- |")
+    concern_order = {"invalid": 0, "high": 1, "moderate": 2, "low": 3}
+    source_summary["_concern_order"] = source_summary["worst_concern"].map(concern_order).fillna(9)
+    for row in source_summary.sort_values(["_concern_order", "min_positive_n"]).to_dict("records"):
+        lines.append(
+            "| "
+            f"{row['variable_label']} | {int(row['min_positive_n'])} | "
+            f"{float(row['median_min_positive_n']):.1f} | "
+            f"{_format_percent(row['max_tie_fraction'])} | {row['worst_concern']} |"
+        )
+    lines.append("")
+
+    if "permutation_p_value" in sample_df.columns:
+        borderline = sample_df.loc[
+            sample_df["permutation_p_value"].between(0.04, 0.06, inclusive="both")
+        ].copy()
+        lines.append("## Borderline P-Values")
+        lines.append("")
+        if borderline.empty:
+            lines.append("_No 2022 positive-only median p-values are between 0.04 and 0.06._")
+        else:
+            lines.append("| Source | Comparison | p-value | Concern |")
+            lines.append("| --- | --- | ---: | --- |")
+            for row in borderline.sort_values("permutation_p_value").to_dict("records"):
+                lines.append(
+                    f"| {row['variable_label']} | {row['comparison']} | "
+                    f"{float(row['permutation_p_value']):.4f} | {row['sample_size_concern']} |"
+                )
+        lines.append("")
+
+    lines.append("## Interpretation")
+    lines.append("")
+    lines.append(
+        "The rare contribution subcategories are the places where sample size most affects interpretation. "
+        "Federated campaign contributions and related organization contributions have the smallest positive "
+        "reporter counts; membership dues and fundraising event contributions have more information, but some "
+        "benchmark pairs are still modest. For total revenue, total contributions, program service revenue, "
+        "mixed / unclassified contributions, and other revenue, non-significant results are less likely to be "
+        "explained mainly by sample size because positive reporter counts are much larger."
+    )
+
+    report_md.parent.mkdir(parents=True, exist_ok=True)
+    report_md.write_text("\n".join(lines) + "\n", encoding="utf-8")
+    info(f"Saved sample-size diagnostics report: {report_md}")
 
 
 # ---------------------------------------------------------------------------
@@ -248,16 +728,16 @@ def check_independence(frame: pd.DataFrame) -> list[dict[str, object]]:
 
 
 def check_normality(frame: pd.DataFrame) -> list[dict[str, object]]:
-    """Test within-group normality of the share variables.
+    """Describe within-group distribution shape of the share variables.
 
-    For organization-level share variables the formal test (D'Agostino-Pearson)
-    will reject normality almost everywhere because the variables are bounded
-    in [0,1] with mass at zero. We therefore also report skew and excess
-    kurtosis, and we treat the violation as a CAVEAT rather than an error
-    because Welch ANOVA with n in the thousands is robust to non-normality.
+    Normality is no longer an assumption of the headline share tests because
+    those tests are Kruskal-Wallis, Mann-Whitney U, and permutation checks.
+    We still report D'Agostino-Pearson, skew, and excess kurtosis because
+    extreme shape or zero-heavy distributions affect how rank-test results
+    should be interpreted.
     """
 
-    info("Checking normality within comparison groups.")
+    info("Describing distribution shape within comparison groups.")
     rows: list[dict[str, object]] = []
     for variable in SHARE_COMPONENTS:
         if variable not in frame.columns:
@@ -281,8 +761,8 @@ def check_normality(frame: pd.DataFrame) -> list[dict[str, object]]:
                 status = "OK"
             rows.append(
                 make_row(
-                    test="welch_anova_share",
-                    assumption="approximate_normality_within_group",
+                    test="rank_share_tests",
+                    assumption="distribution_shape_diagnostic",
                     variable=variable,
                     group=str(group),
                     statistic=stat,
@@ -290,10 +770,56 @@ def check_normality(frame: pd.DataFrame) -> list[dict[str, object]]:
                     status=status,
                     notes=(
                         f"D'Agostino-Pearson omnibus test; skew={skew:.2f}, excess_kurtosis={kurt:.2f}. "
-                        "Welch ANOVA with thousands of observations per group is robust to non-normality, "
-                        "and the analysis triangulates with rank tests and permutation tests; treat as "
-                        "CAVEAT, not blocker."
+                        "Normality is not required for Kruskal-Wallis, Mann-Whitney U, or permutation "
+                        "tests. CAVEAT means the share distribution is strongly skewed or heavy-tailed, "
+                        "so interpret rank-test findings as distributional differences rather than "
+                        "simple mean-only differences."
                     ),
+                )
+            )
+    return rows
+
+
+def check_raw_dollar_normality(frame: pd.DataFrame) -> list[dict[str, object]]:
+    """Check raw and log1p dollar normality for the primary Q9 variables."""
+
+    info("Checking raw-dollar and log1p-dollar normality by region.")
+    rows: list[dict[str, object]] = []
+    for variable in CLIENT_RAW_LEVEL_VARIABLES:
+        if variable not in frame.columns:
+            continue
+        for region, group_frame in frame.groupby("region_label"):
+            values = group_frame[variable].dropna().clip(lower=0).to_numpy(dtype=float)
+            if len(values) < 20:
+                continue
+            log_values = np.log1p(values)
+            try:
+                raw_stat, raw_p = stats.normaltest(values)
+                log_stat, log_p = stats.normaltest(log_values)
+            except Exception:
+                continue
+            mean = float(np.mean(values))
+            median = float(np.median(values))
+            mean_median_ratio = mean / median if median > 0 else (np.inf if mean > 0 else 1.0)
+            skew = float(stats.skew(values, bias=False))
+            notes = (
+                f"Raw dollars: mean=${mean:,.0f}, median=${median:,.0f}, "
+                f"mean/median={'inf' if np.isinf(mean_median_ratio) else f'{mean_median_ratio:.2f}'}, "
+                f"zero_rate={np.mean(values == 0):.1%}, skew={skew:.2f}; "
+                f"log1p normality p={log_p:.4g}. Normality is rejected for raw dollars "
+                "and usually remains rejected after log1p, supporting non-parametric rank tests."
+            )
+            status = "CAVEAT" if raw_p < 0.05 or log_p < 0.05 else "OK"
+            rows.append(
+                make_row(
+                    test="kruskal_wallis_raw_dollars",
+                    assumption="raw_and_log1p_normality_diagnostic",
+                    variable=variable,
+                    group=str(region),
+                    statistic=raw_stat,
+                    p_value=raw_p,
+                    status=status,
+                    notes=notes,
                 )
             )
     return rows
@@ -305,15 +831,15 @@ def check_normality(frame: pd.DataFrame) -> list[dict[str, object]]:
 
 
 def check_variance_homogeneity(frame: pd.DataFrame) -> list[dict[str, object]]:
-    """Test homogeneity of variance across regions for share variables.
+    """Check whether rank-test group distributions have similar spreads.
 
-    Classical ANOVA assumes equal variances; Welch ANOVA does not. We test
-    Levene (median-based, Brown-Forsythe variant) so we know whether the
-    classical row in ``statistical_tests_univariate.csv`` should be deprecated
-    in favor of the Welch row.
+    Kruskal-Wallis does not require equal variances in the same way classical
+    ANOVA does. However, if regions have very different spreads or shapes, a
+    significant Kruskal-Wallis result should be interpreted as a difference in
+    distributions, not strictly as a difference in central tendency.
     """
 
-    info("Checking homogeneity of variance across regions.")
+    info("Checking distribution spread similarity across regions.")
     rows: list[dict[str, object]] = []
     for variable in SHARE_COMPONENTS:
         if variable not in frame.columns:
@@ -332,18 +858,17 @@ def check_variance_homogeneity(frame: pd.DataFrame) -> list[dict[str, object]]:
         if p_value < 0.05:
             status = "CAVEAT"
             note = (
-                "Variance is unequal across regions, so classical ANOVA's homoscedasticity "
-                "assumption is violated. The headline test in this analysis is Welch ANOVA, "
-                "which does not assume equal variances; treat the classical ANOVA row as "
-                "secondary."
+                "Levene/Brown-Forsythe suggests unequal spreads across regions. Kruskal-Wallis "
+                "remains a valid distributional rank test, but a significant result may reflect "
+                "spread/shape differences as well as central tendency differences."
             )
         else:
             status = "OK"
-            note = "Variances comparable across regions."
+            note = "Group spreads are comparable enough for a central-tendency interpretation of the rank test."
         rows.append(
             make_row(
-                test="anova_share",
-                assumption="homogeneity_of_variance",
+                test="kruskal_wallis_share",
+                assumption="similar_distribution_spread",
                 variable=variable,
                 group="region_label",
                 statistic=stat,
@@ -364,8 +889,8 @@ def check_zero_inflation(frame: pd.DataFrame) -> list[dict[str, object]]:
     """Quantify zero inflation in share variables, by group.
 
     Many orgs report zero on a particular Line 1 sub-channel. This is part of
-    why the analysis layers logistic presence models on top of the share
-    Welch ANOVAs.
+    why the analysis layers logistic presence models and permutation checks on
+    top of the share rank tests.
     """
 
     info("Quantifying zero inflation in share variables.")
@@ -381,7 +906,7 @@ def check_zero_inflation(frame: pd.DataFrame) -> list[dict[str, object]]:
             status = "CAVEAT" if zero_rate >= 0.50 else "OK"
             rows.append(
                 make_row(
-                    test="welch_anova_share",
+                    test="rank_share_tests",
                     assumption="continuous_outcome_minimal_zero_inflation",
                     variable=variable,
                     group=str(group),
@@ -389,7 +914,7 @@ def check_zero_inflation(frame: pd.DataFrame) -> list[dict[str, object]]:
                     status=status,
                     notes=(
                         f"{zero_rate:.1%} of {len(values):,} rows have a zero share. "
-                        "The analysis pairs each share Welch ANOVA with a logistic presence model "
+                        "The analysis pairs each share rank test with a logistic presence model "
                         "(does the org report any of this source) so size and presence effects can "
                         "be separated."
                     ),
@@ -661,8 +1186,8 @@ def check_exchangeability(frame: pd.DataFrame) -> list[dict[str, object]]:
             notes=(
                 "Row-level permutation. Strict exchangeability with repeated EINs would require "
                 "permuting at the EIN level. The cluster bootstrap CIs and the one-row-per-EIN "
-                "sensitivity provide cluster-aware triangulation; both confirm the headline "
-                "government-grants result."
+                "sensitivity provide cluster-aware triangulation for the row-level permutation "
+                "results."
             ),
         )
     )
@@ -737,7 +1262,7 @@ def check_composition_closure(frame: pd.DataFrame) -> list[dict[str, object]]:
     the assumptions report is self-contained.
     """
 
-    info("Confirming composition closure of the six revenue segments.")
+    info("Confirming composition closure of the detailed revenue segments.")
     rows: list[dict[str, object]] = []
     component_columns = [column for column in SOURCE_COMPONENTS if column in frame.columns]
     if not component_columns or "total_revenue" not in frame.columns:
@@ -760,7 +1285,9 @@ def check_composition_closure(frame: pd.DataFrame) -> list[dict[str, object]]:
                 f"Mean component-share sum = {share_sum.mean():.3f}. "
                 f"{over_100:.1%} of rows are above 105% of total revenue; "
                 f"{under_95:.1%} of rows are below 95%. Detail rows are listed in "
-                "tables/negative_residual_diagnostics.csv."
+                "tables/negative_residual_diagnostics.csv. Because the share variables are "
+                "parts of a whole, separate share rank tests are univariate follow-ups; the "
+                "PERMANOVA-style CLR test is the overall revenue-mix test."
             ),
         )
     )
@@ -839,11 +1366,11 @@ def write_report(report_md: Path, rows: list[dict[str, object]], frame: pd.DataF
     if violated == 0:
         lines.append(
             "**Verdict:** every assumption that is formally violated by the data is mitigated by "
-            "the analysis design (cluster-robust SEs, Welch correction, distribution-free "
-            "permutation, MANOVA-Pillai, one-row-per-EIN sensitivity, or cluster bootstrap). The "
-            "headline finding (regions differ on revenue mix; Black Hills is distinguished by a "
-            "higher government-grants share) is robust to the assumption violations identified "
-            "below."
+            "the analysis design (rank tests, distribution-free permutation, compositional "
+            "PERMANOVA-style testing, cluster-robust SEs, MANOVA-Pillai triangulation, "
+            "one-row-per-EIN sensitivity, or cluster bootstrap). Use the caveat rows below to "
+            "separate distribution-shape, compositional, clustering, and sample-size limits from "
+            "the substantive Q9 result."
         )
     else:
         lines.append(
@@ -896,9 +1423,14 @@ def run(
     frame = pd.read_parquet(paths.cleaned_parquet)
     if "tax_year" in frame.columns:
         frame["tax_year"] = frame["tax_year"].astype(str)
+    pairwise_2022_summary = _load_pairwise_2022_summary(paths.pairwise_2022_summary_csv)
+    sample_size_diagnostics = build_2022_sample_size_diagnostics(frame, pairwise_2022_summary)
 
     rows: list[dict[str, object]] = []
     rows.extend(check_independence(frame))
+    rows.extend(check_rank_test_sample_sizes(frame))
+    rows.extend(check_2022_presentation_sample_sizes(sample_size_diagnostics))
+    rows.extend(check_raw_dollar_normality(frame))
     rows.extend(check_normality(frame))
     rows.extend(check_variance_homogeneity(frame))
     rows.extend(check_zero_inflation(frame))
@@ -914,6 +1446,14 @@ def run(
     paths.details_csv.parent.mkdir(parents=True, exist_ok=True)
     details.to_csv(paths.details_csv, index=False)
     info(f"Saved assumptions detail table: {paths.details_csv} ({len(details):,} rows)")
+
+    paths.sample_size_csv.parent.mkdir(parents=True, exist_ok=True)
+    sample_size_diagnostics.to_csv(paths.sample_size_csv, index=False)
+    info(
+        f"Saved 2022 sample-size diagnostics table: "
+        f"{paths.sample_size_csv} ({len(sample_size_diagnostics):,} rows)"
+    )
+    write_sample_size_report(paths.sample_size_report_md, sample_size_diagnostics)
 
     write_report(paths.report_md, rows, frame)
     ok, caveat, violated = _summarize_status(rows)

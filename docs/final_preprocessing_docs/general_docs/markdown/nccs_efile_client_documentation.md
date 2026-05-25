@@ -2,7 +2,9 @@
 
 ## Background
 
-The NCCS efile dataset provides parsed public efile Form 990 table data. In this project it is converted into benchmark-filtered annual filing rowsets and a row-level analysis-ready efile dataset.
+The NCCS efile dataset contains parsed public electronic IRS Form 990 filing tables. It is based on required electronic filings submitted by nonprofit organizations and then published in a structured form by NCCS.
+
+In this project, NCCS efile is used to create annual filing-level datasets for the project counties and regions. It provides organization identity, filing year, filing form, geography, revenue, expenses, assets, and selected filing context fields. It is more financially detailed than registry sources, but it does not expose every contribution or grant component needed for all revenue-source questions.
 
 The detailed technical pipeline documentation is `docs/final_preprocessing_docs/technical_docs/pipeline_docs/nccs_efile_pipeline.md`.
 
@@ -16,23 +18,41 @@ The detailed technical pipeline documentation is `docs/final_preprocessing_docs/
 
 ## Collection Method
 
-The source tables are derived from public electronic IRS Form 990 filing data. They represent required tax filings for filing organizations rather than voluntary survey responses.
+The source tables are derived from public electronic IRS Form 990 filings. They represent required tax filings for organizations that file electronically, not voluntary survey responses.
 
 ## Inclusion Criteria And Limitations
 
-The pipeline includes the required HEADER, SUMMARY, and Schedule A table families for tax years `2022-2024`. Geography admission is determined from HEADER rows before the wide table join, and one selected filing is retained per EIN-tax-year. Fields not reliably present in the efile source remain unavailable rather than being weakly backfilled from other datasets.
+The pipeline includes the required HEADER, SUMMARY, and Schedule A table families for tax years `2022-2024`. It first determines which filings are located in the project counties and regions using HEADER rows, then joins in the additional tables needed for analysis.
+
+Important limitations:
+
+- The final row-level output keeps one selected filing per EIN, tax year, and filing form.
+- Some source fields are sparse because not every filing has every table or field.
+- The current efile analysis layer does not include GivingTuesday-style contribution and grant component fields, so those fields remain unavailable here rather than being weakly filled from another source.
+- Some classification fields are supplemented from NCCS BMF and IRS EO BMF when needed.
 
 ## Download And S3 Storage
 
-Annual raw CSV tables and discovery metadata are downloaded locally, uploaded unchanged to Bronze S3 under `bronze/nccs_efile/`, and verified with source/local/S3 byte checks. Annual benchmark outputs are stored under `silver/nccs_efile/`, and analysis documentation is stored under `silver/nccs_efile/analysis/`.
+Annual raw CSV tables and discovery metadata are downloaded locally, uploaded unchanged to Bronze S3 under `bronze/nccs_efile/`, and checked against expected file sizes. Annual project-region outputs are stored under `silver/nccs_efile/`, and analysis documentation is stored under `silver/nccs_efile/analysis/`.
 
 ## Datatype Transformation
 
-Raw annual CSV tables remain unchanged in Bronze S3. After benchmark filtering and selected-filing construction, annual benchmark outputs and the final analysis outputs are written as Parquet.
+Raw annual CSV tables are preserved unchanged in Bronze S3. After filtering to the project geography and selecting the retained filings, the pipeline writes annual Parquet files and final analysis Parquet files.
 
 ## Data Cleaning
 
-Cleaning includes HEADER-based benchmark geography filtering, ZIP/county/region mapping, deterministic filing ranking, selected-filing retention, SUMMARY and Schedule A joins only for retained filings, calculated metrics, classification enrichment, and imputed/proxy exclusion-support flags.
+The cleaning process keeps the raw efile tables unchanged, then creates project-specific filing datasets:
+
+- Selects the required efile tables for tax years `2022-2024`.
+- Uses HEADER rows to identify organization identity, filing year, filing form, ZIP, state, county, and region.
+- Standardizes EINs, ZIP codes, tax years, filing-form values, county FIPS codes, and region labels.
+- Keeps only filings located in the project counties and regions before joining the wider filing tables.
+- When multiple filings exist for the same organization and tax year, keeps the selected filing using documented ranking rules.
+- Joins SUMMARY and Schedule A information only for retained project-region filings.
+- Calculates analysis fields such as revenue, expenses, surplus, net margin, months of reserves, and asset-based support measures where source fields allow.
+- Supplements missing NTEE and subsection classifications from NCCS BMF and IRS EO BMF when needed.
+- Creates helper flags for hospitals, universities, and political organizations so analysts can apply consistent exclusions.
+- Leaves unsupported contribution and grant fields blank because those fields are not reliably present in the current efile analysis source.
 
 ## Analysis-Ready Outputs
 

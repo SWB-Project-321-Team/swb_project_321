@@ -8,20 +8,25 @@ This script answers the project question:
     and 990-PF?
 
 Harmonized segments follow Section 3 Q9 with an explicit donor-channel
-decomposition for Form 990 filers. The six mutually exclusive segments are:
+decomposition for Form 990 filers. The detailed revenue-source segments are:
 
     - program_service_revenue            (990/EZ Line 2g; PF stays missing)
-    - government_grants_received         (Form 990 Line 1e: GOVERNGRANTS)
-    - other_institutional_contributions  (Form 990 Lines 1a + 1d:
-                                          FEDERACAMPAI + RELATEORGANI)
-    - individual_likely_contributions    (Form 990 Lines 1b + 1c:
-                                          MEMBERDUESUE + FUNDRAEVENTS)
-    - mixed_other_contributions          (Form 990 Line 1f ALLOOTHECONT;
+    - government_grants_received         (Form 990 Line 1e: GOVERNGRANTS;
+                                          EZ/PF stay missing)
+    - federated_campaigns                (Form 990 Line 1a: FEDERACAMPAI;
+                                          EZ/PF stay missing)
+    - related_org_contributions          (Form 990 Line 1d: RELATEORGANI;
+                                          EZ/PF stay missing)
+    - membership_dues                    (Form 990 Line 1b: MEMBERDUESUE;
+                                          EZ/PF stay missing)
+    - fundraising_events_contributions   (Form 990 Line 1c: FUNDRAEVENTS;
+                                          EZ/PF stay missing)
+    - mixed_unclassified_contributions   (Form 990 Line 1f ALLOOTHECONT;
                                           for 990-EZ / 990-PF filers, the
                                           full Line 1 / Part I Line 1 total
                                           since those forms do not separately
                                           report sub-components)
-    - residual_other_revenue             (total revenue minus the five above,
+    - residual_other_revenue             (total revenue minus the above,
                                           clipped at zero for plotting)
 
 This decomposition is the most informative slice the IRS basic 990 family can
@@ -42,8 +47,10 @@ from __future__ import annotations
 
 import argparse
 import math
+import re
 import shutil
 import sys
+import textwrap
 import warnings
 from dataclasses import dataclass
 from pathlib import Path
@@ -57,24 +64,32 @@ import statsmodels.api as sm
 from scipy import stats
 from statsmodels.formula.api import glm, ols
 from statsmodels.multivariate.manova import MANOVA
+from statsmodels.stats.oneway import anova_oneway
 
 
 # Make `python/utils/paths.py` importable when the script is executed directly
 # from the repository root, matching the pattern used by existing pipeline code.
 _THIS_FILE = Path(__file__).resolve()
 _PYTHON_DIR = _THIS_FILE.parents[2]
+_PROJECT_ROOT = _THIS_FILE.parents[3]
 if str(_PYTHON_DIR) not in sys.path:
     sys.path.insert(0, str(_PYTHON_DIR))
 
 from utils.paths import DATA as DEFAULT_DATA_ROOT  # noqa: E402
 
 
+CONTRIBUTION_SOURCE_COMPONENTS = [
+    "government_grants_received",
+    "federated_campaigns",
+    "related_org_contributions",
+    "membership_dues",
+    "fundraising_events_contributions",
+    "mixed_unclassified_contributions",
+]
+
 SOURCE_COMPONENTS = [
     "program_service_revenue",
-    "government_grants_received",
-    "other_institutional_contributions",
-    "individual_likely_contributions",
-    "mixed_other_contributions",
+    *CONTRIBUTION_SOURCE_COMPONENTS,
     "residual_other_revenue",
 ]
 
@@ -84,23 +99,19 @@ AMOUNT_VARIABLES = [
     "total_revenue",
     "program_service_revenue",
     "total_contributions",
-    "government_grants_received",
-    "other_institutional_contributions",
-    "individual_likely_contributions",
-    "mixed_other_contributions",
+    *CONTRIBUTION_SOURCE_COMPONENTS,
+    "residual_other_revenue",
+]
+
+DIAGNOSTIC_AMOUNT_VARIABLES = [
     "calculated_institutional_contributions_total",
-    "federated_campaigns",
-    "membership_dues",
-    "fundraising_events_contributions",
-    "related_org_contributions",
     "government_grants",
     "cash_contributions",
     "noncash_contributions",
     "allo_other_contributions_line_1f",
-    "residual_other_revenue",
 ]
 
-PRIMARY_TEST_VARIABLES = SHARE_COMPONENTS + [f"log1p_{column}" for column in AMOUNT_VARIABLES]
+PRIMARY_TEST_VARIABLES = AMOUNT_VARIABLES + SHARE_COMPONENTS + [f"log1p_{column}" for column in AMOUNT_VARIABLES]
 
 REGION_LABELS = {
     "BlackHills": "Black Hills",
@@ -110,6 +121,103 @@ REGION_LABELS = {
     "Missoula": "Missoula",
 }
 
+REGION_ORDER = ["Black Hills", "Billings", "Flagstaff", "Sioux Falls", "Missoula"]
+
+REGION_COLORS = {
+    "Black Hills": "#514680",
+    "Billings": "#436C83",
+    "Flagstaff": "#348C84",
+    "Sioux Falls": "#4BAA78",
+    "Missoula": "#8CC856",
+    "Benchmark": "#7C8795",
+}
+
+DISPLAY_LABELS = {
+    "total_revenue": "Total revenue",
+    "program_service_revenue": "Program service revenue",
+    "total_contributions": "Total contributions",
+    "government_grants_received": "Government grants received",
+    "federated_campaigns": "Federated campaign contributions",
+    "related_org_contributions": "Related organization contributions",
+    "membership_dues": "Membership dues",
+    "fundraising_events_contributions": "Fundraising event contributions",
+    "mixed_unclassified_contributions": "Mixed / unclassified contributions",
+    "residual_other_revenue": "Other revenue",
+    "other_institutional_contributions": "Other institutional support",
+    "individual_likely_contributions": "Individual-adjacent support",
+    "mixed_other_contributions": "Mixed / unclassified contributions",
+}
+
+SOURCE_COLORS = {
+    "total_revenue": "#26364D",
+    "program_service_revenue": "#3B6FB6",
+    "total_contributions": "#C05A8A",
+    "government_grants_received": "#2E8B57",
+    "federated_campaigns": "#7B61B5",
+    "related_org_contributions": "#A06AB4",
+    "membership_dues": "#D8902F",
+    "fundraising_events_contributions": "#E7A84A",
+    "mixed_unclassified_contributions": "#B64B4B",
+    "residual_other_revenue": "#6F7F8F",
+    "other_institutional_contributions": "#8E6BBE",
+    "individual_likely_contributions": "#D8902F",
+    "mixed_other_contributions": "#B64B4B",
+}
+
+CLIENT_RAW_DISPLAY_LABELS = {
+    "total_revenue": "Total revenue",
+    "program_service_revenue": "Program service revenue",
+    "total_contributions": "Total contributions",
+    "government_grants_received": "Government grants received",
+    "federated_campaigns": "Federated campaign contributions",
+    "related_org_contributions": "Related organization contributions",
+    "membership_dues": "Membership dues",
+    "fundraising_events_contributions": "Fundraising event contributions",
+    "mixed_unclassified_contributions": "Mixed / unclassified contributions",
+    "residual_other_revenue": "Other revenue",
+}
+
+CLIENT_LOG_LEVEL_VARIABLES = [
+    "log1p_total_revenue",
+    "log1p_program_service_revenue",
+    "log1p_total_contributions",
+    "log1p_government_grants_received",
+    "log1p_federated_campaigns",
+    "log1p_related_org_contributions",
+    "log1p_membership_dues",
+    "log1p_fundraising_events_contributions",
+    "log1p_mixed_unclassified_contributions",
+    "log1p_residual_other_revenue",
+]
+
+CLIENT_RAW_LEVEL_VARIABLES = [
+    "total_revenue",
+    "program_service_revenue",
+    "total_contributions",
+    *CONTRIBUTION_SOURCE_COMPONENTS,
+    "residual_other_revenue",
+]
+
+PRESENTATION_PAIRWISE_SOURCE_VARIABLES = [
+    "program_service_revenue",
+    "government_grants_received",
+    "federated_campaigns",
+    "related_org_contributions",
+    "membership_dues",
+    "fundraising_events_contributions",
+]
+
+CLIENT_PRESENTATION_VARIABLES = CLIENT_RAW_LEVEL_VARIABLES
+
+# Iteration counts and seed for the 2022 client deck's positive-only median
+# permutation test and bootstrap CI. Kept as module-level constants so the
+# numbers driving the slide headline are visible in one place and easy to bump
+# when accuracy of borderline p-values matters more than runtime.
+PERMUTATION_ITERATIONS_2022 = 10000
+BOOTSTRAP_ITERATIONS_2022 = 10000
+PERMUTATION_SEED_2022 = 321
+
+RAW_BENCHMARK_RELATIVE_PATH = Path("staging") / "filing" / "givingtuesday_990_basic_allforms_benchmark.parquet"
 GT_ANALYSIS_RELATIVE_PATH = Path("staging") / "filing" / "givingtuesday_990_basic_allforms_analysis_variables.parquet"
 CORE_ANALYSIS_RELATIVE_PATH = Path("staging") / "nccs_990" / "core" / "nccs_990_core_analysis_variables.parquet"
 
@@ -124,6 +232,24 @@ class AnalysisPaths:
     results_dir: Path
     results_tables_dir: Path
     results_figures_dir: Path
+    client_assets_dir: Path
+    # Repo docs directory used for the externally-distributed client
+    # presentation Markdown and its image assets. The CLI defaults this to the
+    # repo's `docs/` directory; tests and isolated runs should point this at a
+    # temporary path to avoid overwriting the real client deliverables.
+    docs_dir: Path
+    docs_assets_dir: Path
+    docs_presentation_path: Path
+    # When False, 2022 pairwise bar charts show only the median dollar label
+    # above each bar (no "n=<reporters>" line). Slide bullets still report
+    # reporter counts regardless of this setting.
+    show_chart_reporter_count: bool = False
+
+
+def default_docs_dir() -> Path:
+    """Return the repo-level docs directory used for client deliverables."""
+
+    return _PROJECT_ROOT / "docs"
 
 
 def info(message: str) -> None:
@@ -141,7 +267,13 @@ def default_results_dir_for_output(output_dir: Path) -> Path:
     return _THIS_FILE.parent / "results"
 
 
-def ensure_output_dirs(output_dir: Path, results_dir: Path | None = None) -> AnalysisPaths:
+def ensure_output_dirs(
+    output_dir: Path,
+    results_dir: Path | None = None,
+    docs_dir: Path | None = None,
+    *,
+    show_chart_reporter_count: bool = False,
+) -> AnalysisPaths:
     """Create the output directory tree used by tables, figures, and summaries."""
 
     tables_dir = output_dir / "tables"
@@ -150,14 +282,21 @@ def ensure_output_dirs(output_dir: Path, results_dir: Path | None = None) -> Ana
     results_dir = resolved_results_dir
     results_tables_dir = results_dir / "tables"
     results_figures_dir = results_dir / "figures"
+    client_assets_dir = results_dir / "client_notebook_assets"
+    resolved_docs_dir = docs_dir or default_docs_dir()
+    docs_assets_dir = resolved_docs_dir / "assets" / "section3_q9_2022"
+    docs_presentation_path = resolved_docs_dir / "Section3_Q9_2022_Client_Presentation.md"
     tables_dir.mkdir(parents=True, exist_ok=True)
     figures_dir.mkdir(parents=True, exist_ok=True)
     results_tables_dir.mkdir(parents=True, exist_ok=True)
     results_figures_dir.mkdir(parents=True, exist_ok=True)
+    client_assets_dir.mkdir(parents=True, exist_ok=True)
+    docs_assets_dir.mkdir(parents=True, exist_ok=True)
     info(f"Output directory ready: {output_dir}")
     info(f"Tables will be written to: {tables_dir}")
     info(f"Figures will be written to: {figures_dir}")
     info(f"Final report assets will be collected in: {results_dir}")
+    info(f"Client presentation will be written to: {docs_presentation_path}")
     return AnalysisPaths(
         output_dir=output_dir,
         tables_dir=tables_dir,
@@ -165,6 +304,11 @@ def ensure_output_dirs(output_dir: Path, results_dir: Path | None = None) -> Ana
         results_dir=results_dir,
         results_tables_dir=results_tables_dir,
         results_figures_dir=results_figures_dir,
+        client_assets_dir=client_assets_dir,
+        docs_dir=resolved_docs_dir,
+        docs_assets_dir=docs_assets_dir,
+        docs_presentation_path=docs_presentation_path,
+        show_chart_reporter_count=show_chart_reporter_count,
     )
 
 
@@ -224,6 +368,130 @@ def load_givingtuesday_analysis(data_root: Path, years: list[int]) -> pd.DataFra
     return frame
 
 
+def load_givingtuesday_raw_benchmark(data_root: Path, years: list[int]) -> pd.DataFrame | None:
+    """Load the raw benchmark artifact used for source-field validation."""
+
+    input_path = data_root / RAW_BENCHMARK_RELATIVE_PATH
+    info(f"Checking raw GivingTuesday benchmark file for validation: {input_path}")
+    if not input_path.exists():
+        info("Raw benchmark file is not available; skipping raw-field validation.")
+        return None
+    frame = pd.read_parquet(input_path)
+    frame["tax_year"] = frame["tax_year"].astype(str)
+    selected_years = {str(year) for year in years}
+    frame = frame.loc[frame["tax_year"].isin(selected_years)].copy()
+    info(f"Loaded raw benchmark validation rows={len(frame):,}, columns={len(frame.columns):,}")
+    return frame
+
+
+def build_raw_field_validation_table(raw: pd.DataFrame | None, harmonized: pd.DataFrame) -> pd.DataFrame:
+    """
+    Reproduce the notebook's raw-to-harmonized lineage validation.
+
+    The table checks the exact source fields used for the four requested Q9
+    variables. A mismatch count of zero means the harmonized analysis-variable
+    file still matches the raw GivingTuesday source fields for that form type.
+    """
+
+    key_cols = ["ein", "tax_year", "form_type", "region"]
+    rows: list[dict[str, object]] = []
+    if raw is None:
+        return pd.DataFrame(
+            [
+                {
+                    "check": "raw_file_available",
+                    "passed": False,
+                    "details": "Raw benchmark parquet was not found, so raw-field validation was skipped.",
+                }
+            ]
+        )
+
+    same_key_order = harmonized[key_cols].astype(str).reset_index(drop=True).equals(
+        raw[key_cols].astype(str).reset_index(drop=True)
+    )
+    rows.extend(
+        [
+            {
+                "check": "same_key_order",
+                "passed": bool(same_key_order),
+                "details": "Raw and harmonized files have the same row order by ein, tax_year, form_type, and region.",
+            },
+            {
+                "check": "raw_duplicate_keys",
+                "passed": int(raw.duplicated(key_cols).sum()) == 0,
+                "details": int(raw.duplicated(key_cols).sum()),
+            },
+            {
+                "check": "harmonized_duplicate_keys",
+                "passed": int(harmonized.duplicated(key_cols).sum()) == 0,
+                "details": int(harmonized.duplicated(key_cols).sum()),
+            },
+        ]
+    )
+
+    source_cols = [
+        "TOTREVCURYEA",
+        "TOTALRREVENU",
+        "ANREEXTOREEX",
+        "TOTPROSERREV",
+        "PROGSERVREVE",
+        "TOTACASHCONT",
+        "CONGIFGRAETC",
+        "STREACGRTOIN",
+    ]
+    available_source_cols = [column for column in source_cols if column in raw.columns]
+    check = harmonized.reset_index(drop=True).join(
+        raw[available_source_cols].reset_index(drop=True).add_suffix("_raw")
+    )
+
+    def _mismatch_count(output_col: str, form_type: str, source_col: str) -> dict[str, object]:
+        if output_col not in check.columns or source_col not in check.columns:
+            return {
+                "check": "source_mapping",
+                "analysis_variable": output_col,
+                "form_type": form_type,
+                "raw_source_column": source_col.replace("_raw", ""),
+                "rows_checked": 0,
+                "nonmissing_analysis_values": 0,
+                "nonmissing_raw_values": 0,
+                "mismatches": np.nan,
+                "passed": False,
+                "details": "Required column was not available.",
+            }
+        mask = check["form_type"].astype(str).str.upper().eq(form_type)
+        observed = to_numeric(check.loc[mask, output_col])
+        expected = to_numeric(check.loc[mask, source_col])
+        both_missing = observed.isna() & expected.isna()
+        matched = both_missing | observed.fillna(0).sub(expected.fillna(0)).abs().le(1e-9)
+        mismatches = int((~matched).sum())
+        return {
+            "check": "source_mapping",
+            "analysis_variable": output_col,
+            "form_type": form_type,
+            "raw_source_column": source_col.replace("_raw", ""),
+            "rows_checked": int(mask.sum()),
+            "nonmissing_analysis_values": int(observed.notna().sum()),
+            "nonmissing_raw_values": int(expected.notna().sum()),
+            "mismatches": mismatches,
+            "passed": mismatches == 0,
+            "details": "",
+        }
+
+    rows.extend(
+        [
+            _mismatch_count("analysis_total_revenue_amount", "990", "TOTREVCURYEA_raw"),
+            _mismatch_count("analysis_total_revenue_amount", "990EZ", "TOTALRREVENU_raw"),
+            _mismatch_count("analysis_total_revenue_amount", "990PF", "ANREEXTOREEX_raw"),
+            _mismatch_count("analysis_program_service_revenue_amount", "990", "TOTPROSERREV_raw"),
+            _mismatch_count("analysis_program_service_revenue_amount", "990EZ", "PROGSERVREVE_raw"),
+            _mismatch_count("analysis_total_contributions_amount", "990", "TOTACASHCONT_raw"),
+            _mismatch_count("analysis_total_contributions_amount", "990EZ", "CONGIFGRAETC_raw"),
+            _mismatch_count("analysis_total_contributions_amount", "990PF", "STREACGRTOIN_raw"),
+        ]
+    )
+    return pd.DataFrame(rows)
+
+
 def prepare_givingtuesday_analysis(frame: pd.DataFrame, *, exclude_outliers: bool = False) -> pd.DataFrame:
     """
     Build the primary analysis frame at organization-year grain.
@@ -269,34 +537,49 @@ def prepare_givingtuesday_analysis(frame: pd.DataFrame, *, exclude_outliers: boo
     # in this source. Keeping those values missing prevents the analysis from
     # accidentally treating "not applicable" as a real zero.
     pf_mask = out["form_type"].eq("990PF")
+    program_service_available = out["form_type"].isin(["990", "990EZ"])
+    out.loc[program_service_available, "program_service_revenue"] = out.loc[
+        program_service_available, "program_service_revenue"
+    ].fillna(0.0)
     out.loc[pf_mask, "program_service_revenue"] = np.nan
+
+    # Total contributions is a supported line across the selected 990-family
+    # forms. In this extract, blank supported amount lines are interpreted as
+    # reported zeros; this is different from form-specific source detail that
+    # the filer could not report at all.
+    out["total_contributions"] = out["total_contributions"].fillna(0.0)
 
     # Section 3 Q9 donor-channel decomposition.
     #
     # On Form 990, Part VIII Line 1 has six sub-lines (1a-1f) that reconcile to
-    # Line 1h. We expose those sub-lines so the stacked-bar mix can answer the
-    # client's "individuals versus other organizations" question more honestly:
+    # Line 1h. We expose those sub-lines as the main contribution-source
+    # categories: federated campaigns, membership dues, fundraising event
+    # contributions, related-organization contributions, government grants, and
+    # mixed / unclassified contributions. Line 1f deliberately stays mixed
+    # because it can combine individual gifts with private foundation grants,
+    # DAF distributions, corporate gifts, bequests, and other contribution
+    # types that Form 990 does not separate.
     #
-    #   - government_grants_received        : Line 1e (GOVERNGRANTS)
-    #   - other_institutional_contributions : Line 1a + Line 1d
-    #                                         (FEDERACAMPAI + RELATEORGANI)
-    #   - individual_likely_contributions   : Line 1b + Line 1c
-    #                                         (MEMBERDUESUE + FUNDRAEVENTS)
-    #   - mixed_other_contributions         : Line 1f (ALLOOTHECONT) - a
-    #                                         deliberately-mixed bucket that
-    #                                         lumps individual gifts together
-    #                                         with private foundation grants,
-    #                                         DAF distributions, corporate
-    #                                         gifts, and bequests. Form 990
-    #                                         does not separate those donors.
-    #
-    # 990-EZ and 990-PF do not separately report Line 1 sub-components, so for
-    # those filers the upstream analysis layer leaves the sub-fields null and
-    # we route the entire reported Line 1 / Part I Line 1 total into the
-    # mixed_other_contributions bucket. That keeps the segments mutually
-    # exclusive and summing to total revenue while honestly labeling the
-    # 990-EZ/990-PF contributions as undecomposable.
+    # 990-EZ and 990-PF do not separately report comparable Line 1
+    # sub-components. Those detailed analysis variables stay missing for
+    # non-990 filers so tests and medians do not confuse "unavailable" with a
+    # reported zero. The full reported 990-EZ / 990-PF contribution total is
+    # still routed into mixed / unclassified contributions because that amount
+    # is available, but undecomposable.
     is_form_990 = out["form_type"].eq("990")
+
+    # The detailed Line 1 subcategories only exist for Form 990. Within Form
+    # 990, a blank sub-line is treated as a reported zero; outside Form 990, it
+    # is unavailable and kept missing.
+    for detail_column in [
+        "federated_campaigns",
+        "membership_dues",
+        "fundraising_events_contributions",
+        "related_org_contributions",
+        "government_grants",
+        "allo_other_contributions_line_1f",
+    ]:
+        out[detail_column] = np.where(is_form_990, out[detail_column].fillna(0.0), np.nan)
 
     sub_components = [
         "federated_campaigns",
@@ -308,16 +591,16 @@ def prepare_givingtuesday_analysis(frame: pd.DataFrame, *, exclude_outliers: boo
     ]
     out["sub_component_sum"] = out[sub_components].fillna(0.0).sum(axis=1)
 
-    out["government_grants_received"] = np.where(is_form_990, out["government_grants"].fillna(0.0), 0.0)
+    out["government_grants_received"] = np.where(is_form_990, out["government_grants"].fillna(0.0), np.nan)
     out["other_institutional_contributions"] = np.where(
         is_form_990,
         out["federated_campaigns"].fillna(0.0) + out["related_org_contributions"].fillna(0.0),
-        0.0,
+        np.nan,
     )
     out["individual_likely_contributions"] = np.where(
         is_form_990,
         out["membership_dues"].fillna(0.0) + out["fundraising_events_contributions"].fillna(0.0),
-        0.0,
+        np.nan,
     )
 
     # For 990 rows, the mixed bucket is Line 1f. For 990-EZ / 990-PF, the
@@ -325,7 +608,10 @@ def prepare_givingtuesday_analysis(frame: pd.DataFrame, *, exclude_outliers: boo
     # total goes into the mixed bucket (it really is undecomposable).
     mixed_for_990 = out["allo_other_contributions_line_1f"].fillna(0.0)
     mixed_for_other_forms = out["total_contributions"].fillna(0.0)
-    out["mixed_other_contributions"] = np.where(is_form_990, mixed_for_990, mixed_for_other_forms)
+    out["mixed_unclassified_contributions"] = np.where(is_form_990, mixed_for_990, mixed_for_other_forms)
+    # Backward-compatible alias for older tables/docs. Client-facing outputs use
+    # the more accurate "mixed / unclassified contributions" label.
+    out["mixed_other_contributions"] = out["mixed_unclassified_contributions"]
 
     # Diagnostic: when we trust the 990 sub-components, verify they reconcile
     # to the reported Line 1h total contributions. A meaningful gap usually
@@ -340,10 +626,12 @@ def prepare_givingtuesday_analysis(frame: pd.DataFrame, *, exclude_outliers: boo
 
     # Residual captures revenue not allocated to the five named segments.
     contributions_segment_sum = (
-        out["government_grants_received"]
-        + out["other_institutional_contributions"]
-        + out["individual_likely_contributions"]
-        + out["mixed_other_contributions"]
+        out["government_grants_received"].fillna(0.0)
+        + out["federated_campaigns"].fillna(0.0)
+        + out["related_org_contributions"].fillna(0.0)
+        + out["membership_dues"].fillna(0.0)
+        + out["fundraising_events_contributions"].fillna(0.0)
+        + out["mixed_unclassified_contributions"].fillna(0.0)
     )
     filled_psr = out["program_service_revenue"].fillna(0.0)
     out["residual_other_revenue"] = out["total_revenue"] - filled_psr - contributions_segment_sum
@@ -417,13 +705,14 @@ def missingness_table(frame: pd.DataFrame) -> pd.DataFrame:
         base = dict(zip(group_columns, keys, strict=False))
         for column in AMOUNT_VARIABLES + SHARE_COMPONENTS:
             series = group[column]
+            nonmissing = series.dropna()
             rows.append(
                 {
                     **base,
                     "variable": column,
                     "row_count": len(group),
-                    "nonmissing_count": int(series.notna().sum()),
-                    "nonzero_count": int(series.fillna(0).ne(0).sum()),
+                    "nonmissing_count": int(nonmissing.size),
+                    "nonzero_count": int(nonmissing.ne(0).sum()),
                     "missing_rate": float(series.isna().mean()) if len(group) else np.nan,
                 }
             )
@@ -533,6 +822,41 @@ def bootstrap_ci_difference(
     return observed, float(lower), float(upper)
 
 
+def bootstrap_median_ci(
+    values: Iterable[float],
+    *,
+    iterations: int = 2000,
+    alpha: float = 0.05,
+    seed: int = 321,
+) -> tuple[float, float]:
+    """Return the bootstrap percentile confidence interval for the median.
+
+    Uses the standard non-parametric percentile bootstrap (Efron 1979): resample
+    `values` with replacement `iterations` times, take the median of each draw,
+    and report the `[alpha/2, 1 - alpha/2]` percentiles of the draw
+    distribution. This is the appropriate uncertainty estimate for a positive
+    median computed on heavy-tailed dollar amounts because it (a) does not
+    assume any parametric distribution and (b) degrades gracefully at small n,
+    producing a degenerate but honest interval rather than a misleadingly tight
+    normal approximation. Returns `(nan, nan)` when fewer than two finite
+    positive observations exist, because rank-based statistics on a single
+    point are not meaningful.
+    """
+
+    arr = np.asarray(list(values), dtype=float)
+    arr = arr[np.isfinite(arr)]
+    if arr.size < 2:
+        return (float("nan"), float("nan"))
+    rng = np.random.default_rng(seed)
+    draws = np.empty(iterations, dtype=float)
+    n = arr.size
+    for index in range(iterations):
+        sample = rng.choice(arr, size=n, replace=True)
+        draws[index] = float(np.median(sample))
+    lower, upper = np.percentile(draws, [100 * alpha / 2.0, 100 * (1.0 - alpha / 2.0)])
+    return float(lower), float(upper)
+
+
 def aggregate_revenue_mix(frame: pd.DataFrame, group_columns: list[str]) -> pd.DataFrame:
     """
     Compute aggregate source mix by group.
@@ -631,33 +955,52 @@ def anova_result(frame: pd.DataFrame, variable: str, group_column: str = "compar
 
 
 def welch_anova_result(frame: pd.DataFrame, variable: str, group_column: str = "comparison_group") -> dict[str, object]:
-    """Run Welch ANOVA for unequal variances using the standard weighted formula."""
+    """Run a Welch unequal-variance mean comparison for secondary diagnostics."""
 
     values_by_group = [group[variable].dropna().to_numpy(dtype=float) for _, group in frame.groupby(group_column)]
     values_by_group = [values for values in values_by_group if len(values) > 1]
-    k = len(values_by_group)
-    if k < 2:
+    if len(values_by_group) < 2:
         return {"test": "welch_anova", "variable": variable, "statistic": np.nan, "p_value": np.nan, "n": int(frame[variable].notna().sum())}
-    n = np.array([len(values) for values in values_by_group], dtype=float)
-    means = np.array([np.mean(values) for values in values_by_group], dtype=float)
-    variances = np.array([np.var(values, ddof=1) for values in values_by_group], dtype=float)
-    if np.any(variances <= 0):
-        return {"test": "welch_anova", "variable": variable, "statistic": np.nan, "p_value": np.nan, "n": int(np.sum(n))}
-    weights = n / variances
-    weighted_mean = np.sum(weights * means) / np.sum(weights)
-    numerator = np.sum(weights * (means - weighted_mean) ** 2) / (k - 1)
-    denominator_adjustment = 1 + (2 * (k - 2) / (k**2 - 1)) * np.sum((1 / (n - 1)) * (1 - weights / np.sum(weights)) ** 2)
-    statistic = numerator / denominator_adjustment
-    df_num = k - 1
-    df_den = (k**2 - 1) / (3 * np.sum((1 / (n - 1)) * (1 - weights / np.sum(weights)) ** 2))
-    p_value = stats.f.sf(statistic, df_num, df_den)
-    return {"test": "welch_anova", "variable": variable, "statistic": float(statistic), "p_value": float(p_value), "n": int(np.sum(n))}
+    if any(np.nanvar(values, ddof=1) <= 0 for values in values_by_group):
+        return {
+            "test": "welch_anova",
+            "variable": variable,
+            "statistic": np.nan,
+            "p_value": np.nan,
+            "n": int(sum(len(values) for values in values_by_group)),
+        }
+    try:
+        result = anova_oneway(values_by_group, use_var="unequal")
+    except ValueError:
+        return {
+            "test": "welch_anova",
+            "variable": variable,
+            "statistic": np.nan,
+            "p_value": np.nan,
+            "n": int(sum(len(values) for values in values_by_group)),
+        }
+    return {
+        "test": "welch_anova",
+        "variable": variable,
+        "statistic": float(result.statistic),
+        "p_value": float(result.pvalue),
+        "n": int(sum(len(values) for values in values_by_group)),
+    }
 
 
 def rank_test_result(frame: pd.DataFrame, variable: str, group_column: str = "comparison_group") -> dict[str, object]:
     """Run Mann-Whitney for two groups or Kruskal-Wallis for more groups."""
 
-    values_by_group = [group[variable].dropna().to_numpy(dtype=float) for _, group in frame.groupby(group_column)]
+    if group_column == "comparison_group":
+        group_order = ["Black Hills", "Benchmark"]
+    elif group_column == "region_label":
+        group_order = REGION_ORDER
+    else:
+        group_order = sorted(frame[group_column].dropna().astype(str).unique().tolist())
+    values_by_group = [
+        frame.loc[frame[group_column].astype(str).eq(group_label), variable].dropna().to_numpy(dtype=float)
+        for group_label in group_order
+    ]
     values_by_group = [values for values in values_by_group if len(values) > 0]
     if len(values_by_group) < 2:
         return {"test": "rank_test", "variable": variable, "statistic": np.nan, "p_value": np.nan, "n": int(frame[variable].notna().sum())}
@@ -665,7 +1008,10 @@ def rank_test_result(frame: pd.DataFrame, variable: str, group_column: str = "co
         statistic, p_value = stats.mannwhitneyu(values_by_group[0], values_by_group[1], alternative="two-sided")
         test_name = "mann_whitney"
     else:
-        statistic, p_value = stats.kruskal(*values_by_group)
+        try:
+            statistic, p_value = stats.kruskal(*values_by_group)
+        except ValueError:
+            statistic, p_value = np.nan, np.nan
         test_name = "kruskal_wallis"
     return {"test": test_name, "variable": variable, "statistic": float(statistic), "p_value": float(p_value), "n": int(sum(len(values) for values in values_by_group))}
 
@@ -699,6 +1045,114 @@ def permutation_test_difference(
             extreme += 1
     p_value = (extreme + 1) / (iterations + 1)
     return {"test": "permutation_mean_diff", "variable": variable, "statistic": observed, "p_value": float(p_value), "n": len(work)}
+
+
+def permutation_median_difference(
+    a_values: np.ndarray | pd.Series,
+    b_values: np.ndarray | pd.Series,
+    *,
+    iterations: int = 10000,
+    seed: int = 321,
+) -> dict[str, float | int]:
+    """Two-sided permutation test for the median difference between two groups.
+
+    The observed statistic is ``median(a) - median(b)``. Group labels are
+    randomly reassigned ``iterations`` times against the pooled values, and
+    the p-value is the fraction of reassignments whose absolute median
+    difference is at least as large as the observed absolute difference. This
+    test is the median-focused analogue of the existing
+    ``permutation_test_difference`` (which permutes mean differences) and is
+    well suited to the heavy-tailed positive-only Form 990 dollar amounts on
+    the 2022 client slides.
+
+    A ``+1`` smoothing is applied to numerator and denominator so the smallest
+    possible p-value with ``iterations`` reshuffles is ``1 / (iterations + 1)``
+    rather than zero.
+    """
+
+    a_arr = np.asarray(a_values, dtype=float)
+    b_arr = np.asarray(b_values, dtype=float)
+    a_arr = a_arr[~np.isnan(a_arr)]
+    b_arr = b_arr[~np.isnan(b_arr)]
+    n_a = int(len(a_arr))
+    n_b = int(len(b_arr))
+    if n_a < 2 or n_b < 2:
+        return {
+            "median_difference": float("nan"),
+            "p_value": float("nan"),
+            "iterations": int(iterations),
+            "n_a": n_a,
+            "n_b": n_b,
+        }
+
+    observed = float(np.median(a_arr) - np.median(b_arr))
+    pooled = np.concatenate([a_arr, b_arr])
+    rng = np.random.default_rng(seed)
+    extreme = 0
+    abs_observed = abs(observed)
+    for _ in range(iterations):
+        permuted = rng.permutation(pooled)
+        difference = float(np.median(permuted[:n_a]) - np.median(permuted[n_a:]))
+        if abs(difference) >= abs_observed:
+            extreme += 1
+    p_value = (extreme + 1) / (iterations + 1)
+    return {
+        "median_difference": observed,
+        "p_value": float(p_value),
+        "iterations": int(iterations),
+        "n_a": n_a,
+        "n_b": n_b,
+    }
+
+
+def bootstrap_median_difference_ci(
+    a_values: np.ndarray | pd.Series,
+    b_values: np.ndarray | pd.Series,
+    *,
+    iterations: int = 10000,
+    seed: int = 321,
+    alpha: float = 0.05,
+) -> dict[str, float | int]:
+    """Percentile bootstrap CI for the median difference ``median(a) - median(b)``.
+
+    Each bootstrap replicate independently resamples ``a`` and ``b`` with
+    replacement and records ``median(a*) - median(b*)``. The reported interval
+    is the ``alpha/2`` and ``1 - alpha/2`` percentiles of those replicates,
+    which gives a non-parametric confidence interval for the median gap shown
+    on the slide bars. ``alpha = 0.05`` yields a 95% CI.
+    """
+
+    a_arr = np.asarray(a_values, dtype=float)
+    b_arr = np.asarray(b_values, dtype=float)
+    a_arr = a_arr[~np.isnan(a_arr)]
+    b_arr = b_arr[~np.isnan(b_arr)]
+    n_a = int(len(a_arr))
+    n_b = int(len(b_arr))
+    if n_a < 2 or n_b < 2:
+        return {
+            "median_difference": float("nan"),
+            "ci_low": float("nan"),
+            "ci_high": float("nan"),
+            "iterations": int(iterations),
+            "alpha": float(alpha),
+        }
+
+    observed = float(np.median(a_arr) - np.median(b_arr))
+    rng = np.random.default_rng(seed + 1)
+    replicates = np.empty(iterations, dtype=float)
+    for index in range(iterations):
+        sample_a = rng.choice(a_arr, size=n_a, replace=True)
+        sample_b = rng.choice(b_arr, size=n_b, replace=True)
+        replicates[index] = float(np.median(sample_a) - np.median(sample_b))
+    low = float(np.percentile(replicates, 100.0 * (alpha / 2)))
+    high = float(np.percentile(replicates, 100.0 * (1 - alpha / 2)))
+    return {
+        "median_difference": observed,
+        "ci_low": low,
+        "ci_high": high,
+        "iterations": int(iterations),
+        "alpha": float(alpha),
+    }
 
 
 def effect_size_result(frame: pd.DataFrame, variable: str) -> dict[str, object]:
@@ -1166,16 +1620,2398 @@ def save_stacked_bar(mix: pd.DataFrame, index_column: str, output_path: Path, ti
     value_column = "normalized_mix_share" if "normalized_mix_share" in mix.columns else "share"
     pivot = mix.pivot_table(index=index_column, columns="component", values=value_column, aggfunc="sum").fillna(0)
     pivot = pivot[[component for component in SOURCE_COMPONENTS if component in pivot.columns]]
-    ax = pivot.plot(kind="bar", stacked=True, figsize=(11, 6), colormap="tab20")
+    color_list = [SOURCE_COLORS.get(component, "#6F7F8F") for component in pivot.columns]
+    ax = pivot.plot(kind="bar", stacked=True, figsize=(12, 6.5), color=color_list)
     ax.set_title(title)
     ax.set_ylabel("Normalized component share")
     ax.set_xlabel("")
-    ax.legend(title="Revenue source", bbox_to_anchor=(1.02, 1), loc="upper left")
+    handles, labels = ax.get_legend_handles_labels()
+    ax.legend(
+        handles,
+        [DISPLAY_LABELS.get(label, label) for label in labels],
+        title="Revenue source",
+        bbox_to_anchor=(1.02, 1),
+        loc="upper left",
+    )
     ax.yaxis.set_major_formatter(lambda value, _: f"{value:.0%}")
     plt.tight_layout()
     plt.savefig(output_path, dpi=200)
     plt.close()
     info(f"Saved figure: {output_path}")
+
+
+def client_rank_test_table(
+    frame: pd.DataFrame,
+    variables: list[str],
+    group_column: str,
+    *,
+    include_permutation: bool = False,
+) -> pd.DataFrame:
+    """Write the notebook-style non-parametric table for share comparisons."""
+
+    rows = []
+    for variable in variables:
+        if variable not in frame.columns:
+            continue
+        result = rank_test_result(frame, variable, group_column=group_column)
+        rows.append(
+            {
+                "test": result["test"],
+                "variable": variable,
+                "statistic": result["statistic"],
+                "p_value": result["p_value"],
+                "n": result["n"],
+            }
+        )
+        if include_permutation and group_column == "comparison_group":
+            permutation = permutation_test_difference(frame, variable, group_column=group_column)
+            rows.append(
+                {
+                    "test": permutation["test"],
+                    "variable": variable,
+                    "statistic": permutation["statistic"],
+                    "p_value": permutation["p_value"],
+                    "n": permutation["n"],
+                }
+            )
+    out = pd.DataFrame(rows)
+    if out.empty:
+        return out
+    out["significant_before_fdr"] = np.where(out["p_value"].lt(0.05), "Yes", "No")
+    out["fdr_p_value"] = fdr_bh(out["p_value"])
+    out["significant_after_fdr"] = np.where(out["fdr_p_value"].lt(0.05), "Yes", "No")
+    if group_column == "comparison_group" and {"Black Hills", "Benchmark"}.issubset(set(frame["comparison_group"].dropna())):
+        grouped = frame.groupby("comparison_group")
+
+        def direction(row: pd.Series) -> str:
+            variable = str(row["variable"])
+            if variable not in frame.columns:
+                return ""
+            bh_values = grouped.get_group("Black Hills")[variable].dropna().clip(lower=0)
+            bm_values = grouped.get_group("Benchmark")[variable].dropna().clip(lower=0)
+            if row.get("test") == "permutation_mean_diff":
+                bh = bh_values.mean()
+                bm = bm_values.mean()
+            elif variable in CLIENT_RAW_LEVEL_VARIABLES:
+                bh = bh_values.median()
+                bm = bm_values.median()
+                if math.isclose(float(bh), float(bm), rel_tol=0, abs_tol=0.001):
+                    bh = bh_values.gt(0).mean()
+                    bm = bm_values.gt(0).mean()
+            else:
+                bh = bh_values.mean()
+                bm = bm_values.mean()
+            if pd.isna(bh) or pd.isna(bm):
+                return ""
+            if math.isclose(float(bh), float(bm), rel_tol=0, abs_tol=0.001):
+                return "No meaningful difference"
+            return "Black Hills higher" if bh > bm else "Black Hills lower"
+
+        out["direction"] = out.apply(direction, axis=1)
+    return out
+
+
+def client_year_by_year_rank_tables(
+    frame: pd.DataFrame,
+    variables: list[str],
+    group_column: str = "comparison_group",
+    *,
+    include_permutation: bool = False,
+) -> pd.DataFrame:
+    """Repeat the notebook-style rank-test table within each tax year."""
+
+    tables = []
+    for tax_year in sorted(frame["tax_year"].dropna().astype(str).unique()):
+        one_year = frame.loc[frame["tax_year"].astype(str).eq(tax_year)].copy()
+        table = client_rank_test_table(
+            one_year,
+            variables,
+            group_column,
+            include_permutation=include_permutation,
+        )
+        if table.empty:
+            continue
+        table.insert(0, "tax_year", tax_year)
+        tables.append(table)
+    return pd.concat(tables, ignore_index=True) if tables else pd.DataFrame()
+
+
+def client_raw_level_summary(frame: pd.DataFrame, variables: list[str]) -> pd.DataFrame:
+    """Summarize organization-level raw-dollar variables by region."""
+
+    rows: list[dict[str, object]] = []
+    for variable in variables:
+        if variable not in frame.columns:
+            continue
+        for region in REGION_ORDER:
+            values = frame.loc[frame["region_label"].eq(region), variable].dropna().clip(lower=0)
+            n = int(len(values))
+            positive = values.loc[values.gt(0)]
+            rows.append(
+                {
+                    "variable": variable,
+                    "variable_label": CLIENT_RAW_DISPLAY_LABELS.get(variable, DISPLAY_LABELS.get(variable, variable)),
+                    "region_label": region,
+                    "n": n,
+                    "mean": float(values.mean()) if n else np.nan,
+                    "median": float(values.median()) if n else np.nan,
+                    "nonzero_count": int(values.gt(0).sum()) if n else 0,
+                    "nonzero_percent": float(values.gt(0).mean()) if n else np.nan,
+                    "positive_median": float(positive.median()) if len(positive) else np.nan,
+                }
+            )
+    return pd.DataFrame(rows)
+
+
+def client_raw_level_normality_diagnostics(frame: pd.DataFrame, variables: list[str]) -> pd.DataFrame:
+    """Run normality/skew diagnostics for raw and log1p dollars."""
+
+    rows: list[dict[str, object]] = []
+    for variable in variables:
+        if variable not in frame.columns:
+            continue
+        for region in REGION_ORDER:
+            values = frame.loc[frame["region_label"].eq(region), variable].dropna().clip(lower=0)
+            if values.empty:
+                continue
+            raw = values.to_numpy(dtype=float)
+            log_values = np.log1p(raw)
+            mean = float(np.mean(raw))
+            median = float(np.median(raw))
+            mean_median_ratio = mean / median if median > 0 else np.nan
+            raw_p = np.nan
+            log_p = np.nan
+            if len(raw) >= 8 and np.unique(raw).size > 1:
+                raw_p = float(stats.normaltest(raw).pvalue)
+            if len(log_values) >= 8 and np.unique(log_values).size > 1:
+                log_p = float(stats.normaltest(log_values).pvalue)
+            rows.append(
+                {
+                    "variable": variable,
+                    "variable_label": CLIENT_RAW_DISPLAY_LABELS.get(variable, DISPLAY_LABELS.get(variable, variable)),
+                    "region_label": region,
+                    "n": int(len(raw)),
+                    "zero_percent": float(np.mean(raw == 0)),
+                    "mean": mean,
+                    "median": median,
+                    "mean_median_ratio": mean_median_ratio,
+                    "skew": float(stats.skew(raw, bias=False)) if len(raw) >= 3 else np.nan,
+                    "normaltest_p_raw": raw_p,
+                    "normaltest_p_log1p": log_p,
+                    "raw_rejects_normality_0_05": bool(pd.notna(raw_p) and raw_p < 0.05),
+                    "log1p_rejects_normality_0_05": bool(pd.notna(log_p) and log_p < 0.05),
+                }
+            )
+    return pd.DataFrame(rows)
+
+
+def client_pairwise_black_hills_region_tests(frame: pd.DataFrame, variables: list[str]) -> pd.DataFrame:
+    """Compare Black Hills directly with each benchmark region, one pair at a time."""
+
+    rows: list[dict[str, object]] = []
+    benchmark_regions = [region for region in REGION_ORDER if region != "Black Hills"]
+    for benchmark_region in benchmark_regions:
+        pair = frame.loc[frame["region_label"].isin(["Black Hills", benchmark_region])].copy()
+        if pair.empty:
+            continue
+        pair["pairwise_group"] = np.where(pair["region_label"].eq("Black Hills"), "Black Hills", benchmark_region)
+        table = client_rank_test_table(
+            pair,
+            variables,
+            "pairwise_group",
+            include_permutation=False,
+        )
+        # client_rank_test_table only adds permutations for comparison_group. Add them
+        # explicitly so every pair has the same two direct-test rows as the pooled table.
+        permutation_rows: list[dict[str, object]] = []
+        for variable in variables:
+            if variable not in pair.columns:
+                continue
+            permutation = permutation_test_difference(
+                pair,
+                variable,
+                group_column="pairwise_group",
+                a="Black Hills",
+                b=benchmark_region,
+            )
+            permutation_rows.append(
+                {
+                    "test": permutation["test"],
+                    "variable": variable,
+                    "statistic": permutation["statistic"],
+                    "p_value": permutation["p_value"],
+                    "n": permutation["n"],
+                }
+            )
+        if permutation_rows:
+            table = pd.concat([table, pd.DataFrame(permutation_rows)], ignore_index=True)
+            table["significant_before_fdr"] = np.where(table["p_value"].lt(0.05), "Yes", "No")
+            table["fdr_p_value"] = fdr_bh(table["p_value"])
+            table["significant_after_fdr"] = np.where(table["fdr_p_value"].lt(0.05), "Yes", "No")
+
+        grouped = pair.groupby("pairwise_group")
+
+        def direction(row: pd.Series) -> str:
+            variable = str(row["variable"])
+            if variable not in pair.columns or "Black Hills" not in grouped.groups or benchmark_region not in grouped.groups:
+                return ""
+            bh_values = grouped.get_group("Black Hills")[variable].dropna().clip(lower=0)
+            bm_values = grouped.get_group(benchmark_region)[variable].dropna().clip(lower=0)
+            if row.get("test") == "permutation_mean_diff":
+                bh = bh_values.mean()
+                bm = bm_values.mean()
+            elif variable in CLIENT_RAW_LEVEL_VARIABLES:
+                bh = bh_values.median()
+                bm = bm_values.median()
+                if math.isclose(float(bh), float(bm), rel_tol=0, abs_tol=0.001):
+                    bh = bh_values.gt(0).mean()
+                    bm = bm_values.gt(0).mean()
+            else:
+                bh = bh_values.mean()
+                bm = bm_values.mean()
+            if pd.isna(bh) or pd.isna(bm):
+                return ""
+            if math.isclose(float(bh), float(bm), rel_tol=0, abs_tol=0.001):
+                return "No meaningful difference"
+            return "Black Hills higher" if bh > bm else "Black Hills lower"
+
+        table["benchmark_region"] = benchmark_region
+        table["comparison"] = f"Black Hills vs {benchmark_region}"
+        table["direction"] = table.apply(direction, axis=1)
+        rows.extend(table.to_dict("records"))
+    if not rows:
+        return pd.DataFrame()
+    out = pd.DataFrame(rows)
+    ordered_columns = [
+        "comparison",
+        "benchmark_region",
+        "test",
+        "variable",
+        "direction",
+        "statistic",
+        "p_value",
+        "n",
+        "significant_before_fdr",
+        "fdr_p_value",
+        "significant_after_fdr",
+    ]
+    return out[[column for column in ordered_columns if column in out.columns]]
+
+
+def write_client_equivalent_tables(frame: pd.DataFrame, tables_dir: Path) -> dict[str, pd.DataFrame]:
+    """
+    Write the compact tables that mirror the client notebook exactly.
+
+    The main script writes a broader statistical suite. These tables are kept
+    separately so reviewers can trace notebook figures and interpretations back
+    to compact rank-test, raw-dollar, and log-dollar tables.
+    """
+
+    info("Writing client-notebook-equivalent rank-test tables.")
+    for stale_name in [
+        "client_bh_vs_benchmark_level_welch_tests.csv",
+        "client_year_by_year_level_welch_tests.csv",
+        "client_bh_vs_benchmark_level_anova.csv",
+        "client_year_by_year_level_anova.csv",
+    ]:
+        stale_path = tables_dir / stale_name
+        if stale_path.exists():
+            stale_path.unlink()
+    client_tables = {
+        "client_raw_level_region_summary": client_raw_level_summary(frame, CLIENT_RAW_LEVEL_VARIABLES),
+        "client_raw_level_normality_diagnostics": client_raw_level_normality_diagnostics(frame, CLIENT_RAW_LEVEL_VARIABLES),
+        "client_five_region_raw_level_rank_tests": client_rank_test_table(
+            frame,
+            CLIENT_RAW_LEVEL_VARIABLES,
+            "region_label",
+        ),
+        "client_bh_vs_benchmark_raw_level_rank_tests": client_rank_test_table(
+            frame,
+            CLIENT_RAW_LEVEL_VARIABLES,
+            "comparison_group",
+            include_permutation=True,
+        ),
+        "client_pairwise_black_hills_region_raw_level_rank_tests": client_pairwise_black_hills_region_tests(
+            frame,
+            CLIENT_RAW_LEVEL_VARIABLES,
+        ),
+        "client_year_by_year_five_region_raw_level_rank_tests": client_year_by_year_rank_tables(
+            frame,
+            CLIENT_RAW_LEVEL_VARIABLES,
+            "region_label",
+        ),
+        "client_year_by_year_raw_level_rank_tests": client_year_by_year_rank_tables(
+            frame,
+            CLIENT_RAW_LEVEL_VARIABLES,
+            "comparison_group",
+            include_permutation=True,
+        ),
+        "client_five_region_share_rank_tests": client_rank_test_table(frame, SHARE_COMPONENTS, "region_label"),
+        "client_bh_vs_benchmark_share_rank_tests": client_rank_test_table(
+            frame,
+            SHARE_COMPONENTS,
+            "comparison_group",
+            include_permutation=True,
+        ),
+        "client_year_by_year_five_region_share_rank_tests": client_year_by_year_rank_tables(
+            frame,
+            SHARE_COMPONENTS,
+            "region_label",
+        ),
+        "client_year_by_year_bh_vs_benchmark_share_rank_tests": client_year_by_year_rank_tables(
+            frame,
+            SHARE_COMPONENTS,
+            "comparison_group",
+            include_permutation=True,
+        ),
+        "client_pairwise_black_hills_region_share_rank_tests": client_pairwise_black_hills_region_tests(
+            frame,
+            SHARE_COMPONENTS,
+        ),
+        "client_bh_vs_benchmark_log_level_rank_tests": client_rank_test_table(
+            frame,
+            CLIENT_LOG_LEVEL_VARIABLES,
+            "comparison_group",
+            include_permutation=True,
+        ),
+        "client_year_by_year_log_level_rank_tests": client_year_by_year_rank_tables(
+            frame,
+            CLIENT_LOG_LEVEL_VARIABLES,
+            "comparison_group",
+            include_permutation=True,
+        ),
+    }
+    for name, table in client_tables.items():
+        write_table(table, tables_dir / f"{name}.csv")
+    return client_tables
+
+
+def format_p_value(p_value: float) -> str:
+    """Format p-values for compact chart titles."""
+
+    if pd.isna(p_value):
+        return "p=NA"
+    if float(p_value) < 0.001:
+        return "p<0.001"
+    return f"p={float(p_value):.3f}"
+
+
+def format_kruskal_title(frame: pd.DataFrame, variable: str, label: str, group_column: str = "region_label") -> str:
+    """Return a notebook-style panel title with Kruskal-Wallis statistic and p-value."""
+
+    result = rank_test_result(frame, variable, group_column=group_column)
+    statistic = result["statistic"]
+    p_value = result["p_value"]
+    if pd.isna(statistic):
+        return f"{label}\n(Kruskal-Wallis: H=NA, p=NA)"
+    return f"{label}\n(Kruskal-Wallis: H={float(statistic):.3f}, {format_p_value(float(p_value))})"
+
+
+def save_client_stacked_mix(
+    mix: pd.DataFrame,
+    index_column: str,
+    output_path: Path,
+    title: str,
+    *,
+    order: list[str] | None = None,
+    x_labels: list[str] | None = None,
+    figsize: tuple[float, float] = (11, 6),
+) -> None:
+    """Save the notebook-style aggregate-dollar stacked revenue mix chart."""
+
+    pivot = mix.pivot_table(index=index_column, columns="component", values="normalized_mix_share", aggfunc="sum").fillna(0)
+    if order is not None:
+        pivot = pivot.loc[order]
+    else:
+        pivot = pivot.sort_index()
+    pivot = pivot[[component for component in SOURCE_COMPONENTS if component in pivot.columns]]
+
+    fig, ax = plt.subplots(figsize=figsize)
+    bottom = np.zeros(len(pivot))
+    x_positions = np.arange(len(pivot))
+    for component in pivot.columns:
+        values = pivot[component].to_numpy()
+        ax.bar(
+            x_positions,
+            values,
+            bottom=bottom,
+            label=DISPLAY_LABELS[component],
+            color=SOURCE_COLORS[component],
+            edgecolor="white",
+            linewidth=0.6,
+        )
+        bottom += values
+
+    labels = x_labels if x_labels is not None else [str(value) for value in pivot.index]
+    ax.set_xticks(x_positions)
+    tick_labels = ax.set_xticklabels(labels)
+    for x_position, label, tick_label in zip(x_positions, labels, tick_labels):
+        region_color = REGION_COLORS.get(str(label).replace("\n", " "))
+        if region_color is None:
+            continue
+        tick_label.set_color(region_color)
+        tick_label.set_fontweight("bold")
+        ax.plot(
+            [x_position - 0.35, x_position + 0.35],
+            [-0.075, -0.075],
+            transform=ax.get_xaxis_transform(),
+            color=region_color,
+            linewidth=4,
+            solid_capstyle="round",
+            clip_on=False,
+        )
+
+    ax.set_title(title, fontsize=14, weight="bold")
+    ax.set_ylabel("Normalized share of reported revenue-source mix")
+    ax.set_ylim(0, 1)
+    ax.yaxis.set_major_formatter(lambda value, _: f"{value:.0%}")
+    ax.legend(loc="center left", bbox_to_anchor=(1.02, 0.5), frameon=False)
+    ax.grid(axis="y", alpha=0.25)
+    fig.tight_layout()
+    fig.savefig(output_path, dpi=200, bbox_inches="tight")
+    plt.close(fig)
+    info(f"Saved client chart: {output_path}")
+
+
+def build_region_positive_median_table(
+    frame: pd.DataFrame,
+    components: list[str],
+    *,
+    group_column: str = "region_label",
+) -> pd.DataFrame:
+    """Median dollars among positive reporters, by group and revenue-source component."""
+
+    rows: list[dict[str, object]] = []
+    for keys, group in frame.groupby(group_column, dropna=False):
+        if not isinstance(keys, tuple):
+            keys = (keys,)
+        base = dict(zip([group_column], keys, strict=False))
+        for component in components:
+            values = group[component].dropna()
+            if component == "residual_other_revenue":
+                values = values.clip(lower=0)
+            positive = values.loc[values.gt(0)]
+            positive_median = float(positive.median()) if len(positive) else np.nan
+            rows.append(
+                {
+                    **base,
+                    "component": component,
+                    "positive_median": positive_median,
+                    "positive_n": int(len(positive)),
+                }
+            )
+    result = pd.DataFrame(rows)
+    if result.empty:
+        return result
+    median_sum = result.groupby(group_column, dropna=False)["positive_median"].transform("sum")
+    result["normalized_median_mix_share"] = np.where(
+        median_sum.gt(0),
+        result["positive_median"] / median_sum,
+        np.nan,
+    )
+    return result
+
+
+def save_client_stacked_positive_median_mix(
+    median_table: pd.DataFrame,
+    index_column: str,
+    output_path: Path,
+    title: str,
+    *,
+    normalize: bool = True,
+    order: list[str] | None = None,
+    figsize: tuple[float, float] = (11, 6),
+) -> None:
+    """Stack positive-only regional medians by source (optional 100% normalization within region)."""
+
+    value_column = "normalized_median_mix_share" if normalize else "positive_median"
+    pivot = median_table.pivot_table(index=index_column, columns="component", values=value_column, aggfunc="first").fillna(0)
+    if order is not None:
+        pivot = pivot.reindex(order).fillna(0)
+    else:
+        pivot = pivot.sort_index()
+    pivot = pivot[[component for component in SOURCE_COMPONENTS if component in pivot.columns]]
+
+    fig, ax = plt.subplots(figsize=figsize)
+    bottom = np.zeros(len(pivot))
+    x_positions = np.arange(len(pivot))
+    for component in pivot.columns:
+        values = pivot[component].to_numpy()
+        ax.bar(
+            x_positions,
+            values,
+            bottom=bottom,
+            label=DISPLAY_LABELS[component],
+            color=SOURCE_COLORS[component],
+            edgecolor="white",
+            linewidth=0.6,
+        )
+        bottom += values
+
+    labels = [str(value) for value in pivot.index]
+    ax.set_xticks(x_positions)
+    tick_labels = ax.set_xticklabels(labels)
+    for x_position, label, tick_label in zip(x_positions, labels, tick_labels):
+        region_color = REGION_COLORS.get(str(label).replace("\n", " "))
+        if region_color is None:
+            continue
+        tick_label.set_color(region_color)
+        tick_label.set_fontweight("bold")
+        ax.plot(
+            [x_position - 0.35, x_position + 0.35],
+            [-0.075, -0.075],
+            transform=ax.get_xaxis_transform(),
+            color=region_color,
+            linewidth=4,
+            solid_capstyle="round",
+            clip_on=False,
+        )
+
+    if normalize:
+        ax.set_ylabel("Share of summed positive-only medians within region")
+        ax.set_ylim(0, 1)
+        ax.yaxis.set_major_formatter(lambda value, _: f"{value:.0%}")
+    else:
+        bar_totals = pivot.sum(axis=1).to_numpy()
+        upper = float(np.nanmax(bar_totals)) if len(bar_totals) else 0.0
+        for x_position, total in enumerate(bar_totals):
+            if total <= 0:
+                continue
+            ax.text(
+                x_position,
+                total + upper * 0.01,
+                f"${total:,.0f}",
+                ha="center",
+                va="bottom",
+                fontsize=9,
+                color="#333333",
+            )
+        ax.set_ylabel("Sum of positive-only source medians ($)")
+        ax.set_ylim(0, upper * 1.08 if upper else 1)
+        ax.yaxis.set_major_formatter(lambda value, _: f"${value:,.0f}")
+
+    ax.set_title(title, fontsize=14, weight="bold")
+    ax.legend(loc="center left", bbox_to_anchor=(1.02, 0.5), frameon=False)
+    ax.grid(axis="y", alpha=0.25)
+    fig.tight_layout()
+    fig.savefig(output_path, dpi=200, bbox_inches="tight")
+    plt.close(fig)
+    info(f"Saved client chart: {output_path}")
+
+
+def save_client_stacked_mix_dollars(
+    mix: pd.DataFrame,
+    index_column: str,
+    output_path: Path,
+    title: str,
+    *,
+    order: list[str] | None = None,
+    x_labels: list[str] | None = None,
+    figsize: tuple[float, float] = (11, 6),
+) -> None:
+    """Save an aggregate-dollar stacked revenue-mix chart (not normalized shares)."""
+
+    pivot = mix.pivot_table(index=index_column, columns="component", values="amount", aggfunc="sum").fillna(0)
+    if order is not None:
+        pivot = pivot.reindex(order).fillna(0)
+    else:
+        pivot = pivot.sort_index()
+    pivot = pivot[[component for component in SOURCE_COMPONENTS if component in pivot.columns]]
+
+    fig, ax = plt.subplots(figsize=figsize)
+    bottom = np.zeros(len(pivot))
+    x_positions = np.arange(len(pivot))
+    for component in pivot.columns:
+        values = pivot[component].to_numpy()
+        ax.bar(
+            x_positions,
+            values,
+            bottom=bottom,
+            label=DISPLAY_LABELS[component],
+            color=SOURCE_COLORS[component],
+            edgecolor="white",
+            linewidth=0.6,
+        )
+        bottom += values
+
+    labels = x_labels if x_labels is not None else [str(value) for value in pivot.index]
+    ax.set_xticks(x_positions)
+    tick_labels = ax.set_xticklabels(labels)
+    for x_position, label, tick_label in zip(x_positions, labels, tick_labels):
+        region_color = REGION_COLORS.get(str(label).replace("\n", " "))
+        if region_color is None:
+            continue
+        tick_label.set_color(region_color)
+        tick_label.set_fontweight("bold")
+        ax.plot(
+            [x_position - 0.35, x_position + 0.35],
+            [-0.075, -0.075],
+            transform=ax.get_xaxis_transform(),
+            color=region_color,
+            linewidth=4,
+            solid_capstyle="round",
+            clip_on=False,
+        )
+
+    bar_totals = pivot.sum(axis=1).to_numpy()
+    upper = float(np.nanmax(bar_totals)) if len(bar_totals) else 0.0
+    for x_position, total in enumerate(bar_totals):
+        if total <= 0:
+            continue
+        ax.text(
+            x_position,
+            total + upper * 0.01,
+            f"${total:,.0f}",
+            ha="center",
+            va="bottom",
+            fontsize=9,
+            color="#333333",
+        )
+
+    ax.set_title(title, fontsize=14, weight="bold")
+    ax.set_ylabel("Aggregate reported dollars ($)")
+    ax.set_ylim(0, upper * 1.08 if upper else 1)
+    ax.yaxis.set_major_formatter(lambda value, _: f"${value:,.0f}")
+    ax.legend(loc="center left", bbox_to_anchor=(1.02, 0.5), frameon=False)
+    ax.grid(axis="y", alpha=0.25)
+    fig.tight_layout()
+    fig.savefig(output_path, dpi=200, bbox_inches="tight")
+    plt.close(fig)
+    info(f"Saved client chart: {output_path}")
+
+
+def format_compact_axis_dollars(value: float) -> str:
+    """Format large dollar values compactly for dense presentation charts."""
+
+    if pd.isna(value):
+        return ""
+    absolute = abs(float(value))
+    if absolute >= 1_000_000_000:
+        return f"${float(value) / 1_000_000_000:.1f}B"
+    if absolute >= 1_000_000:
+        if absolute < 10_000_000:
+            return f"${float(value) / 1_000_000:.1f}M"
+        return f"${float(value) / 1_000_000:.0f}M"
+    if absolute >= 1_000:
+        return f"${float(value) / 1_000:.0f}K"
+    return f"${float(value):.0f}"
+
+
+def save_client_grouped_mix_dollars_by_source(
+    mix: pd.DataFrame,
+    output_path: Path,
+    title: str,
+    *,
+    order: list[str] | None = None,
+    figsize: tuple[float, float] = (18, 8.5),
+) -> None:
+    """Save side-by-side aggregate-dollar bars by source and region.
+
+    Each panel uses its own y-axis scale. That is intentional: the chart is
+    meant to compare regions within a source, not to compare the magnitude of
+    every source on one shared axis where program-service revenue overwhelms
+    the smaller contribution lines.
+    """
+
+    regions = order or [region for region in REGION_ORDER if region in set(mix["region_label"])]
+    pivot = (
+        mix.pivot_table(index="component", columns="region_label", values="amount", aggfunc="sum")
+        .reindex(SOURCE_COMPONENTS)
+        .reindex(columns=regions)
+        .fillna(0)
+    )
+    if pivot.empty:
+        return
+
+    ncols = 4
+    nrows = int(np.ceil(len(pivot) / ncols))
+    fig, axes = plt.subplots(nrows, ncols, figsize=figsize, sharey=False)
+    axes = np.asarray(axes).ravel()
+    x = np.arange(len(regions))
+
+    for ax, component in zip(axes, pivot.index):
+        values = pivot.loc[component].to_numpy(dtype=float)
+        bars = ax.bar(
+            x,
+            values,
+            color=[REGION_COLORS.get(region, "#7C8795") for region in regions],
+            edgecolor="none",
+            linewidth=0,
+            width=0.68,
+        )
+        upper = float(np.nanmax(values)) if len(values) else 0.0
+        ax.set_ylim(0, upper * 1.22 if upper else 1)
+        ax.set_title(textwrap.fill(DISPLAY_LABELS.get(component, component), width=26), fontsize=10.5, weight="bold")
+        ax.set_xticks(x)
+        tick_labels = ax.set_xticklabels(regions, rotation=28, ha="right")
+        for region, tick_label in zip(regions, tick_labels):
+            tick_label.set_color(REGION_COLORS.get(region, "#333333"))
+            tick_label.set_fontweight("bold")
+        ax.yaxis.set_major_formatter(lambda value, _: format_compact_axis_dollars(value))
+        ax.grid(axis="y", alpha=0.22)
+        for bar, value in zip(bars, values):
+            if value <= 0:
+                continue
+            ax.text(
+                bar.get_x() + bar.get_width() / 2,
+                value + (upper * 0.025 if upper else 0.02),
+                format_compact_axis_dollars(value),
+                ha="center",
+                va="bottom",
+                fontsize=7.5,
+                color="#333333",
+            )
+
+    for ax in axes[len(pivot) :]:
+        ax.axis("off")
+
+    fig.suptitle(title, fontsize=16, weight="bold", y=1.02)
+    fig.text(
+        0.5,
+        0.005,
+        "Each panel uses its own dollar scale; bars compare regions within the same revenue source.",
+        ha="center",
+        fontsize=9,
+        color="#4B5563",
+    )
+    fig.tight_layout(rect=(0, 0.03, 1, 1))
+    fig.savefig(output_path, dpi=200, bbox_inches="tight")
+    plt.close(fig)
+    info(f"Saved client chart: {output_path}")
+
+
+def mean_share_summary(frame: pd.DataFrame) -> pd.DataFrame:
+    """Compute mean organization-level source shares by region with rough 95% CIs."""
+
+    rows = []
+    for share_col in SHARE_COMPONENTS:
+        component = share_col.replace("_share", "")
+        for region, group in frame.groupby("region_label", dropna=False):
+            values = group[share_col].dropna().clip(lower=0, upper=1)
+            n = len(values)
+            mean = float(values.mean()) if n else np.nan
+            se = float(values.std(ddof=1) / np.sqrt(n)) if n > 1 else np.nan
+            rows.append(
+                {
+                    "share_variable": share_col,
+                    "component_label": DISPLAY_LABELS[component],
+                    "region_label": region,
+                    "mean_share": mean,
+                    "ci_low": max(0, mean - 1.96 * se) if pd.notna(se) else np.nan,
+                    "ci_high": min(1, mean + 1.96 * se) if pd.notna(se) else np.nan,
+                    "n": n,
+                }
+            )
+    return pd.DataFrame(rows)
+
+
+def client_panel_grid(panel_count: int, *, width: float = 5.2, height: float = 4.4) -> tuple[plt.Figure, np.ndarray]:
+    """Create a client chart grid sized for the current number of panels."""
+
+    ncols = 3
+    nrows = int(np.ceil(panel_count / ncols))
+    fig, axes = plt.subplots(nrows, ncols, figsize=(width * ncols, height * nrows), sharey=False)
+    return fig, np.asarray(axes).ravel()
+
+
+def save_client_mean_share_bars(frame: pd.DataFrame, summary: pd.DataFrame, output_path: Path) -> None:
+    """Save the notebook's rank-test-aligned mean-share bar chart."""
+
+    fig, axes = client_panel_grid(len(SOURCE_COMPONENTS))
+    for ax, component in zip(axes, SOURCE_COMPONENTS):
+        label = DISPLAY_LABELS[component]
+        share_variable = f"{component}_share"
+        # Reindex against the full canonical region order so that runs which do
+        # not have every region (e.g. small fixtures or partial sensitivities)
+        # still render a chart with empty slots for missing regions instead of
+        # raising a KeyError.
+        sub = (
+            summary.loc[summary["component_label"].eq(label)]
+            .set_index("region_label")
+            .reindex(REGION_ORDER)
+            .reset_index()
+        )
+        x = np.arange(len(REGION_ORDER))
+        y = sub["mean_share"].to_numpy(dtype=float)
+        ci_low = sub["ci_low"].to_numpy(dtype=float)
+        ci_high = sub["ci_high"].to_numpy(dtype=float)
+        yerr = np.vstack([np.nan_to_num(y - ci_low), np.nan_to_num(ci_high - y)])
+        ax.bar(x, np.nan_to_num(y), color=[REGION_COLORS[region] for region in REGION_ORDER], edgecolor="none", linewidth=0)
+        ax.errorbar(x, np.nan_to_num(y), yerr=yerr, fmt="none", ecolor="#4A4A4A", elinewidth=1.2, capsize=0)
+        ax.set_title(format_kruskal_title(frame, share_variable, label), fontsize=10.5, weight="bold")
+        ax.set_xticks(x, REGION_ORDER, rotation=25, ha="right")
+        ax.yaxis.set_major_formatter(lambda value, _: f"{value:.0%}")
+        ci_high_finite = ci_high[np.isfinite(ci_high)]
+        upper = min(1.0, max(0.05, float(ci_high_finite.max()) * 1.2)) if ci_high_finite.size else 0.05
+        ax.set_ylim(0, upper)
+        ax.grid(axis="y", alpha=0.25)
+    for ax in axes[len(SOURCE_COMPONENTS) :]:
+        ax.axis("off")
+    fig.suptitle("Mean organization-level revenue-source shares by region", fontsize=15, weight="bold", y=1.02)
+    fig.tight_layout()
+    fig.savefig(output_path, dpi=200, bbox_inches="tight")
+    plt.close(fig)
+    info(f"Saved client chart: {output_path}")
+
+
+def save_client_raw_median_bars(frame: pd.DataFrame, summary: pd.DataFrame, output_path: Path) -> None:
+    """Save median raw-dollar bars that match the primary Kruskal-Wallis tests."""
+
+    fig, axes = client_panel_grid(len(CLIENT_RAW_LEVEL_VARIABLES))
+    for ax, variable in zip(axes, CLIENT_RAW_LEVEL_VARIABLES):
+        label = CLIENT_RAW_DISPLAY_LABELS.get(variable, variable)
+        # Reindex against the canonical region order so missing regions render
+        # as empty slots rather than raising on .loc lookup.
+        sub = (
+            summary.loc[summary["variable"].eq(variable)]
+            .set_index("region_label")
+            .reindex(REGION_ORDER)
+            .reset_index()
+        )
+        x = np.arange(len(REGION_ORDER))
+        y = sub["median"].to_numpy(dtype=float)
+        y_finite_abs_max = float(np.nanmax(np.abs(y))) if np.isfinite(y).any() else 0.0
+        nonzero_percent = sub["nonzero_percent"].to_numpy(dtype=float)
+        nonzero_finite_max = float(np.nanmax(nonzero_percent)) if np.isfinite(nonzero_percent).any() else 0.0
+        y_is_nonzero_rate = bool(y_finite_abs_max <= 0.001 and nonzero_finite_max > 0)
+        if y_is_nonzero_rate:
+            y = nonzero_percent
+        ax.bar(x, np.nan_to_num(y), color=[REGION_COLORS[region] for region in REGION_ORDER], edgecolor="none", linewidth=0)
+        title_label = f"{label}\n(nonzero reporting rate)" if y_is_nonzero_rate else label
+        ax.set_title(format_kruskal_title(frame, variable, title_label), fontsize=10.5, weight="bold")
+        ax.set_xticks(x, REGION_ORDER, rotation=25, ha="right")
+        y_finite_max = float(np.nanmax(y)) if np.isfinite(y).any() else 0.0
+        if y_is_nonzero_rate:
+            ax.yaxis.set_major_formatter(lambda value, _: f"{value:.0%}")
+            upper = min(1.0, max(0.05, y_finite_max * 1.25)) if y_finite_max > 0 else 1.0
+        else:
+            ax.yaxis.set_major_formatter(lambda value, _: f"${value:,.0f}")
+            upper = max(1.0, y_finite_max * 1.25) if y_finite_max > 0 else 1.0
+        ax.set_ylim(0, upper)
+        ax.grid(axis="y", alpha=0.25)
+    for ax in axes[len(CLIENT_RAW_LEVEL_VARIABLES) :]:
+        ax.axis("off")
+    fig.suptitle("Median organization-level raw revenue amounts by region", fontsize=15, weight="bold", y=1.02)
+    fig.tight_layout()
+    fig.savefig(output_path, dpi=200, bbox_inches="tight")
+    plt.close(fig)
+    info(f"Saved client chart: {output_path}")
+
+
+def slugify_label(value: str) -> str:
+    """Return a filesystem-friendly lowercase label."""
+
+    return re.sub(r"[^a-z0-9]+", "_", value.lower()).strip("_")
+
+
+def pairwise_presentation_summary(frame: pd.DataFrame, variables: list[str]) -> pd.DataFrame:
+    """Build the Black Hills vs individual benchmark-region chart summary.
+
+    Every revenue and contribution source is summarized on **positive values
+    only**: organizations that legitimately reported $0 on Form 990 Line 1
+    sub-lines (or on whole-form lines that happen to be $0) are excluded so the
+    chart answers the question "of the organizations that receive this source,
+    what does the distribution look like?". The Form 990 reconciliation audit in
+    `scripts/diagnostics/form_990_line1_blanks_audit.py` confirms these zeros
+    are real reported zeros (not missing data), so dropping them changes the
+    research question rather than fixing a data-quality issue.
+    """
+
+    rows: list[dict[str, object]] = []
+    benchmark_regions = [region for region in REGION_ORDER if region != "Black Hills"]
+    for variable in variables:
+        label = CLIENT_RAW_DISPLAY_LABELS.get(variable, DISPLAY_LABELS.get(variable, variable))
+        for benchmark_region in benchmark_regions:
+            for region in ["Black Hills", benchmark_region]:
+                values = frame.loc[frame["region_label"].eq(region), variable].dropna().clip(lower=0)
+                positive_values = values.loc[values.gt(0)]
+                # IQR of the positive subset answers "where does the middle 50%
+                # of reporting organizations sit?", which is a spread metric for
+                # the population of reporters rather than an uncertainty
+                # interval for the median estimate. With at least two positive
+                # observations np.percentile returns the standard linear
+                # interpolation; with fewer it returns NaN so the chart skips
+                # the whisker cleanly.
+                if len(positive_values) >= 2:
+                    iqr_p25 = float(np.percentile(positive_values.to_numpy(dtype=float), 25))
+                    iqr_p75 = float(np.percentile(positive_values.to_numpy(dtype=float), 75))
+                else:
+                    iqr_p25 = np.nan
+                    iqr_p75 = np.nan
+                rows.append(
+                    {
+                        "variable": variable,
+                        "variable_label": label,
+                        "comparison": f"Black Hills vs {benchmark_region}",
+                        "benchmark_region": benchmark_region,
+                        "region_label": region,
+                        "n": int(len(values)),
+                        "positive_n": int(len(positive_values)),
+                        "median": float(values.median()) if len(values) else np.nan,
+                        "nonzero_percent": float(values.gt(0).mean()) if len(values) else np.nan,
+                        "positive_median": float(positive_values.median()) if len(positive_values) else np.nan,
+                        "positive_iqr_p25": iqr_p25,
+                        "positive_iqr_p75": iqr_p75,
+                    }
+                )
+    out = pd.DataFrame(rows)
+    if out.empty:
+        return out
+    # Headline metric for every revenue/contribution source is the positive-only
+    # median. The historical "switch to nonzero_percent if every region's median
+    # is zero" branch is intentionally removed: with the audit-validated zeros,
+    # the slide story is "of organizations that receive this source, the median
+    # amount is $X".
+    out["display_metric"] = "positive_median"
+    out["display_value"] = out["positive_median"]
+    return out
+
+
+def save_client_pairwise_source_charts(frame: pd.DataFrame, variables: list[str], output_dir: Path) -> pd.DataFrame:
+    """
+    Save one presentation chart per requested source.
+
+    Each chart has four pairwise panels: Black Hills vs Billings, Flagstaff,
+    Sioux Falls, and Missoula. Strict median-dollar charts are always saved.
+    If the all-organization median is zero in every panel for a source, a
+    companion presentation chart displays nonzero reporting rate instead so the
+    slide remains informative.
+    """
+
+    summary = pairwise_presentation_summary(frame, variables)
+    if summary.empty:
+        return summary
+
+    benchmark_regions = [region for region in REGION_ORDER if region != "Black Hills"]
+
+    def _save_chart(
+        variable_summary: pd.DataFrame,
+        *,
+        metric_column: str,
+        metric_label: str,
+        output_path: Path,
+        title_suffix: str,
+        percent_axis: bool = False,
+    ) -> None:
+        label = variable_summary["variable_label"].iloc[0]
+        fig, axes = plt.subplots(1, 4, figsize=(15.5, 4.6), sharey=True)
+        max_value = float(np.nanmax(variable_summary[metric_column])) if len(variable_summary) else 0.0
+        for ax, benchmark_region in zip(axes, benchmark_regions):
+            sub = (
+                variable_summary.loc[variable_summary["benchmark_region"].eq(benchmark_region)]
+                .set_index("region_label")
+                .loc[["Black Hills", benchmark_region]]
+                .reset_index()
+            )
+            x = np.arange(len(sub))
+            y = sub[metric_column].to_numpy(dtype=float)
+            ax.bar(
+                x,
+                y,
+                color=[REGION_COLORS.get(region, "#7C8795") for region in sub["region_label"]],
+                edgecolor="none",
+                linewidth=0,
+                width=0.62,
+            )
+            ax.set_title(f"Black Hills vs\n{benchmark_region}", fontsize=10.5, weight="bold")
+            ax.set_xticks(x, sub["region_label"], rotation=25, ha="right")
+            if percent_axis:
+                ax.yaxis.set_major_formatter(lambda value, _: f"{value:.0%}")
+                upper = min(1.0, max(0.05, max_value * 1.25))
+            else:
+                ax.yaxis.set_major_formatter(lambda value, _: f"${value:,.0f}")
+                upper = max(1.0, max_value * 1.25)
+                if max_value <= 0:
+                    ax.text(
+                        0.5,
+                        0.5,
+                        "all medians are $0",
+                        ha="center",
+                        va="center",
+                        transform=ax.transAxes,
+                        fontsize=9.5,
+                        color="#555555",
+                    )
+            ax.set_ylim(0, upper)
+            ax.grid(axis="y", alpha=0.25)
+        axes[0].set_ylabel(metric_label)
+        fig.suptitle(f"{label}: Black Hills vs each benchmark region{title_suffix}", fontsize=15, weight="bold", y=1.08)
+        fig.tight_layout()
+        fig.savefig(output_path, dpi=200, bbox_inches="tight")
+        plt.close(fig)
+        info(f"Saved client chart: {output_path}")
+
+    for variable in variables:
+        variable_summary = summary.loc[summary["variable"].eq(variable)].copy()
+        slug = slugify_label(variable)
+
+        _save_chart(
+            variable_summary,
+            metric_column="median",
+            metric_label="Median dollars",
+            output_path=output_dir / f"client_pairwise_median_{slug}.png",
+            title_suffix=" (median dollars)",
+        )
+
+        display_metric = variable_summary["display_metric"].iloc[0]
+        if display_metric == "nonzero_percent":
+            _save_chart(
+                variable_summary,
+                metric_column="nonzero_percent",
+                metric_label="Nonzero reporting rate",
+                output_path=output_dir / f"client_pairwise_{slug}.png",
+                title_suffix=" (nonzero reporting rate)",
+                percent_axis=True,
+            )
+        else:
+            _save_chart(
+                variable_summary,
+                metric_column="median",
+                metric_label="Median dollars",
+                output_path=output_dir / f"client_pairwise_{slug}.png",
+                title_suffix=" (median dollars)",
+            )
+
+    return summary
+
+
+def format_slide_p_value(p_value: float) -> str:
+    """Format p-values for presentation bullets."""
+
+    if pd.isna(p_value):
+        return "= NA"
+    if float(p_value) < 0.001:
+        return "< 0.001"
+    return f"= {float(p_value):.3f}"
+
+
+def format_chart_perm_p(p_value: float) -> str:
+    """Compact p-value label for slide bullets and tables."""
+
+    if pd.isna(p_value):
+        return ""
+    if float(p_value) < 0.001:
+        return "p < 0.001"
+    return f"p = {float(p_value):.3f}"
+
+
+def format_slide_dollars(value: float) -> str:
+    """Format dollars for compact slide tables."""
+
+    if pd.isna(value):
+        return "NA"
+    return f"${float(value):,.0f}"
+
+
+def _format_signed_dollars(value: float) -> str:
+    """Format a signed dollar amount (median gap) with explicit sign and thousands."""
+
+    if pd.isna(value):
+        return "NA"
+    rounded = float(value)
+    if rounded == 0:
+        return "$0"
+    sign = "-" if rounded < 0 else "+"
+    return f"{sign}${abs(rounded):,.0f}"
+
+
+def _format_median_gap_with_ci(
+    point: float | None,
+    ci_low: float | None,
+    ci_high: float | None,
+) -> str:
+    """Render ``+/-$gap (95% CI low to high)`` for slide tables and bullets."""
+
+    if point is None or pd.isna(point):
+        return "NA"
+    base = _format_signed_dollars(float(point))
+    if ci_low is None or ci_high is None or pd.isna(ci_low) or pd.isna(ci_high):
+        return base
+    return f"{base} (95% CI {_format_signed_dollars(float(ci_low))} to {_format_signed_dollars(float(ci_high))})"
+
+
+def format_slide_iqr(p25: float | None, p75: float | None) -> str:
+    """Format the IQR (25th-75th percentile) for inline slide text.
+
+    Returns an empty string when either bound is missing so the bullet stays
+    readable. The IQR describes the spread of the population of reporting
+    organizations, not the uncertainty of the median estimate; the bullet text
+    uses "IQR" explicitly to avoid confusion with a confidence interval.
+    """
+
+    if p25 is None or p75 is None or pd.isna(p25) or pd.isna(p75):
+        return ""
+    low_value = float(p25)
+    high_value = float(p75)
+    if math.isclose(low_value, high_value, rel_tol=0, abs_tol=0.5):
+        return f"(IQR ≈ {format_slide_dollars(low_value)})"
+    return f"(IQR {format_slide_dollars(low_value)}–{format_slide_dollars(high_value)})"
+
+
+def build_2022_pairwise_presentation_table(frame: pd.DataFrame, variables: list[str]) -> pd.DataFrame:
+    """Build one Mann-Whitney pairwise row per variable and benchmark region for 2022 slides.
+
+    The headline metric and statistical test are both computed on the
+    **positive subset** of each region's filers — i.e. organizations that
+    actually report the source. The Mann-Whitney U test compares positive
+    values only so the p-value answers the conditional question "among
+    organizations that receive this source, do the dollar amounts differ?".
+    Benjamini-Hochberg FDR is applied across the four pairwise p-values within
+    a single variable so the multiple-comparison adjustment matches the slide
+    that the reader is looking at.
+    """
+
+    year_frame = frame.loc[frame["tax_year"].astype(str).eq("2022")].copy()
+
+    rows: list[dict[str, object]] = []
+    benchmark_regions = [region for region in REGION_ORDER if region != "Black Hills"]
+    for variable in variables:
+        label = CLIENT_RAW_DISPLAY_LABELS.get(variable, DISPLAY_LABELS.get(variable, variable))
+        variable_rows: list[dict[str, object]] = []
+        for benchmark_region in benchmark_regions:
+            bh_values = year_frame.loc[year_frame["region_label"].eq("Black Hills"), variable].dropna().clip(lower=0)
+            benchmark_values = year_frame.loc[year_frame["region_label"].eq(benchmark_region), variable].dropna().clip(lower=0)
+            bh_median = float(bh_values.median()) if len(bh_values) else np.nan
+            benchmark_median = float(benchmark_values.median()) if len(benchmark_values) else np.nan
+            bh_nonzero_percent = float(bh_values.gt(0).mean()) if len(bh_values) else np.nan
+            benchmark_nonzero_percent = float(benchmark_values.gt(0).mean()) if len(benchmark_values) else np.nan
+            bh_positive = bh_values.loc[bh_values.gt(0)]
+            benchmark_positive = benchmark_values.loc[benchmark_values.gt(0)]
+            bh_positive_n = int(len(bh_positive))
+            benchmark_positive_n = int(len(benchmark_positive))
+            bh_positive_median = float(bh_positive.median()) if bh_positive_n else np.nan
+            benchmark_positive_median = float(benchmark_positive.median()) if benchmark_positive_n else np.nan
+            if bh_positive_n >= 2:
+                bh_iqr_p25 = float(np.percentile(bh_positive.to_numpy(dtype=float), 25))
+                bh_iqr_p75 = float(np.percentile(bh_positive.to_numpy(dtype=float), 75))
+            else:
+                bh_iqr_p25 = np.nan
+                bh_iqr_p75 = np.nan
+            if benchmark_positive_n >= 2:
+                benchmark_iqr_p25 = float(np.percentile(benchmark_positive.to_numpy(dtype=float), 25))
+                benchmark_iqr_p75 = float(np.percentile(benchmark_positive.to_numpy(dtype=float), 75))
+            else:
+                benchmark_iqr_p25 = np.nan
+                benchmark_iqr_p75 = np.nan
+
+            # Mann-Whitney U on the positive subset only. The test is skipped
+            # gracefully when either group has fewer than two positive
+            # observations, because rank-sum requires variance in both groups.
+            if bh_positive_n >= 2 and benchmark_positive_n >= 2:
+                test_stat, p_value = stats.mannwhitneyu(
+                    bh_positive.to_numpy(dtype=float),
+                    benchmark_positive.to_numpy(dtype=float),
+                    alternative="two-sided",
+                )
+                mann_u = float(test_stat)
+                p_value = float(p_value)
+            else:
+                mann_u = np.nan
+                p_value = np.nan
+
+            if pd.isna(bh_positive_median) or pd.isna(benchmark_positive_median):
+                direction = ""
+            elif math.isclose(float(bh_positive_median), float(benchmark_positive_median), rel_tol=0, abs_tol=0.001):
+                direction = "No median difference among reporters"
+            else:
+                direction = (
+                    "Black Hills higher among reporters"
+                    if bh_positive_median > benchmark_positive_median
+                    else "Black Hills lower among reporters"
+                )
+
+            # Permutation test on the median difference is the slide-aligned
+            # headline test: it asks directly whether the median dollar gap
+            # between Black Hills and this benchmark region is unusual under
+            # random relabeling of the pooled positive reporters. Mann-Whitney
+            # U is retained alongside as a distribution-level cross-check.
+            perm_result = permutation_median_difference(
+                bh_positive.to_numpy(dtype=float),
+                benchmark_positive.to_numpy(dtype=float),
+                iterations=PERMUTATION_ITERATIONS_2022,
+                seed=PERMUTATION_SEED_2022,
+            )
+            ci_result = bootstrap_median_difference_ci(
+                bh_positive.to_numpy(dtype=float),
+                benchmark_positive.to_numpy(dtype=float),
+                iterations=BOOTSTRAP_ITERATIONS_2022,
+                seed=PERMUTATION_SEED_2022,
+            )
+
+            variable_rows.append(
+                {
+                    "tax_year": "2022",
+                    "variable": variable,
+                    "variable_label": label,
+                    "comparison": f"Black Hills vs {benchmark_region}",
+                    "benchmark_region": benchmark_region,
+                    "display_metric": "positive_median",
+                    "black_hills_median": bh_median,
+                    "benchmark_median": benchmark_median,
+                    "black_hills_nonzero_percent": bh_nonzero_percent,
+                    "benchmark_nonzero_percent": benchmark_nonzero_percent,
+                    "black_hills_positive_n": bh_positive_n,
+                    "benchmark_positive_n": benchmark_positive_n,
+                    "black_hills_positive_median": bh_positive_median,
+                    "benchmark_positive_median": benchmark_positive_median,
+                    "black_hills_positive_iqr_p25": bh_iqr_p25,
+                    "black_hills_positive_iqr_p75": bh_iqr_p75,
+                    "benchmark_positive_iqr_p25": benchmark_iqr_p25,
+                    "benchmark_positive_iqr_p75": benchmark_iqr_p75,
+                    "direction": direction,
+                    "test": "permutation_median_diff_positive_only",
+                    "median_difference": perm_result["median_difference"],
+                    "median_difference_ci_low": ci_result["ci_low"],
+                    "median_difference_ci_high": ci_result["ci_high"],
+                    "permutation_p_value": perm_result["p_value"],
+                    "permutation_iterations": perm_result["iterations"],
+                    "bootstrap_iterations": ci_result["iterations"],
+                    "mann_whitney_u": mann_u,
+                    "mann_whitney_p_value": p_value,
+                    "p_value": perm_result["p_value"],
+                    "n": bh_positive_n + benchmark_positive_n,
+                }
+            )
+
+        if variable_rows:
+            # Apply Benjamini-Hochberg across the four pairwise permutation
+            # p-values per variable so multiple-comparison framing matches the
+            # slide-by-slide read. Mann-Whitney FDR is preserved on its own
+            # columns for backward compatibility with the sensitivity table.
+            perm_p_values = [row["permutation_p_value"] for row in variable_rows]
+            perm_fdr_p_values = fdr_bh(perm_p_values)
+            mw_p_values = [row["mann_whitney_p_value"] for row in variable_rows]
+            mw_fdr_p_values = fdr_bh(mw_p_values)
+            for row, raw_p, fdr_p, mw_raw, mw_fdr in zip(
+                variable_rows, perm_p_values, perm_fdr_p_values, mw_p_values, mw_fdr_p_values
+            ):
+                row["fdr_p_value"] = fdr_p
+                row["significant_before_fdr"] = (
+                    "Yes" if pd.notna(raw_p) and float(raw_p) < 0.05 else "No"
+                )
+                row["significant_after_fdr"] = (
+                    "Yes" if pd.notna(fdr_p) and float(fdr_p) < 0.05 else "No"
+                )
+                row["mann_whitney_fdr_p_value"] = mw_fdr
+                row["mann_whitney_significant_before_fdr"] = (
+                    "Yes" if pd.notna(mw_raw) and float(mw_raw) < 0.05 else "No"
+                )
+                row["mann_whitney_significant_after_fdr"] = (
+                    "Yes" if pd.notna(mw_fdr) and float(mw_fdr) < 0.05 else "No"
+                )
+        rows.extend(variable_rows)
+
+    return pd.DataFrame(rows)
+
+
+def _pairwise_significance_label(p_value: float) -> str:
+    if pd.isna(p_value):
+        return "n/a"
+    return "significant" if float(p_value) < 0.05 else "not significant"
+
+
+def summarize_2022_special_org_exclusions(full_universe_frame: pd.DataFrame) -> tuple[int, pd.DataFrame]:
+    """Count hospital/university/political org-year rows flagged in the 2022 full universe."""
+
+    year_frame = full_universe_frame.loc[full_universe_frame["tax_year"].astype(str).eq("2022")].copy()
+    special_mask = (
+        year_frame["is_hospital"].fillna(False)
+        | year_frame["is_university"].fillna(False)
+        | year_frame["is_political_org"].fillna(False)
+    )
+    rows: list[dict[str, object]] = []
+    for region in REGION_ORDER:
+        region_rows = year_frame.loc[year_frame["region_label"].eq(region)]
+        special_rows = region_rows.loc[special_mask.reindex(region_rows.index, fill_value=False)]
+        rows.append(
+            {
+                "region_label": region,
+                "full_universe_rows": int(len(region_rows)),
+                "special_org_rows": int(len(special_rows)),
+                "hospital_rows": int(region_rows["is_hospital"].fillna(False).sum()),
+                "university_rows": int(region_rows["is_university"].fillna(False).sum()),
+                "political_org_rows": int(region_rows["is_political_org"].fillna(False).sum()),
+            }
+        )
+    return int(special_mask.sum()), pd.DataFrame(rows)
+
+
+def build_2022_special_org_sensitivity_comparison(
+    excluded_frame: pd.DataFrame,
+    included_frame: pd.DataFrame,
+    variables: list[str] | None = None,
+) -> pd.DataFrame:
+    """Compare 2022 pairwise presentation tests with vs without special-org exclusions."""
+
+    variables = variables or CLIENT_PRESENTATION_VARIABLES
+    excluded_table = build_2022_pairwise_presentation_table(excluded_frame, variables)
+    included_table = build_2022_pairwise_presentation_table(included_frame, variables)
+    key_columns = [
+        "variable",
+        "variable_label",
+        "benchmark_region",
+        "direction",
+        "p_value",
+        "black_hills_positive_median",
+        "benchmark_positive_median",
+    ]
+    merged = excluded_table[key_columns].merge(
+        included_table[key_columns],
+        on=["variable", "variable_label", "benchmark_region"],
+        suffixes=("_excluded", "_included"),
+        how="outer",
+    )
+    merged["significance_excluded"] = merged["p_value_excluded"].map(_pairwise_significance_label)
+    merged["significance_included"] = merged["p_value_included"].map(_pairwise_significance_label)
+    merged["direction_changed"] = merged["direction_excluded"] != merged["direction_included"]
+    merged["significance_changed"] = merged["significance_excluded"] != merged["significance_included"]
+    merged["any_change"] = merged["direction_changed"] | merged["significance_changed"]
+    merged["p_value_delta"] = merged["p_value_included"] - merged["p_value_excluded"]
+    return merged.sort_values(["any_change", "variable", "benchmark_region"], ascending=[False, True, True]).reset_index(
+        drop=True
+    )
+
+
+def build_2022_special_org_sensitivity_slide_lines(
+    comparison: pd.DataFrame,
+    exclusion_summary: pd.DataFrame,
+    *,
+    slide_number: int,
+    first_source_slide: int,
+    last_source_slide: int,
+    special_org_ein_count: int,
+) -> list[str]:
+    """Build the sensitivity slide comparing primary exclusions to the full 2022 universe."""
+
+    changed = comparison.loc[comparison["any_change"]].copy()
+    sig_excluded = int((comparison["significance_excluded"].eq("significant")).sum())
+    sig_included = int((comparison["significance_included"].eq("significant")).sum())
+    direction_changes = int(comparison["direction_changed"].sum())
+    significance_changes = int(comparison["significance_changed"].sum())
+    total_special_rows = int(exclusion_summary["special_org_rows"].sum())
+    ein_phrase = (
+        f"{special_org_ein_count:,} unique EIN{'s' if special_org_ein_count != 1 else ''} in 2022"
+        if special_org_ein_count
+        else "no flagged EINs in 2022"
+    )
+
+    lines = [
+        f"## Slide {slide_number}: Sensitivity — including hospitals, universities, and political organizations",
+        "",
+        f"Slides {first_source_slide}–{last_source_slide} use the **primary** analysis universe, which excludes "
+        f"**{total_special_rows:,}** organization-year records flagged as hospitals, universities, or political "
+        f"organizations ({ein_phrase}) for client-peer comparability. This slide reruns the same "
+        "positive-reporter permutation-on-median pairwise tests on the **full** 2022 universe with those organizations included.",
+        "",
+        "### Excluded organization counts by region (2022 full universe before exclusion)",
+        "",
+        "| Region | Full-universe rows | Excluded special-org rows | Hospitals | Universities | Political |",
+        "| --- | ---: | ---: | ---: | ---: | ---: |",
+    ]
+    for _, row in exclusion_summary.iterrows():
+        lines.append(
+            f"| {row['region_label']} | {int(row['full_universe_rows']):,} | {int(row['special_org_rows']):,} | "
+            f"{int(row['hospital_rows']):,} | {int(row['university_rows']):,} | {int(row['political_org_rows']):,} |"
+        )
+    lines.extend(
+        [
+            "",
+            "### Headline comparison (40 pairwise tests: 10 sources × 4 benchmarks)",
+            "",
+            f"- **Significant at p < 0.05 when excluding special orgs (primary deck):** {sig_excluded}",
+            f"- **Significant at p < 0.05 when including special orgs:** {sig_included}",
+            f"- **Direction changes:** {direction_changes}",
+            f"- **Significance-status changes:** {significance_changes}",
+            "",
+        ]
+    )
+    if direction_changes == 0:
+        lines.append(
+            "- **No pairwise comparison flipped median direction** between the two universes; "
+            "where both versions are comparable, Black Hills vs benchmark stays on the same side of the median."
+        )
+        lines.append("")
+    if significance_changes == 0:
+        lines.append(
+            "- **No pairwise comparison crossed the p < 0.05 threshold** when special organizations were added back."
+        )
+        lines.append("")
+    else:
+        lines.extend(
+            [
+                "### Pairwise comparisons where significance or direction changed",
+                "",
+                "| Revenue source | Benchmark | Direction (excluded) | Direction (included) | Significance (excluded) | Significance (included) | p (excluded) | p (included) |",
+                "| --- | --- | --- | --- | --- | --- | ---: | ---: |",
+            ]
+        )
+        for _, row in changed.iterrows():
+            lines.append(
+                f"| {row['variable_label']} | {row['benchmark_region']} | {row['direction_excluded'] or 'n/a'} | "
+                f"{row['direction_included'] or 'n/a'} | {row['significance_excluded']} | {row['significance_included']} | "
+                f"{format_slide_p_value(row['p_value_excluded']).replace('= ', '')} | "
+                f"{format_slide_p_value(row['p_value_included']).replace('= ', '')} |"
+            )
+        lines.append("")
+
+    only_included = comparison.loc[
+        comparison["significance_included"].eq("significant") & ~comparison["significance_excluded"].eq("significant")
+    ]
+    only_excluded = comparison.loc[
+        comparison["significance_excluded"].eq("significant") & ~comparison["significance_included"].eq("significant")
+    ]
+    if not only_included.empty:
+        lines.append("**Newly significant only when special orgs are included:**")
+        lines.append("")
+        for _, row in only_included.iterrows():
+            lines.append(
+                f"- **{row['variable_label']} vs {row['benchmark_region']}:** "
+                f"{row['direction_included']}; p moves from "
+                f"{format_slide_p_value(row['p_value_excluded']).replace('= ', '')} to "
+                f"{format_slide_p_value(row['p_value_included']).replace('= ', '')} "
+                f"(Black Hills median {format_slide_dollars(row['black_hills_positive_median_included'])}; "
+                f"{row['benchmark_region']} median {format_slide_dollars(row['benchmark_positive_median_included'])})."
+            )
+        lines.append("")
+    if not only_excluded.empty:
+        lines.append("**Significant in the primary deck but not when special orgs are included:**")
+        lines.append("")
+        for _, row in only_excluded.iterrows():
+            lines.append(
+                f"- **{row['variable_label']} vs {row['benchmark_region']}:** "
+                f"p {format_slide_p_value(row['p_value_excluded']).replace('= ', '')} (excluded) vs "
+                f"{format_slide_p_value(row['p_value_included']).replace('= ', '')} (included)."
+            )
+        lines.append("")
+
+    if sig_excluded and only_excluded.empty:
+        lines.append(
+            f"- **All {sig_excluded} comparisons significant in the primary deck remain significant** when hospitals, "
+            "universities, and political organizations are included."
+        )
+        lines.append("")
+
+    lines.extend(
+        [
+            "### How to use this slide",
+            "",
+            "- Treat the primary slides as the client-facing conclusion; this slide shows that the exclusion choice "
+            "does not overturn that story.",
+            "- Most excluded organizations are in **Sioux Falls** (16 of 25 rows), so Sioux Falls–related p-values "
+            "shift more than other regions even when significance does not change.",
+            "- The full comparison table is in `client_2022_special_org_sensitivity_comparison.csv`.",
+            "",
+        ]
+    )
+    return lines
+
+
+def save_2022_pairwise_median_charts(
+    frame: pd.DataFrame,
+    variables: list[str],
+    output_dir: Path,
+    *,
+    presentation_table: pd.DataFrame | None = None,
+    show_reporter_count: bool = False,
+) -> dict[str, Path]:
+    """Save one combined 2022 chart per presentation variable.
+
+    Each chart is a single-axis bar chart showing the **positive-only**
+    (zero-excluded) median dollar amount for Black Hills next to all four
+    benchmark regions. Bars are annotated above with `$median` and, when
+    ``show_reporter_count`` is True, a second line ``n=<reporters>``. The
+    Pairwise permutation p-values and bootstrap CIs are reported on slide
+    bullets and in ``client_2022_pairwise_presentation_summary.csv``, not on
+    the chart axis (region names only) so labels stay readable.
+    ``presentation_table`` is accepted for API compatibility but is not
+    drawn on the chart.
+
+    Stale chart files from earlier framings (``client_2022_pairwise_median_*``,
+    ``client_2022_pairwise_nonzero_rate_*``) are deleted at the end so the deck
+    assets folder cannot leak the old story.
+    """
+
+    output_dir.mkdir(parents=True, exist_ok=True)
+    year_frame = frame.loc[frame["tax_year"].astype(str).eq("2022")].copy()
+    display_summary = pairwise_presentation_summary(year_frame, variables)
+    benchmark_regions = [region for region in REGION_ORDER if region != "Black Hills"]
+    chart_regions = ["Black Hills", *benchmark_regions]
+    chart_paths: dict[str, Path] = {}
+
+    for variable in variables:
+        label = CLIENT_RAW_DISPLAY_LABELS.get(variable, DISPLAY_LABELS.get(variable, variable))
+        variable_slug = slugify_label(variable)
+        variable_rows = display_summary.loc[display_summary["variable"].eq(variable)].copy()
+
+        # Collapse the per-pairwise summary into a single row per region by
+        # taking the first occurrence (positive_median / positive_n are
+        # identical across pairwise rows for Black Hills, and benchmark rows
+        # already appear exactly once each).
+        region_table = (
+            variable_rows.drop_duplicates(subset="region_label")
+            .set_index("region_label")
+            .reindex(chart_regions)
+            .reset_index()
+        )
+        medians = region_table["positive_median"].to_numpy(dtype=float)
+        positive_n = region_table["positive_n"].to_numpy(dtype=float)
+        median_max = float(np.nanmax(medians)) if np.isfinite(medians).any() else 0.0
+        upper = max(1.0, median_max * 1.32)
+
+        fig, ax = plt.subplots(figsize=(10.0, 5.6))
+        x = np.arange(len(chart_regions))
+        colors = [REGION_COLORS.get(region, "#7C8795") for region in chart_regions]
+        bar_edge = ["#1F1F1F" if region == "Black Hills" else "none" for region in chart_regions]
+        bar_linewidth = [1.4 if region == "Black Hills" else 0.0 for region in chart_regions]
+        ax.bar(
+            x,
+            np.nan_to_num(medians, nan=0.0),
+            color=colors,
+            edgecolor=bar_edge,
+            linewidth=bar_linewidth,
+            width=0.66,
+        )
+
+        for idx, (region, value, n_pos) in enumerate(zip(chart_regions, medians, positive_n)):
+            if pd.isna(value) or n_pos <= 0:
+                ax.text(
+                    idx,
+                    upper * 0.02,
+                    "no reporters",
+                    ha="center",
+                    va="bottom",
+                    fontsize=9,
+                    color="#777777",
+                )
+                continue
+            bar_label = (
+                f"${value:,.0f}\nn={int(n_pos):,}"
+                if show_reporter_count
+                else f"${value:,.0f}"
+            )
+            ax.text(
+                idx,
+                float(value) + upper * 0.012,
+                bar_label,
+                ha="center",
+                va="bottom",
+                fontsize=9,
+                color="#333333",
+            )
+
+        ax.set_xticks(x, chart_regions, rotation=0, ha="center")
+        ax.set_xlim(-0.55, len(chart_regions) - 0.45)
+        ax.yaxis.set_major_formatter(lambda value, _: f"${value:,.0f}")
+        ax.grid(axis="y", alpha=0.25)
+        ax.set_ylabel("2022 median $ among reporters")
+        ax.set_ylim(0, upper)
+
+        ax.set_title(
+            f"{label}: 2022 median dollars among organizations that report this source",
+            fontsize=12.5,
+            weight="bold",
+            pad=10,
+        )
+        fig.tight_layout()
+        output_path = output_dir / f"client_2022_pairwise_positive_median_{variable_slug}.png"
+        fig.savefig(output_path, dpi=200, bbox_inches="tight")
+        plt.close(fig)
+        info(f"Saved client chart: {output_path}")
+        chart_paths[variable] = output_path
+
+    # Delete stale chart files from earlier framings so the deck assets folder
+    # cannot leak the old story. Only files matching the known stale prefixes
+    # are removed; unrelated files in the folder are untouched. The current
+    # output filenames are tracked in `chart_paths` so we can spare them.
+    current_filenames = {path.name for path in chart_paths.values()}
+    stale_prefixes = (
+        "client_2022_pairwise_median_",
+        "client_2022_pairwise_nonzero_rate_",
+    )
+    for stale_file in output_dir.iterdir():
+        if not stale_file.is_file():
+            continue
+        if stale_file.name in current_filenames:
+            continue
+        if stale_file.name.startswith(stale_prefixes) and stale_file.suffix.lower() == ".png":
+            try:
+                stale_file.unlink()
+                info(f"Removed stale client chart: {stale_file}")
+            except OSError as exc:
+                info(f"Could not remove stale chart {stale_file}: {exc}")
+
+    return chart_paths
+
+
+def save_2022_stacked_revenue_mix_overview(
+    frame: pd.DataFrame,
+    output_dir: Path,
+    *,
+    preserve_share_chart_dir: Path | None = None,
+) -> Path:
+    """Save descriptive 2022 aggregate-dollar revenue-mix charts.
+
+    The primary deck chart uses side-by-side aggregate reported dollars by
+    revenue source and region. When ``preserve_share_chart_dir`` is set, the
+    older stacked versions are also written there for reference.
+    """
+
+    output_dir.mkdir(parents=True, exist_ok=True)
+    year_frame = frame.loc[frame["tax_year"].astype(str).eq("2022")].copy()
+    mix_2022 = aggregate_revenue_mix(year_frame, ["region_label"])
+    region_order = [region for region in REGION_ORDER if region in set(mix_2022["region_label"])]
+    output_path = output_dir / "client_2022_stacked_revenue_mix_by_region_dollars.png"
+    save_client_grouped_mix_dollars_by_source(
+        mix_2022,
+        output_path,
+        "2022 aggregate reported dollars by revenue source and region",
+        order=region_order,
+        figsize=(18, 8.5),
+    )
+    grouped_named_path = output_dir / "client_2022_grouped_revenue_mix_by_region_dollars.png"
+    if grouped_named_path != output_path:
+        shutil.copy2(output_path, grouped_named_path)
+    median_mix_2022 = build_region_positive_median_table(year_frame, SOURCE_COMPONENTS)
+    if preserve_share_chart_dir is not None:
+        preserve_share_chart_dir.mkdir(parents=True, exist_ok=True)
+        stacked_dollars_path = preserve_share_chart_dir / "client_2022_stacked_revenue_mix_by_region_dollars_stacked.png"
+        save_client_stacked_mix_dollars(
+            mix_2022,
+            "region_label",
+            stacked_dollars_path,
+            "2022 revenue-source mix by region (aggregate reported dollars, stacked)",
+            order=region_order,
+            figsize=(13.5, 6.5),
+        )
+        share_path = preserve_share_chart_dir / "client_2022_stacked_revenue_mix_by_region.png"
+        save_client_stacked_mix(
+            mix_2022,
+            "region_label",
+            share_path,
+            "2022 revenue-source mix by region (descriptive aggregate shares)",
+            order=region_order,
+            figsize=(13.5, 6.5),
+        )
+        if not median_mix_2022.empty:
+            save_client_stacked_positive_median_mix(
+                median_mix_2022,
+                "region_label",
+                preserve_share_chart_dir / "client_2022_stacked_positive_median_mix_by_region.png",
+                "2022 stacked mix by region (positive-only medians, normalized within region)",
+                normalize=True,
+                order=region_order,
+                figsize=(13.5, 6.5),
+            )
+            save_client_stacked_positive_median_mix(
+                median_mix_2022,
+                "region_label",
+                preserve_share_chart_dir / "client_2022_stacked_positive_median_sum_by_region.png",
+                "2022 stacked sum of positive-only source medians by region (not a true total)",
+                normalize=False,
+                order=region_order,
+                figsize=(13.5, 6.5),
+            )
+    return output_path
+
+
+def save_2022_positive_median_overview(
+    frame: pd.DataFrame,
+    output_dir: Path,
+) -> Path:
+    """Save a single grouped bar chart using the same positive-only medians as the source slides."""
+
+    output_dir.mkdir(parents=True, exist_ok=True)
+    year_frame = frame.loc[frame["tax_year"].astype(str).eq("2022")].copy()
+    summary = pairwise_presentation_summary(year_frame, CLIENT_PRESENTATION_VARIABLES)
+    output_path = output_dir / "client_2022_positive_median_overview_by_region.png"
+    if summary.empty:
+        info(f"Skipping positive-median overview chart (no data): {output_path}")
+        return output_path
+
+    overview = summary.groupby(["variable", "region_label"], as_index=False).agg(
+        {
+            "variable_label": "first",
+            "positive_median": "first",
+            "positive_n": "first",
+        }
+    )
+
+    value_matrix = (
+        overview.pivot(index="variable", columns="region_label", values="positive_median")
+        .reindex(CLIENT_PRESENTATION_VARIABLES)
+        .reindex(columns=REGION_ORDER)
+    )
+    value_matrix.index = [
+        CLIENT_RAW_DISPLAY_LABELS.get(variable, DISPLAY_LABELS.get(variable, variable))
+        for variable in value_matrix.index
+    ]
+    fig, ax = plt.subplots(figsize=(18, 8.8))
+    x_centers = np.arange(len(REGION_ORDER), dtype=float)
+    bar_width = 0.072
+    offsets = np.linspace(-0.38, 0.38, len(CLIENT_PRESENTATION_VARIABLES))
+    finite_values = value_matrix.to_numpy(dtype=float)
+    finite_values = finite_values[np.isfinite(finite_values)]
+    upper = max(1.0, float(finite_values.max()) * 1.28) if finite_values.size else 1.0
+
+    for source_index, variable in enumerate(CLIENT_PRESENTATION_VARIABLES):
+        source_label = CLIENT_RAW_DISPLAY_LABELS.get(variable, DISPLAY_LABELS.get(variable, variable))
+        values = value_matrix.loc[source_label, REGION_ORDER].to_numpy(dtype=float)
+        x = x_centers + offsets[source_index]
+        ax.bar(
+            x,
+            np.nan_to_num(values, nan=0.0),
+            width=bar_width,
+            color=SOURCE_COLORS.get(variable, "#6F7F8F"),
+            edgecolor="none",
+            label=textwrap.fill(source_label, width=24),
+        )
+        for x_value, value in zip(x, values):
+            if pd.isna(value):
+                continue
+            y_value = float(value)
+            ax.text(
+                x_value,
+                y_value + upper * 0.008,
+                f"${y_value:,.0f}",
+                ha="center",
+                va="bottom",
+                fontsize=7.6,
+                color="#333333",
+                rotation=90,
+            )
+
+    ax.set_title(
+        "2022 median dollars by source and region (positive reporters only)",
+        fontsize=15,
+        weight="bold",
+        pad=18,
+    )
+    ax.set_xlabel("")
+    ax.set_ylabel("Median dollars among positive reporters")
+    ax.set_xticks(x_centers)
+    ax.set_xticklabels(REGION_ORDER, rotation=0, ha="center", fontsize=11, weight="bold")
+    for tick_label in ax.get_xticklabels():
+        region = tick_label.get_text()
+        if region in REGION_COLORS:
+            tick_label.set_color(REGION_COLORS[region])
+    ax.set_ylim(0, upper)
+    ax.yaxis.set_major_formatter(lambda value, _: format_compact_axis_dollars(value))
+    ax.tick_params(axis="x", length=0)
+    ax.grid(axis="y", alpha=0.25)
+    ax.legend(
+        title="Revenue source",
+        loc="center left",
+        bbox_to_anchor=(1.01, 0.5),
+        ncol=1,
+        frameon=False,
+        fontsize=8.5,
+    )
+
+    fig.text(
+        0.01,
+        0.01,
+        "Each bar shows the median dollar amount among organizations with a positive value for that source; colors identify revenue sources.",
+        ha="left",
+        va="bottom",
+        fontsize=9,
+        color="#555555",
+    )
+    fig.tight_layout(rect=(0, 0.06, 1, 0.98))
+    fig.savefig(output_path, dpi=200, bbox_inches="tight")
+    grouped_bar_output_path = output_dir / "client_2022_positive_median_grouped_bar_by_region.png"
+    fig.savefig(grouped_bar_output_path, dpi=200, bbox_inches="tight")
+    plt.close(fig)
+    stale_heatmap_output_path = output_dir / "client_2022_positive_median_heatmap_by_region.png"
+    if stale_heatmap_output_path.exists():
+        stale_heatmap_output_path.unlink()
+    info(f"Saved client chart: {output_path}")
+    info(f"Saved client chart: {grouped_bar_output_path}")
+    return output_path
+
+
+def build_2022_full_answer_slide_lines(
+    summary: pd.DataFrame,
+    *,
+    slide_number: int,
+    first_source_slide: int,
+    last_source_slide: int,
+) -> list[str]:
+    """Build the closing slide that answers Q9 from the 2022 pairwise summary table."""
+
+    benchmark_regions = [region for region in REGION_ORDER if region != "Black Hills"]
+    significant_rows: list[dict[str, object]] = []
+    not_significant_by_variable: dict[str, list[str]] = {}
+
+    for variable in CLIENT_PRESENTATION_VARIABLES:
+        label = CLIENT_RAW_DISPLAY_LABELS.get(variable, DISPLAY_LABELS.get(variable, variable))
+        variable_rows = summary.loc[summary["variable"].eq(variable)]
+        ns_benchmarks: list[str] = []
+        for benchmark_region in benchmark_regions:
+            row_matches = variable_rows.loc[variable_rows["benchmark_region"].eq(benchmark_region)]
+            if row_matches.empty:
+                continue
+            row = row_matches.iloc[0]
+            p_value = row.get("p_value", np.nan)
+            if pd.notna(p_value) and float(p_value) < 0.05:
+                significant_rows.append(
+                    {
+                        "label": label,
+                        "benchmark_region": benchmark_region,
+                        "direction": row.get("direction", ""),
+                        "p_value": float(p_value),
+                        "bh_median": row.get("black_hills_positive_median"),
+                        "benchmark_median": row.get("benchmark_positive_median"),
+                        "median_difference": row.get("median_difference"),
+                        "ci_low": row.get("median_difference_ci_low"),
+                        "ci_high": row.get("median_difference_ci_high"),
+                    }
+                )
+            else:
+                ns_benchmarks.append(benchmark_region)
+        if ns_benchmarks:
+            not_significant_by_variable[label] = ns_benchmarks
+
+    any_significant = bool(significant_rows)
+    lines = [
+        f"## Slide {slide_number}: Full answer — Is there a difference in revenue sources between Black Hills and benchmark regions?",
+        "",
+        "### Short answer",
+        "",
+    ]
+    if any_significant:
+        lines.append(
+            "**Yes — for tax year 2022, Black Hills differs from at least one benchmark region on several revenue sources**, "
+            "but the difference is **not uniform across all sources or all benchmarks**. "
+            "This deck tests one source at a time using organization-level dollars among organizations that **report a positive amount** "
+            "for that source (zeros excluded). Statistical significance comes from a **permutation test on the median difference** "
+            "between Black Hills and each benchmark region's positive reporters, with a 95% bootstrap confidence interval reported "
+            f"alongside; pairwise results appear on Slides {first_source_slide}–{last_source_slide} and in the table below."
+        )
+    else:
+        lines.append(
+            "**No statistically significant pairwise differences were detected at p < 0.05** under the positive-reporter "
+            "permutation-on-median framing used in this deck. That does not prove revenue sources are identical — only that "
+            "this 2022 conditional-median comparison did not clear the significance threshold."
+        )
+    lines.extend(
+        [
+            "",
+            "### What this presentation tested",
+            "",
+            "- **Question:** Do Black Hills nonprofits differ from Billings, Flagstaff, Sioux Falls, and Missoula in how they draw revenue from each source?",
+            "- **Year:** 2022 only (see `docs/Section3_Q9_Analysis.md` for the full multi-year analysis and additional statistical framings).",
+            "- **Unit:** Organization-level reported dollars per source, not regional aggregate totals or stacked-bar percentages.",
+            "- **Comparison:** Black Hills vs each benchmark region separately (four pairwise tests per source).",
+            f"- **Statistic:** Permutation test on the median difference among organizations with a **positive** value for that source ({PERMUTATION_ITERATIONS_2022:,} reshuffles); 95% percentile bootstrap CI on the same median gap ({BOOTSTRAP_ITERATIONS_2022:,} resamples). Slide bullets report medians for those reporters only.",
+            "- **Significance rule:** p < 0.05 on the pairwise permutation test (not FDR-adjusted on this slide).",
+            "",
+        ]
+    )
+
+    if significant_rows:
+        lines.extend(
+            [
+                "### Statistically significant pairwise differences (permutation p < 0.05, among positive reporters)",
+                "",
+                "| Revenue source | Benchmark region | Direction | Black Hills median | Benchmark median | Median gap (95% CI) | Permutation p |",
+                "| --- | --- | --- | ---: | ---: | ---: | ---: |",
+            ]
+        )
+        for row in sorted(significant_rows, key=lambda item: (str(item["label"]), str(item["benchmark_region"]))):
+            gap_text = _format_median_gap_with_ci(
+                row.get("median_difference"), row.get("ci_low"), row.get("ci_high")
+            )
+            lines.append(
+                f"| {row['label']} | {row['benchmark_region']} | {row['direction']} | "
+                f"{format_slide_dollars(row['bh_median'])} | {format_slide_dollars(row['benchmark_median'])} | "
+                f"{gap_text} | {format_slide_p_value(row['p_value']).replace('= ', '')} |"
+            )
+        lines.append("")
+
+    if not_significant_by_variable:
+        lines.extend(
+            [
+                "### No significant pairwise difference detected (permutation p ≥ 0.05, among positive reporters)",
+                "",
+                "For these sources, none of the four Black Hills vs benchmark comparisons reached p < 0.05 under the conditional median permutation test:",
+                "",
+            ]
+        )
+        for label in [CLIENT_RAW_DISPLAY_LABELS.get(v, v) for v in CLIENT_PRESENTATION_VARIABLES]:
+            if label not in not_significant_by_variable:
+                continue
+            regions = ", ".join(not_significant_by_variable[label])
+            lines.append(f"- **{label}:** vs {regions}")
+        lines.append("")
+
+    lines.extend(
+        [
+            "### How to state the conclusion to the board",
+            "",
+            "1. **Revenue-source patterns are not the same everywhere.** Several 2022 pairwise comparisons show statistically significant differences in dollar amounts among organizations that actually use a given source.",
+            "2. **Black Hills is often lower among reporters, not universally higher.** Where this deck finds significance, the usual pattern is a **lower median among Black Hills reporters** than in the benchmark region being compared (for example program service revenue vs Flagstaff, government grants vs Flagstaff, fundraising events vs Billings and Sioux Falls, other revenue vs Billings and Sioux Falls).",
+            "3. **Participation and dollars can tell different stories.** Black Hills sometimes has **more organizations reporting** a source (higher nonzero rate) while still showing a **lower median among reporters** on that same source. See `client_2022_pairwise_presentation_summary.csv` for reporting rates; do not describe a significant median gap as proof of higher participation without checking the rate.",
+            "4. **This deck does not replace the full Q9 report.** The broader analysis in `docs/Section3_Q9_Analysis.md` covers additional tax years and alternative statistical framings. Use this presentation for 2022 pairwise, conditional-dollar comparisons.",
+            "",
+            "### One-sentence takeaway",
+            "",
+        ]
+    )
+    if any_significant:
+        n_sig = len(significant_rows)
+        lines.append(
+            f"> **Yes — in 2022, Black Hills differs from benchmark regions on multiple revenue sources ({n_sig} significant pairwise comparison"
+            f"{'s' if n_sig != 1 else ''} at permutation p < 0.05 on the median dollar gap among positive reporters), especially where median dollars among reporters are lower than in Billings, Flagstaff, or Sioux Falls; the pattern is source-specific and should be read together with reporting rates and the full 2022–2024 Q9 analysis.**"
+        )
+    else:
+        lines.append(
+            "> **Under this 2022 positive-reporter permutation test on the median gap, no pairwise comparison reached p < 0.05; refer to `docs/Section3_Q9_Analysis.md` for the full multi-year, all-filer Q9 conclusion.**"
+        )
+    lines.append("")
+    return lines
+
+
+def write_2022_client_presentation_markdown(
+    frame: pd.DataFrame,
+    summary: pd.DataFrame,
+    output_path: Path,
+    *,
+    full_universe_frame: pd.DataFrame | None = None,
+    special_org_sensitivity_comparison: pd.DataFrame | None = None,
+    special_org_exclusion_summary: pd.DataFrame | None = None,
+    image_dir_relative: str = "assets/section3_q9_2022",
+) -> None:
+    """Write slide-ready Markdown for the 2022 Q9 client presentation."""
+
+    year_frame = frame.loc[frame["tax_year"].astype(str).eq("2022")].copy()
+    output_path.parent.mkdir(parents=True, exist_ok=True)
+    form_counts = year_frame["form_type"].value_counts().reindex(["990", "990EZ", "990PF"]).fillna(0).astype(int)
+    row_count = int(len(year_frame))
+    ein_count = int(year_frame["ein"].nunique()) if "ein" in year_frame.columns else row_count
+    excluded_rows = int(frame.attrs.get("excluded_org_type_row_count", 0))
+
+    variable_descriptions = {
+        "total_revenue": "All reported revenue for the organization in tax year 2022.",
+        "program_service_revenue": "Mission-related earned revenue from program services; available for Form 990 and 990-EZ, while Form 990-PF lacks the same comparable field. Blank supported lines are treated as zero.",
+        "total_contributions": "Total reported contributions, gifts, grants, and similar amounts across the 990-family forms. Blank supported lines are treated as zero.",
+        "government_grants_received": "Form 990 Part VIII Line 1e government grants; 990-EZ/PF are excluded for this subcomponent because they do not expose it cleanly.",
+        "federated_campaigns": "Form 990 Part VIII Line 1a federated campaign support, such as United Way-style campaign allocations.",
+        "related_org_contributions": "Form 990 Part VIII Line 1d contributions from related organizations or affiliates.",
+        "membership_dues": "Form 990 Part VIII Line 1b membership dues; an individual-adjacent proxy, not pure individual giving.",
+        "fundraising_events_contributions": "Form 990 Part VIII Line 1c fundraising event contributions; individual-adjacent, not pure individual giving.",
+        "mixed_unclassified_contributions": "Form 990 Line 1f plus all 990-EZ/PF contribution totals that cannot be decomposed into source subcategories.",
+        "residual_other_revenue": "Other revenue, calculated as total revenue minus program revenue and the detailed contribution-source components.",
+    }
+
+    lines = [
+        "# Q9 2022 Client Presentation: Revenue Sources",
+        "",
+        "## Slide 1: Dataset and revenue source variables",
+        "",
+        "### Dataset",
+        "",
+        "This presentation uses the GivingTuesday Form 990-family analysis file for the Black Hills and benchmark-region nonprofit comparison.",
+        "",
+        f"- Tax year: 2022 only.",
+        f"- Forms included: Form 990 ({form_counts.get('990', 0):,} rows), Form 990-EZ ({form_counts.get('990EZ', 0):,} rows), and Form 990-PF ({form_counts.get('990PF', 0):,} rows).",
+        f"- Analysis universe: {row_count:,} organization-year records representing {ein_count:,} unique EINs after requiring positive total revenue.",
+        f"- Exclusions: hospitals, universities, and political organizations are excluded for client-peer comparability; excluded rows in the full selected-year frame: {excluded_rows:,}.",
+        "- Statistical tests compare organization-level 2022 raw dollar values, not regional aggregate totals or stacked-bar percentages.",
+        "",
+        "### Variable definitions",
+        "",
+        "The analysis partitions revenue into earned program revenue, contribution-source categories, mixed/unclassified contributions, and other revenue. The detailed contribution-source categories are clean only for Form 990 filers.",
+        "",
+        "| Variable | Meaning |",
+        "| --- | --- |",
+    ]
+    for variable in CLIENT_PRESENTATION_VARIABLES:
+        label = CLIENT_RAW_DISPLAY_LABELS.get(variable, DISPLAY_LABELS.get(variable, variable))
+        lines.append(f"| {label} | {variable_descriptions[variable]} |")
+    lines.extend(
+        [
+            "",
+            "990-EZ and 990-PF do not expose the same contribution-source subcomponents as Form 990. For detailed subcomponent tests and median charts, those rows are excluded for the unavailable source rather than treated as zero. Their contribution totals are routed to mixed / unclassified contributions for the all-form revenue partition. Foundation grants cannot be cleanly isolated in this file.",
+            "",
+        ]
+    )
+
+    overview_slide_number = 2
+    first_source_slide_number = 3
+    lines.extend(
+        [
+            f"## Slide {overview_slide_number}: 2022 revenue sources — overview (same metric as statistical slides)",
+            "",
+            f"![2022 positive-median overview by region]({image_dir_relative}/client_2022_positive_median_overview_by_region.png)",
+            "",
+            "This chart uses the **same definition as Slides "
+            f"{first_source_slide_number}–{first_source_slide_number + len(CLIENT_PRESENTATION_VARIABLES) - 1}**: "
+            "each bar shows the **median dollar amount among organizations in that region "
+            "that report a positive value** for that source (zeros excluded). The X-axis groups are regions; "
+            "colors are revenue sources.",
+            "",
+            "- **Purpose:** Orientation — see all sources and regions on one page before the source-by-source pairwise slides.",
+            "- **Aligned with tests:** Slides "
+            f"{first_source_slide_number}–{first_source_slide_number + len(CLIENT_PRESENTATION_VARIABLES) - 1} "
+            "show the same positive-only medians with Black Hills vs each benchmark; permutation p-values are on the following slides' bullets and tables.",
+            "- **Value labels:** Each bar is labeled with the median dollar value.",
+            "- **Not stacked:** Medians for different sources are not added together (each source has its own reporter pool).",
+            "- **Archived stacked views:** Aggregate dollar totals, aggregate shares, and **stacked positive-only medians** "
+            "(normalized mix and raw sum of medians) are in "
+            "`python/analysis/revenue_sources_black_hills/results/client_notebook_assets/`. "
+            "Stacked medians use the same positive-reporter definition but each segment is a **different org subset**, "
+            "so normalized stacks show a relative profile only — not a budget that adds up.",
+            "",
+            "### How to read the charts and tests",
+            "",
+            "**Zero-excluded framing.** Every revenue and contribution source slide below restricts the median and the permutation test to organizations that report a **positive** amount for that source. This trades the population-level prevalence story (how many organizations engage with the source at all) for the conditional dollar story (when an organization does engage, how big is the check). Reporting rates, reporter counts, and IQR are stored in `client_2022_pairwise_presentation_summary.csv` if needed.",
+            "",
+            f"**Headline test.** Pairwise tests use a **two-sided permutation test on the median dollar difference** between Black Hills positive reporters and each benchmark region's positive reporters ({PERMUTATION_ITERATIONS_2022:,} reshuffles, seed {PERMUTATION_SEED_2022}). The median gap is shown with a **95% percentile bootstrap CI** on the source slides below.",
+            "",
+            "**How to read the charts.** Each region is a single bar whose height equals the median dollar amount reported by organizations in that region — restricted to positive reporters, as described above. The chart shows region names only; slide bullets on the following pages report the median gap, 95% CI, and permutation p-value for each Black Hills vs benchmark comparison.",
+            "",
+            "**What changes vs an all-population test.** For sources where Black Hills has the *highest* reporting rate but a *lower* dollar amount among reporters (government grants, federated campaigns), the direction of difference flips between the two framings. Both views can be true at once: more Black Hills organizations participate, but each participating organization brings in fewer dollars from that source. Use both numbers when telling the full story to the board.",
+            "",
+        ]
+    )
+
+    benchmark_regions = [region for region in REGION_ORDER if region != "Black Hills"]
+    slide_number = first_source_slide_number
+    for variable in CLIENT_PRESENTATION_VARIABLES:
+        label = CLIENT_RAW_DISPLAY_LABELS.get(variable, DISPLAY_LABELS.get(variable, variable))
+        variable_rows = summary.loc[summary["variable"].eq(variable)].set_index("benchmark_region")
+        image_name = f"client_2022_pairwise_positive_median_{slugify_label(variable)}.png"
+
+        lines.extend(
+            [
+                f"## Slide {slide_number}: {label}",
+                "",
+                f"![{label} 2022 positive-only median chart]({image_dir_relative}/{image_name})",
+                "",
+                "Pairwise comparison of conditional medians for organizations with a positive value for this source (zeros excluded). Headline test: two-sided permutation on the median difference.",
+                "",
+            ]
+        )
+        for benchmark_region in benchmark_regions:
+            row = variable_rows.loc[benchmark_region]
+            significance = "significant" if row.get("significant_before_fdr") == "Yes" else "not significant"
+            gap_text = _format_median_gap_with_ci(
+                row.get("median_difference"),
+                row.get("median_difference_ci_low"),
+                row.get("median_difference_ci_high"),
+            )
+            lines.append(
+                "- "
+                f"Black Hills vs {benchmark_region}: {row['direction'] or 'comparison unavailable'}; {significance}; "
+                f"Black Hills median = {format_slide_dollars(row['black_hills_positive_median'])}; "
+                f"{benchmark_region} median = {format_slide_dollars(row['benchmark_positive_median'])}; "
+                f"median gap = {gap_text}; "
+                f"p {format_slide_p_value(row['permutation_p_value'])}."
+            )
+        lines.append("")
+        slide_number += 1
+
+    last_source_slide_number = slide_number - 1
+    if (
+        full_universe_frame is not None
+        and special_org_sensitivity_comparison is not None
+        and special_org_exclusion_summary is not None
+        and not special_org_sensitivity_comparison.empty
+    ):
+        special_org_ein_count = 0
+        if "ein" in full_universe_frame.columns:
+            year_full = full_universe_frame.loc[full_universe_frame["tax_year"].astype(str).eq("2022")]
+            special_mask = (
+                year_full["is_hospital"].fillna(False)
+                | year_full["is_university"].fillna(False)
+                | year_full["is_political_org"].fillna(False)
+            )
+            special_org_ein_count = int(year_full.loc[special_mask, "ein"].nunique())
+        lines.extend(
+            build_2022_special_org_sensitivity_slide_lines(
+                special_org_sensitivity_comparison,
+                special_org_exclusion_summary,
+                slide_number=slide_number,
+                first_source_slide=first_source_slide_number,
+                last_source_slide=last_source_slide_number,
+                special_org_ein_count=special_org_ein_count,
+            )
+        )
+        slide_number += 1
+
+    answer_slide_number = slide_number
+    lines.extend(
+        build_2022_full_answer_slide_lines(
+            summary,
+            slide_number=answer_slide_number,
+            first_source_slide=first_source_slide_number,
+            last_source_slide=last_source_slide_number,
+        )
+    )
+    output_path.write_text("\n".join(lines), encoding="utf-8")
+    info(f"Saved 2022 client presentation Markdown: {output_path}")
+
+
+def save_client_raw_level_distributions(frame: pd.DataFrame, output_path: Path) -> None:
+    """Save raw-dollar organization-level distributions on a log-scaled axis."""
+
+    plot_df = frame[["region_label"] + CLIENT_RAW_LEVEL_VARIABLES].melt(
+        id_vars="region_label",
+        value_vars=CLIENT_RAW_LEVEL_VARIABLES,
+        var_name="variable",
+        value_name="amount",
+    ).dropna()
+    plot_df["amount"] = plot_df["amount"].clip(lower=0)
+    plot_df["region_label"] = pd.Categorical(plot_df["region_label"], categories=REGION_ORDER, ordered=True)
+
+    fig, axes = client_panel_grid(len(CLIENT_RAW_LEVEL_VARIABLES))
+    rng = np.random.default_rng(321)
+    for ax, variable in zip(axes, CLIENT_RAW_LEVEL_VARIABLES):
+        label = CLIENT_RAW_DISPLAY_LABELS.get(variable, variable)
+        sub = plot_df.loc[plot_df["variable"].eq(variable)].copy()
+        data = [
+            sub.loc[sub["region_label"].eq(region), "amount"].to_numpy(dtype=float)
+            for region in REGION_ORDER
+        ]
+        plot_data = [np.log1p(values) for values in data]
+        bp = ax.boxplot(
+            plot_data,
+            positions=np.arange(len(REGION_ORDER)),
+            widths=0.55,
+            patch_artist=True,
+            showfliers=False,
+            medianprops={"color": "black", "linewidth": 1.2},
+            whiskerprops={"color": "#4B5563"},
+            capprops={"color": "#4B5563"},
+        )
+        for patch, region in zip(bp["boxes"], REGION_ORDER):
+            patch.set_facecolor(REGION_COLORS[region])
+            patch.set_alpha(0.55)
+            patch.set_edgecolor("#2D3748")
+            patch.set_linewidth(0.9)
+        for x, (region, values) in enumerate(zip(REGION_ORDER, plot_data)):
+            values = values[~np.isnan(values)]
+            if len(values) > 350:
+                values = rng.choice(values, size=350, replace=False)
+            jitter = rng.normal(loc=0, scale=0.055, size=len(values))
+            ax.scatter(
+                np.full(len(values), x) + jitter,
+                values,
+                s=7,
+                alpha=0.18,
+                color=REGION_COLORS[region],
+                linewidths=0,
+            )
+        ax.set_title(format_kruskal_title(frame, variable, label), fontsize=10.5, weight="bold")
+        ax.set_xticks(np.arange(len(REGION_ORDER)), REGION_ORDER, rotation=25, ha="right")
+        ax.set_ylabel("log1p(dollars), display only")
+        ax.grid(axis="y", alpha=0.25)
+    for ax in axes[len(CLIENT_RAW_LEVEL_VARIABLES) :]:
+        ax.axis("off")
+    fig.suptitle("Organization-level raw revenue amounts compared in five-region rank tests", fontsize=15, weight="bold", y=1.02)
+    fig.tight_layout()
+    fig.savefig(output_path, dpi=200, bbox_inches="tight")
+    plt.close(fig)
+    info(f"Saved client chart: {output_path}")
+
+
+def save_client_rank_share_distributions(frame: pd.DataFrame, output_path: Path) -> None:
+    """Save the notebook's organization-level distribution companion to rank tests."""
+
+    plot_df = frame[["region_label"] + SHARE_COMPONENTS].melt(
+        id_vars="region_label",
+        value_vars=SHARE_COMPONENTS,
+        var_name="share_variable",
+        value_name="share",
+    ).dropna()
+    plot_df["share_label"] = plot_df["share_variable"].str.replace("_share", "", regex=False).map(DISPLAY_LABELS)
+    plot_df["region_label"] = pd.Categorical(plot_df["region_label"], categories=REGION_ORDER, ordered=True)
+
+    fig, axes = client_panel_grid(len(SOURCE_COMPONENTS))
+    rng = np.random.default_rng(321)
+    for ax, component in zip(axes, SOURCE_COMPONENTS):
+        label = DISPLAY_LABELS[component]
+        share_variable = f"{component}_share"
+        sub = plot_df.loc[plot_df["share_label"].eq(label)].copy()
+        data = [
+            sub.loc[sub["region_label"].eq(region), "share"].clip(lower=0, upper=1).to_numpy()
+            for region in REGION_ORDER
+        ]
+        bp = ax.boxplot(
+            data,
+            positions=np.arange(len(REGION_ORDER)),
+            widths=0.55,
+            patch_artist=True,
+            showfliers=False,
+            medianprops={"color": "black", "linewidth": 1.2},
+            whiskerprops={"color": "#4B5563"},
+            capprops={"color": "#4B5563"},
+        )
+        for patch, region in zip(bp["boxes"], REGION_ORDER):
+            patch.set_facecolor(REGION_COLORS[region])
+            patch.set_alpha(0.55)
+            patch.set_edgecolor("#2D3748")
+            patch.set_linewidth(0.9)
+
+        for x, (region, values) in enumerate(zip(REGION_ORDER, data)):
+            values = values[~np.isnan(values)]
+            if len(values) > 350:
+                values = rng.choice(values, size=350, replace=False)
+            jitter = rng.normal(loc=0, scale=0.055, size=len(values))
+            ax.scatter(
+                np.full(len(values), x) + jitter,
+                values,
+                s=7,
+                alpha=0.18,
+                color=REGION_COLORS[region],
+                linewidths=0,
+            )
+
+        ax.set_title(format_kruskal_title(frame, share_variable, label), fontsize=10.5, weight="bold")
+        ax.set_xticks(np.arange(len(REGION_ORDER)), REGION_ORDER, rotation=25, ha="right")
+        upper = min(1.0, max(0.05, np.nanpercentile(sub["share"].clip(lower=0, upper=1), 99) * 1.15))
+        ax.set_ylim(0, upper)
+        ax.yaxis.set_major_formatter(lambda value, _: f"{value:.0%}")
+        ax.grid(axis="y", alpha=0.25)
+    for ax in axes[len(SOURCE_COMPONENTS) :]:
+        ax.axis("off")
+    fig.suptitle("Organization-level revenue-source shares compared in five-region rank tests", fontsize=15, weight="bold", y=1.02)
+    fig.tight_layout()
+    fig.savefig(output_path, dpi=200, bbox_inches="tight")
+    plt.close(fig)
+    info(f"Saved client chart: {output_path}")
+
+
+def create_client_notebook_equivalent_outputs(
+    frame: pd.DataFrame,
+    tables: dict[str, pd.DataFrame],
+    paths: AnalysisPaths,
+    *,
+    full_universe_frame: pd.DataFrame | None = None,
+) -> None:
+    """Create the notebook-equivalent client charts from the script run."""
+
+    info("Creating client-notebook-equivalent charts.")
+    years_label = ", ".join(sorted(frame["tax_year"].astype(str).unique()))
+    save_client_stacked_mix(
+        tables["mix_by_group"],
+        "comparison_group",
+        paths.client_assets_dir / "client_stacked_revenue_mix_black_hills_vs_benchmark.png",
+        f"Revenue-source mix: Black Hills vs benchmark regions, {years_label}",
+        order=["Black Hills", "Benchmark"],
+    )
+
+    by_year = tables["mix_by_group_year"].copy()
+    by_year["year_group"] = by_year["tax_year"].astype(str) + "|" + by_year["comparison_group"].astype(str)
+    year_order = [
+        f"{year}|{group}"
+        for year in sorted(frame["tax_year"].astype(str).unique())
+        for group in ["Black Hills", "Benchmark"]
+    ]
+    year_order = [item for item in year_order if item in set(by_year["year_group"])]
+    label_map = {item: item.replace("|", "\n") for item in year_order}
+    save_client_stacked_mix(
+        by_year,
+        "year_group",
+        paths.client_assets_dir / "client_stacked_revenue_mix_by_year.png",
+        "Revenue-source mix by tax year and comparison group",
+        order=year_order,
+        x_labels=[label_map[item] for item in year_order],
+        figsize=(13.5, 6.5),
+    )
+
+    region_order = [region for region in REGION_ORDER if region in set(tables["mix_by_region"]["region_label"])]
+    save_client_stacked_mix(
+        tables["mix_by_region"],
+        "region_label",
+        paths.client_assets_dir / "client_stacked_revenue_mix_by_five_regions.png",
+        f"Revenue-source mix by region, {years_label}",
+        order=region_order,
+        figsize=(13.5, 6.5),
+    )
+
+    summary = mean_share_summary(frame)
+    write_table(summary, paths.results_tables_dir / "client_mean_share_region_summary.csv")
+    raw_summary = client_raw_level_summary(frame, CLIENT_RAW_LEVEL_VARIABLES)
+    write_table(raw_summary, paths.results_tables_dir / "client_raw_level_region_summary.csv")
+    normality = client_raw_level_normality_diagnostics(frame, CLIENT_RAW_LEVEL_VARIABLES)
+    write_table(normality, paths.results_tables_dir / "client_raw_level_normality_diagnostics.csv")
+    save_client_raw_level_distributions(
+        frame,
+        paths.client_assets_dir / "client_raw_level_distribution_by_region.png",
+    )
+    save_client_raw_median_bars(
+        frame,
+        raw_summary,
+        paths.client_assets_dir / "client_raw_level_median_bars_by_region.png",
+    )
+    pairwise_summary = save_client_pairwise_source_charts(
+        frame,
+        PRESENTATION_PAIRWISE_SOURCE_VARIABLES,
+        paths.client_assets_dir,
+    )
+    write_table(pairwise_summary, paths.results_tables_dir / "client_pairwise_presentation_source_summary.csv")
+    presentation_2022_summary = build_2022_pairwise_presentation_table(frame, CLIENT_PRESENTATION_VARIABLES)
+    write_table(presentation_2022_summary, paths.results_tables_dir / "client_2022_pairwise_presentation_summary.csv")
+    save_2022_pairwise_median_charts(
+        frame,
+        CLIENT_PRESENTATION_VARIABLES,
+        paths.client_assets_dir,
+        presentation_table=presentation_2022_summary,
+        show_reporter_count=paths.show_chart_reporter_count,
+    )
+    save_2022_pairwise_median_charts(
+        frame,
+        CLIENT_PRESENTATION_VARIABLES,
+        paths.docs_assets_dir,
+        presentation_table=presentation_2022_summary,
+        show_reporter_count=paths.show_chart_reporter_count,
+    )
+    save_2022_positive_median_overview(frame, paths.client_assets_dir)
+    save_2022_positive_median_overview(frame, paths.docs_assets_dir)
+    save_2022_stacked_revenue_mix_overview(
+        frame,
+        paths.client_assets_dir,
+        preserve_share_chart_dir=paths.client_assets_dir,
+    )
+    save_2022_stacked_revenue_mix_overview(
+        frame,
+        paths.docs_assets_dir,
+    )
+    special_org_sensitivity_comparison: pd.DataFrame | None = None
+    special_org_exclusion_summary: pd.DataFrame | None = None
+    if full_universe_frame is not None:
+        _, special_org_exclusion_summary = summarize_2022_special_org_exclusions(full_universe_frame)
+        special_org_sensitivity_comparison = build_2022_special_org_sensitivity_comparison(
+            frame,
+            full_universe_frame,
+            CLIENT_PRESENTATION_VARIABLES,
+        )
+        write_table(
+            special_org_exclusion_summary,
+            paths.results_tables_dir / "client_2022_special_org_exclusion_summary.csv",
+        )
+        write_table(
+            special_org_sensitivity_comparison,
+            paths.results_tables_dir / "client_2022_special_org_sensitivity_comparison.csv",
+        )
+    write_2022_client_presentation_markdown(
+        frame,
+        presentation_2022_summary,
+        paths.docs_presentation_path,
+        full_universe_frame=full_universe_frame,
+        special_org_sensitivity_comparison=special_org_sensitivity_comparison,
+        special_org_exclusion_summary=special_org_exclusion_summary,
+    )
+    save_client_rank_share_distributions(
+        frame,
+        paths.client_assets_dir / "client_rank_organization_level_share_distributions.png",
+    )
+    save_client_mean_share_bars(
+        frame,
+        summary,
+        paths.client_assets_dir / "client_rank_aligned_mean_share_bars_by_region.png",
+    )
 
 
 INDIVIDUAL_FOCUS_COMPONENTS = [
@@ -1281,16 +4117,16 @@ def aggregate_individual_focus_mix(frame: pd.DataFrame, group_columns: list[str]
 def run_individual_focus_tests(frame: pd.DataFrame) -> tuple[pd.DataFrame, pd.DataFrame]:
     """Run the focused tests on the individual-contributions metrics.
 
-    Returns ``(univariate_tests, bootstrap_cis)``. The univariate tests run
-    Welch ANOVA for both group definitions (five regions and BH vs benchmark)
-    plus permutation tests on the BH-vs-benchmark mean difference. The
+    Returns ``(univariate_tests, bootstrap_cis)``. The broad univariate table
+    still includes parametric rows for auditability, but the report surfaces
+    rank tests and permutation checks for this focused share analysis. The
     bootstrap CIs use the EIN cluster bootstrap.
     """
 
     if frame.empty:
         return pd.DataFrame(), pd.DataFrame()
 
-    info("Running focused individual-contributions Welch ANOVA and permutation tests.")
+    info("Running focused individual-contributions rank and permutation tests.")
     five_regions = run_univariate_tests(
         frame,
         INDIVIDUAL_FOCUS_SHARES,
@@ -1507,13 +4343,13 @@ def build_markdown_summary(
         "",
         "- Primary source: GivingTuesday 990 basic all-forms analysis variables.",
         "- Universe: Forms 990, 990-EZ, and 990-PF with positive total revenue in the selected years, excluding hospitals, universities, and political organizations for client-peer comparability.",
-        "- Headline statistical tests: five-region Welch ANOVA on revenue-source shares (Section 3 convention), plus Black Hills versus pooled benchmarks as follow-up.",
-        "- Program service revenue is interpreted for Forms 990 and 990-EZ; 990-PF is kept missing for that component.",
-        "- Total contributions use GT `analysis_total_contributions_amount` (990 Line 1h via TOTACASHCONT; 990-EZ Part I Line 1 via CONGIFGRAETC; 990-PF Part I Line 1 via STREACGRTOIN).",
-        "- For Form 990 filers, the contributions total is decomposed into Line 1 sub-channels: government grants (1e), other institutional channels (1a federated + 1d related-org), likely-individual channels (1b membership dues + 1c fundraising events), and the unidentifiable Line 1f bucket that lumps individual gifts with private foundation grants, DAF distributions, corporate gifts, and bequests.",
-        "- 990-EZ and 990-PF do not separately report Line 1 sub-components, so for those filers the entire reported contributions total is routed into the unidentifiable mixed bucket.",
-        "- Reported segment shares divide harmonized segment amounts by total revenue. Residual captures remaining revenue.",
-        "- Statistical tests include ANOVA, Welch ANOVA, rank tests, permutation tests, EIN-clustered OLS, EIN-clustered logistic presence models, compositional PERMANOVA-style tests, MANOVA-style tests, EIN-cluster bootstrap confidence intervals, a one-row-per-EIN independence sensitivity, and concentration metrics.",
+        "- Headline tests: Kruskal-Wallis for five-region organization-level raw-dollar revenue-source comparisons and Mann-Whitney U plus permutation mean-difference tests for Black Hills versus pooled benchmarks.",
+        "- Program service revenue is interpreted for Forms 990 and 990-EZ; blank supported lines are treated as zero, while 990-PF is kept missing for that component.",
+        "- Total contributions use GT `analysis_total_contributions_amount` (990 Line 1h via TOTACASHCONT; 990-EZ Part I Line 1 via CONGIFGRAETC; 990-PF Part I Line 1 via STREACGRTOIN). Blank supported lines are treated as zero.",
+        "- For Form 990 filers, the contributions total is decomposed into detailed Line 1 sub-channels: government grants (1e), federated campaigns (1a), related-organization contributions (1d), membership dues (1b), fundraising event contributions (1c), and the unidentifiable Line 1f bucket that lumps individual gifts with private foundation grants, DAF distributions, corporate gifts, and bequests.",
+        "- 990-EZ and 990-PF do not separately report comparable Line 1 sub-components. They are excluded from detailed subcomponent tests instead of being treated as zero, while their entire reported contributions total is routed into mixed / unclassified contributions for the all-form revenue partition.",
+        "- Reported segment shares divide harmonized segment amounts by total revenue. Because those shares are compositional, share-based tests are supplemental revenue-mix context rather than the headline Q9 test.",
+        "- Statistical tests include raw-dollar rank tests, permutation tests, supplemental PERMANOVA-style composition tests, log-dollar checks, EIN-clustered OLS, EIN-clustered logistic presence models, MANOVA-style tests, EIN-cluster bootstrap confidence intervals, a one-row-per-EIN independence sensitivity, and concentration metrics.",
         "- Year-by-year hypothesis tests are reported separately so 2022, 2023, and 2024 can be interpreted without relying only on pooled results.",
         "",
         "## Coverage",
@@ -1528,21 +4364,21 @@ def build_markdown_summary(
         "",
     ]
 
-    for variable in SHARE_COMPONENTS:
+    for variable in CLIENT_RAW_LEVEL_VARIABLES:
         subset = stats_results.loc[
             stats_results["variable"].eq(variable)
-            & stats_results["test"].eq("welch_anova")
+            & stats_results["test"].eq("kruskal_wallis")
             & stats_results["analysis_frame"].eq("primary_all_years_five_regions")
         ]
         if subset.empty:
             continue
         row = subset.iloc[0]
-        bh_mean = frame.loc[frame["comparison_group"].eq("Black Hills"), variable].mean()
-        bm_mean = frame.loc[frame["comparison_group"].eq("Benchmark"), variable].mean()
-        direction = "higher" if bh_mean > bm_mean else "lower"
+        bh_median = frame.loc[frame["comparison_group"].eq("Black Hills"), variable].dropna().clip(lower=0).median()
+        bm_median = frame.loc[frame["comparison_group"].eq("Benchmark"), variable].dropna().clip(lower=0).median()
+        direction = "higher" if bh_median > bm_median else "lower" if bh_median < bm_median else "equal to"
         lines.append(
-            f"- `{variable}`: Black Hills mean is {direction} than benchmarks "
-            f"({bh_mean:.1%} vs {bm_mean:.1%}); five-region Welch p={row['p_value']:.4g}, FDR p={row.get('p_value_fdr_bh', np.nan):.4g}."
+            f"- `{variable}`: Black Hills median is {direction} benchmarks "
+            f"(${bh_median:,.0f} vs ${bm_median:,.0f}); five-region Kruskal-Wallis p={row['p_value']:.4g}, FDR p={row.get('p_value_fdr_bh', np.nan):.4g}."
         )
 
     if not multivariate_results.empty:
@@ -1553,8 +4389,8 @@ def build_markdown_summary(
     if not by_year_results.empty:
         lines.extend(["", "## Year-by-Year Tests", ""])
         year_rows = by_year_results.loc[
-            by_year_results["test"].eq("welch_anova")
-            & by_year_results["variable"].isin(SHARE_COMPONENTS)
+            by_year_results["test"].eq("kruskal_wallis")
+            & by_year_results["variable"].isin(CLIENT_RAW_LEVEL_VARIABLES)
             & by_year_results["analysis_frame"].str.endswith("_five_regions", na=False)
         ].copy()
         for row in year_rows.itertuples(index=False):
@@ -1562,7 +4398,7 @@ def build_markdown_summary(
                 str(row.analysis_frame).replace("year_", "").replace("_five_regions", "")
             )
             lines.append(
-                f"- {year_label} `{row.variable}`: Welch p={row.p_value:.4g}, "
+                f"- {year_label} `{row.variable}`: Kruskal-Wallis p={row.p_value:.4g}, "
                 f"FDR p={getattr(row, 'p_value_fdr_bh', np.nan):.4g}, n={row.n}."
             )
 
@@ -1582,8 +4418,8 @@ def build_markdown_summary(
             "- 2024 filing data may be incomplete, so the script also writes a 2022-2023 sensitivity frame.",
             "- Residual other revenue is derived from available components and should be interpreted as an accounting diagnostic, not a source-reported line item.",
             "- Some rows still show diagnostic overlap when upstream totals are missing or the institutional aggregate exceeds reported total contributions.",
-            "- Form 990 Line 1 sub-channels are exposed individually as diagnostics; the institutional headline segments use Lines 1a + 1d (`other_institutional_contributions`) and Line 1e (`government_grants_received`).",
-            "- Form 990 Line 1f (`mixed_other_contributions`) cannot be split into individual versus institutional giving without Schedule B, which is not in the GT basic datamart. 990-EZ and 990-PF route their entire contributions total into this bucket because those forms do not separately report Line 1 sub-components.",
+            "- Form 990 Line 1 sub-channels are exposed individually: government grants, federated campaigns, related-organization contributions, membership dues, fundraising event contributions, and mixed / unclassified Line 1f.",
+            "- Form 990 Line 1f and 990-EZ/990-PF contribution totals cannot be split into individual, foundation, DAF, corporate, or bequest sources without more detailed donor-level data.",
         ]
     )
 
@@ -1635,6 +4471,15 @@ def collect_results_artifacts(paths: AnalysisPaths, table_names: list[str], figu
     """
 
     info("Collecting selected tables and charts into the results folder.")
+    for stale_name in [
+        "client_bh_vs_benchmark_level_welch_tests.csv",
+        "client_year_by_year_level_welch_tests.csv",
+        "client_bh_vs_benchmark_level_anova.csv",
+        "client_year_by_year_level_anova.csv",
+    ]:
+        stale_path = paths.results_tables_dir / stale_name
+        if stale_path.exists():
+            stale_path.unlink()
     for table_name in table_names:
         source = paths.tables_dir / table_name
         if source.exists():
@@ -1700,56 +4545,55 @@ def write_detailed_results_report(
         }
     )
 
-    primary_five_raw = univariate_results.loc[
+    primary_five_raw = client_rank_test_table(
+        analysis,
+        CLIENT_RAW_LEVEL_VARIABLES,
+        "region_label",
+    )
+    primary_bm_raw = client_rank_test_table(
+        analysis,
+        CLIENT_RAW_LEVEL_VARIABLES,
+        "comparison_group",
+        include_permutation=True,
+    )
+    primary_share_five_raw = univariate_results.loc[
         univariate_results["analysis_frame"].eq("primary_all_years_five_regions")
-        & univariate_results["test"].eq("welch_anova")
+        & univariate_results["test"].eq("kruskal_wallis")
         & univariate_results["variable"].isin(SHARE_COMPONENTS)
     ].copy()
-    primary_bm_raw = univariate_results.loc[
+    primary_share_bm_raw = univariate_results.loc[
         univariate_results["analysis_frame"].eq("primary_all_years_bh_vs_benchmark")
-        & univariate_results["test"].isin(["welch_anova", "permutation_mean_diff"])
+        & univariate_results["test"].isin(["mann_whitney", "permutation_mean_diff"])
         & univariate_results["variable"].isin(SHARE_COMPONENTS)
     ].copy()
 
-    # Level-variable Welch ANOVA. The Section 3 Q9 plan lists "Total revenue",
-    # "Program service revenue", "Total contributions", and "Other contributions
-    # (foundation grants etc.)" as variables, so we surface the five-region
-    # ANOVA on the log1p-transformed level fields here in addition to the share
-    # comparisons above.
-    level_variables_for_report = [
-        "log1p_total_revenue",
-        "log1p_total_contributions",
-        "log1p_program_service_revenue",
-        "log1p_government_grants_received",
-        "log1p_other_institutional_contributions",
-        "log1p_individual_likely_contributions",
-        "log1p_mixed_other_contributions",
-        "log1p_calculated_institutional_contributions_total",
-    ]
-    primary_levels_raw = univariate_results.loc[
-        univariate_results["analysis_frame"].eq("primary_all_years_five_regions")
-        & univariate_results["test"].eq("welch_anova")
-        & univariate_results["variable"].isin(level_variables_for_report)
-    ].copy()
+    raw_summary_raw = client_raw_level_summary(analysis, CLIENT_RAW_LEVEL_VARIABLES)
+    raw_normality_raw = client_raw_level_normality_diagnostics(analysis, CLIENT_RAW_LEVEL_VARIABLES)
+    primary_log_levels_raw = client_rank_test_table(
+        analysis,
+        CLIENT_LOG_LEVEL_VARIABLES,
+        "comparison_group",
+        include_permutation=True,
+    )
 
     # Independence sensitivity: one-row-per-EIN re-run of the share-variable
-    # Welch ANOVAs. If the headline pattern holds when each EIN contributes a
+    # rank and permutation tests. If the headline pattern holds when each EIN contributes a
     # single observation, the repeated-filer structure is not driving the
     # primary p-values.
     one_per_ein_raw = univariate_results.loc[
         univariate_results["analysis_frame"].isin(
             ["sensitivity_one_row_per_ein_five_regions", "sensitivity_one_row_per_ein_bh_vs_benchmark"]
         )
-        & univariate_results["test"].isin(["welch_anova", "permutation_mean_diff"])
-        & univariate_results["variable"].isin(SHARE_COMPONENTS)
+        & univariate_results["test"].isin(["kruskal_wallis", "mann_whitney", "permutation_mean_diff"])
+        & univariate_results["variable"].isin(CLIENT_RAW_LEVEL_VARIABLES)
     ].copy()
 
     full_universe_raw = univariate_results.loc[
         univariate_results["analysis_frame"].isin(
             ["sensitivity_including_outliers_five_regions", "sensitivity_including_outliers_bh_vs_benchmark"]
         )
-        & univariate_results["test"].isin(["welch_anova", "permutation_mean_diff"])
-        & univariate_results["variable"].isin(SHARE_COMPONENTS)
+        & univariate_results["test"].isin(["kruskal_wallis", "mann_whitney", "permutation_mean_diff"])
+        & univariate_results["variable"].isin(CLIENT_RAW_LEVEL_VARIABLES)
     ].copy()
 
     def _format_univariate_table(frame: pd.DataFrame) -> pd.DataFrame:
@@ -1761,9 +4605,36 @@ def write_detailed_results_report(
         out["statistic"] = out["statistic"].map(lambda value: _number(value, 4))
         return out
 
-    primary_five = _format_univariate_table(primary_five_raw)
-    primary_bm = _format_univariate_table(primary_bm_raw)
-    primary_levels = _format_univariate_table(primary_levels_raw)
+    def _format_client_rank_table(frame: pd.DataFrame) -> pd.DataFrame:
+        if frame.empty:
+            return frame
+        out = frame.copy()
+        out["p_value"] = out["p_value"].map(lambda value: _number(value, 4))
+        out["fdr_p_value"] = out["fdr_p_value"].map(lambda value: _number(value, 4))
+        out["statistic"] = out["statistic"].map(lambda value: _number(value, 4))
+        return out
+
+    primary_five = _format_client_rank_table(primary_five_raw)
+    primary_bm = _format_client_rank_table(primary_bm_raw)
+    primary_share_five = _format_univariate_table(primary_share_five_raw)
+    primary_share_bm = _format_univariate_table(primary_share_bm_raw)
+    primary_log_levels = _format_client_rank_table(primary_log_levels_raw)
+
+    raw_summary = raw_summary_raw.copy()
+    if not raw_summary.empty:
+        for column in ["mean", "median", "positive_median"]:
+            raw_summary[column] = raw_summary[column].map(lambda value: f"${float(value):,.0f}" if not pd.isna(value) else "")
+        raw_summary["nonzero_percent"] = raw_summary["nonzero_percent"].map(_percent)
+
+    raw_normality = raw_normality_raw.copy()
+    if not raw_normality.empty:
+        for column in ["mean", "median"]:
+            raw_normality[column] = raw_normality[column].map(lambda value: f"${float(value):,.0f}" if not pd.isna(value) else "")
+        raw_normality["zero_percent"] = raw_normality["zero_percent"].map(_percent)
+        raw_normality["mean_median_ratio"] = raw_normality["mean_median_ratio"].map(lambda value: "not defined" if pd.isna(value) else _number(value, 3))
+        raw_normality["skew"] = raw_normality["skew"].map(lambda value: _number(value, 3))
+        raw_normality["normaltest_p_raw"] = raw_normality["normaltest_p_raw"].map(lambda value: "<0.001" if not pd.isna(value) and float(value) < 0.001 else _number(value, 4))
+        raw_normality["normaltest_p_log1p"] = raw_normality["normaltest_p_log1p"].map(lambda value: "<0.001" if not pd.isna(value) and float(value) < 0.001 else _number(value, 4))
     one_per_ein = _format_univariate_table(one_per_ein_raw)
     if not one_per_ein.empty:
         one_per_ein["analysis_frame"] = one_per_ein["analysis_frame"].str.replace(
@@ -1776,7 +4647,7 @@ def write_detailed_results_report(
         )
 
     # Individual contributions focus: format the share-of-contributions mix
-    # table and the share-of-contributions Welch ANOVA table for the report.
+    # table and the non-parametric BH-vs-benchmark tests for the report.
     if individual_focus_mix is None or individual_focus_mix.empty:
         focus_mix_table = pd.DataFrame()
         focus_n_orgs = 0
@@ -1802,8 +4673,9 @@ def write_detailed_results_report(
         focus_anova = pd.DataFrame()
     else:
         focus_anova_raw = individual_focus_univariate.loc[
-            individual_focus_univariate["test"].isin(["welch_anova", "permutation_mean_diff"])
+            individual_focus_univariate["test"].isin(["mann_whitney", "permutation_mean_diff"])
             & individual_focus_univariate["variable"].isin(INDIVIDUAL_FOCUS_SHARES)
+            & individual_focus_univariate["analysis_frame"].str.contains("bh_vs_benchmark", na=False)
         ].copy()
         focus_anova = _format_univariate_table(focus_anova_raw)
         if not focus_anova.empty:
@@ -1818,14 +4690,13 @@ def write_detailed_results_report(
         for column in ["mean_difference", "ci_lower", "ci_upper"]:
             focus_bootstrap[column] = focus_bootstrap[column].map(_percent)
 
-    # Year-by-year focused tables for the report. Filter to the Welch ANOVA
-    # row for each share metric so the table mirrors the existing year-by-year
-    # primary table format.
+    # Year-by-year focused tables for the report. Keep the same BH-vs-benchmark
+    # rank/permutation test family used in the main client-facing analysis.
     if individual_focus_by_year_univariate is None or individual_focus_by_year_univariate.empty:
         focus_by_year = pd.DataFrame()
     else:
         focus_by_year_raw = individual_focus_by_year_univariate.loc[
-            individual_focus_by_year_univariate["test"].eq("welch_anova")
+            individual_focus_by_year_univariate["test"].isin(["mann_whitney", "permutation_mean_diff"])
             & individual_focus_by_year_univariate["variable"].isin(INDIVIDUAL_FOCUS_SHARES)
             & individual_focus_by_year_univariate["analysis_frame"].str.endswith(
                 "_bh_vs_benchmark", na=False
@@ -1852,8 +4723,8 @@ def write_detailed_results_report(
 
     if {"test", "variable"}.issubset(by_year_univariate_results.columns):
         by_year = by_year_univariate_results.loc[
-            by_year_univariate_results["test"].eq("welch_anova")
-            & by_year_univariate_results["variable"].isin(SHARE_COMPONENTS)
+            by_year_univariate_results["test"].eq("kruskal_wallis")
+            & by_year_univariate_results["variable"].isin(CLIENT_RAW_LEVEL_VARIABLES)
             & by_year_univariate_results["analysis_frame"].str.endswith("_five_regions", na=False)
         ].copy()
     else:
@@ -1913,20 +4784,22 @@ def write_detailed_results_report(
         "",
         "The analysis uses the GivingTuesday Form 990 basic all-forms analysis dataset as the primary source because it covers Form 990, Form 990-EZ, and Form 990-PF and contains the requested revenue-source fields. The primary comparison excludes hospitals, universities, and political organizations so the benchmark regions better reflect the client-peer universe; the full Form 990/990-EZ/990-PF universe is retained as a sensitivity check. NCCS Core is used separately as a 2022 sensitivity check where comparable fields exist.",
         "",
-        "The script filtered to positive total revenue, valid region/year/form records, and the comparable peer universe, then derived six mutually exclusive revenue-source segments aligned with Section 3 Q9. For Form 990 filers (the bulk of the analytical sample) the contribution side of total revenue is decomposed into the IRS Part VIII Line 1 sub-channels:",
+        "The script filtered to positive total revenue, valid region/year/form records, and the comparable peer universe, then derived detailed revenue-source segments aligned with Section 3 Q9. For Form 990 filers (the bulk of the analytical sample) the contribution side of total revenue is decomposed into the IRS Part VIII Line 1 sub-channels:",
         "",
         "1. **program_service_revenue** - Form 990 / 990-EZ Line 2g program service revenue (Form 990-PF stays missing; that form lacks an equivalent concept).",
         "2. **government_grants_received** - Form 990 Line 1e (`GOVERNGRANTS`). The only Line 1 sub-component the IRS labels unambiguously as institutional.",
-        "3. **other_institutional_contributions** - Form 990 Line 1a + Line 1d (`FEDERACAMPAI` + `RELATEORGANI`). Federated campaigns (e.g. United Way) and related-organization transfers are also institutional channels.",
-        "4. **individual_likely_contributions** - Form 990 Line 1b + Line 1c (`MEMBERDUESUE` + `FUNDRAEVENTS`). Membership dues and fundraising-event proceeds are predominantly but not exclusively individual.",
-        "5. **mixed_other_contributions** - Form 990 Line 1f (`ALLOOTHECONT`). The IRS lumps individual gifts together with private foundation grants, donor-advised fund distributions, corporate gifts, and bequests in this single line and does not separate the donor types. For 990-EZ and 990-PF filers, which do not separately report Line 1 sub-components, the entire reported Line 1 / Part I Line 1 contributions total is routed into this bucket so the segments still partition reported revenue.",
-        "6. **residual_other_revenue** - total revenue minus the five segments above; clipped at zero for plotting.",
+        "3. **federated_campaigns** - Form 990 Line 1a (`FEDERACAMPAI`). Institutional/intermediary campaign support, such as United Way-style campaigns.",
+        "4. **related_org_contributions** - Form 990 Line 1d (`RELATEORGANI`). Institutional or affiliate support from related organizations.",
+        "5. **membership_dues** - Form 990 Line 1b (`MEMBERDUESUE`). Individual-adjacent support, but not pure individual giving.",
+        "6. **fundraising_events_contributions** - Form 990 Line 1c (`FUNDRAEVENTS`). Individual-adjacent support from fundraising events, but not pure individual giving.",
+        "7. **mixed_unclassified_contributions** - Form 990 Line 1f (`ALLOOTHECONT`). The IRS lumps individual gifts together with private foundation grants, donor-advised fund distributions, corporate gifts, and bequests in this single line and does not separate the donor types. For 990-EZ and 990-PF filers, which do not separately report comparable Line 1 sub-components, the entire reported Line 1 / Part I Line 1 contributions total is routed into this bucket for the all-form revenue partition.",
+        "8. **residual_other_revenue** - total revenue minus the segments above; clipped at zero for plotting.",
         "",
-        "Total contributions used as the contribution-side denominator are the GT canonical field `analysis_total_contributions_amount` (Line 1h via `TOTACASHCONT` for 990; Part I Line 1 via `CONGIFGRAETC` for 990-EZ; Part I Line 1 via `STREACGRTOIN` for 990-PF). The institutional aggregate (`analysis_calculated_grants_total_amount` = Line 1a + 1d + 1e on Form 990) is exposed for diagnostics; earlier versions of that aggregate accidentally included Form 990 Part IX grants paid out (`FOREGRANTOTA`, `GRANTOORORGA`) and have been corrected.",
+        "Total contributions used as the contribution-side denominator are the GT canonical field `analysis_total_contributions_amount` (Line 1h via `TOTACASHCONT` for 990; Part I Line 1 via `CONGIFGRAETC` for 990-EZ; Part I Line 1 via `STREACGRTOIN` for 990-PF). Blank supported amount fields are interpreted as reported zero; unavailable form-specific subcomponents are kept missing. The institutional aggregate (`analysis_calculated_grants_total_amount` = Line 1a + 1d + 1e on Form 990) is exposed for diagnostics; earlier versions of that aggregate accidentally included Form 990 Part IX grants paid out (`FOREGRANTOTA`, `GRANTOORORGA`) and have been corrected.",
         "",
-        "**Interpretation caveat for the client question.** This decomposition is the most informative split the IRS basic 990 family can support for distinguishing individual donors from other organizations. It cannot fully isolate individual giving because Line 1f mixes individuals, foundations, DAFs, corporates, and bequests, and Form 990-EZ / 990-PF expose only a single contributions total. Reading `government_grants_received` and `other_institutional_contributions` as institutional, and `individual_likely_contributions` as the closest proxy for individual giving, is defensible; reading `mixed_other_contributions` as either pure-individual or pure-institutional is not.",
+        "**Interpretation caveat for the client question.** This decomposition is the most informative split the IRS basic 990 family can support for distinguishing source channels. It cannot fully isolate individual giving because Line 1f mixes individuals, foundations, DAFs, corporates, and bequests, and Form 990-EZ / 990-PF expose only a single contributions total. Government grants, federated campaigns, related-organization contributions, membership dues, and fundraising event contributions are tested only where the form actually reports the comparable field, so unavailable EZ/PF source detail is not counted as zero. Government grants, federated campaigns, and related-organization contributions are institutional channels; membership dues and fundraising events are individual-adjacent proxies; mixed / unclassified contributions should not be read as either pure-individual or pure-institutional.",
         "",
-        "The statistical analysis includes descriptive summaries, ANOVA, Welch ANOVA, rank tests, permutation tests, FDR-adjusted p-values, effect sizes, OLS models with EIN-clustered standard errors, EIN-clustered logistic presence models, compositional PERMANOVA-style tests, MANOVA-style tests, year-by-year tests, form-type sensitivity tests, revenue-size sensitivity tests, a full-universe sensitivity that includes the excluded organization types, a one-row-per-EIN independence sensitivity, EIN-cluster bootstrap confidence intervals, and concentration metrics. Where the same nonprofit appears in multiple tax years, inference uses cluster-robust adjustments rather than treating org-years as independent.",
+        "The statistical analysis includes descriptive summaries, raw-dollar rank tests, permutation tests, FDR-adjusted p-values, effect sizes, supplemental share/compositional tests, log-dollar checks, OLS models with EIN-clustered standard errors, EIN-clustered logistic presence models, MANOVA-style tests, year-by-year tests, form-type sensitivity tests, revenue-size sensitivity tests, a full-universe sensitivity that includes the excluded organization types, a one-row-per-EIN independence sensitivity, EIN-cluster bootstrap confidence intervals, and concentration metrics. Where the same nonprofit appears in multiple tax years, inference uses cluster-robust adjustments rather than treating org-years as independent.",
         "",
         "## Coverage",
         "",
@@ -1941,9 +4814,9 @@ def write_detailed_results_report(
         "",
         "## Headline Findings",
         "",
-        "The clearest headline comparison is the five-region Welch ANOVA on organization-level revenue-source shares (Section 3 convention). Follow-up Black Hills versus pooled benchmark tests (including permutation tests on the mean difference) appear in the secondary table below.",
+        "The clearest headline comparison is now the five-region Kruskal-Wallis test on organization-level raw revenue-source dollars. Follow-up Black Hills versus pooled benchmark tests use Mann-Whitney U and permutation mean-difference tests. This avoids making the compositional source-share variables the main inferential test.",
         "",
-        "The aggregate-dollar view can differ from organization-level tests because benchmark-region revenue is often concentrated among a small number of very large organizations. Read stacked bars and concentration diagnostics together.",
+        "The stacked-bar share visuals are descriptive aggregate-dollar revenue-mix charts. They are useful for presentation, but they are not the values being tested in the primary raw-dollar rank tests.",
         "",
         "## Aggregate Reported Component Mix",
         "",
@@ -1970,25 +4843,108 @@ def write_detailed_results_report(
         "",
         "![Normalized reported component mix by form type](figures/stacked_revenue_mix_by_form_type.png)",
         "",
-        "## Primary Statistical Tests (five regions, Welch ANOVA)",
+        "## Raw-Dollar Descriptive Summary",
+        "",
+        "These medians and nonzero rates summarize the organization-level dollar amounts used in the primary tests. Means are shown only as context because the distributions are strongly right-skewed.",
+        "",
+        _markdown_table(
+            raw_summary,
+            ["variable_label", "region_label", "n", "mean", "median", "nonzero_percent", "positive_median"],
+            {
+                "variable_label": "Variable",
+                "region_label": "Region",
+                "n": "N",
+                "mean": "Mean",
+                "median": "Median",
+                "nonzero_percent": "Nonzero %",
+                "positive_median": "Positive-only median",
+            },
+        ),
+        "",
+        "## Normality and Skew Diagnostics",
+        "",
+        "D'Agostino-Pearson normality tests reject normality for the raw dollar variables in every region. Log1p-transformed values also reject normality in every region, so Kruskal-Wallis and Mann-Whitney U are preferred over ANOVA for the primary Q9 tests.",
+        "",
+        _markdown_table(
+            raw_normality,
+            ["variable_label", "region_label", "n", "zero_percent", "mean", "median", "mean_median_ratio", "skew", "normaltest_p_raw", "normaltest_p_log1p"],
+            {
+                "variable_label": "Variable",
+                "region_label": "Region",
+                "n": "N",
+                "zero_percent": "Zero %",
+                "mean": "Mean",
+                "median": "Median",
+                "mean_median_ratio": "Mean/median",
+                "skew": "Skew",
+                "normaltest_p_raw": "Raw normality p",
+                "normaltest_p_log1p": "Log1p normality p",
+            },
+        ),
+        "",
+        "![Raw-dollar distributions by region](client_notebook_assets/client_raw_level_distribution_by_region.png)",
+        "",
+        "![Median raw revenue-source dollars by region](client_notebook_assets/client_raw_level_median_bars_by_region.png)",
+        "",
+        "## Primary Raw-Dollar Statistical Tests (five-region Kruskal-Wallis)",
         "",
         _markdown_table(
             primary_five,
-            ["test", "variable", "statistic", "p_value", "p_value_fdr_bh", "n"],
+            ["test", "variable", "statistic", "p_value", "fdr_p_value", "n"],
             {
                 "test": "Test",
                 "variable": "Variable",
                 "statistic": "Statistic",
                 "p_value": "P-value",
-                "p_value_fdr_bh": "FDR p-value",
+                "fdr_p_value": "FDR p-value",
                 "n": "N",
             },
         ),
         "",
-        "## Black Hills vs pooled benchmarks (follow-up)",
+        "## Black Hills vs pooled benchmarks (raw-dollar follow-up)",
         "",
         _markdown_table(
             primary_bm,
+            ["test", "variable", "direction", "statistic", "p_value", "fdr_p_value", "n"],
+            {
+                "test": "Test",
+                "variable": "Variable",
+                "direction": "Direction",
+                "statistic": "Statistic",
+                "p_value": "P-value",
+                "fdr_p_value": "FDR p-value",
+                "n": "N",
+            },
+        ),
+        "",
+        "## Supplemental Log-Dollar Checks",
+        "",
+        "Log-dollar tests use `log1p`, which reduces the influence of very large organizations while still retaining zero-dollar rows. They are supplemental because the normality diagnostics still reject normality after log transformation.",
+        "",
+        "### Log-dollar rank/permutation tests",
+        "",
+        _markdown_table(
+            primary_log_levels,
+            ["test", "variable", "direction", "statistic", "p_value", "fdr_p_value", "n"],
+            {
+                "test": "Test",
+                "variable": "Variable",
+                "direction": "Direction",
+                "statistic": "Statistic",
+                "p_value": "P-value",
+                "fdr_p_value": "FDR p-value",
+                "n": "N",
+            },
+        ),
+        "",
+        "## Supplemental Revenue-Mix / Compositional Context",
+        "",
+        "The share variables are parts of each organization's total revenue and are therefore compositional. These tests remain useful as revenue-mix follow-ups, but they are no longer the primary Q9 test.",
+        "",
+        "### Five-region source-share rank tests",
+        "",
+        _markdown_table(
+            primary_share_five,
             ["test", "variable", "statistic", "p_value", "p_value_fdr_bh", "n"],
             {
                 "test": "Test",
@@ -2000,16 +4956,10 @@ def write_detailed_results_report(
             },
         ),
         "",
-        "## Level-Variable Comparisons (five regions, Welch ANOVA on log1p)",
-        "",
-        "The Section 3 Q9 plan lists Total revenue, Program service revenue, Total contributions, and "
-        "Other contributions (foundation grants etc.) as variables of interest. The table below tests "
-        "those variables on the level (log1p-transformed) in addition to the share comparisons above. "
-        "Level differences reflect organization-size differences across regions; share differences "
-        "reflect revenue-mix differences. Both views are needed for a complete answer.",
+        "### Black Hills vs pooled benchmark source-share follow-ups",
         "",
         _markdown_table(
-            primary_levels,
+            primary_share_bm,
             ["test", "variable", "statistic", "p_value", "p_value_fdr_bh", "n"],
             {
                 "test": "Test",
@@ -2026,7 +4976,7 @@ def write_detailed_results_report(
         "Each EIN contributes at most three filings (2022-2024). The pooled tests above treat each "
         "org-year as an independent observation; this sensitivity restricts the analysis to one row "
         "per EIN (most recent reported year) so that the test's independence assumption is satisfied "
-        "exactly. If the direction and significance of the share comparisons survive this restriction, "
+        "exactly. If the direction and significance of the raw-dollar comparisons survive this restriction, "
         "repeated filings are not driving the headline result.",
         "",
         _markdown_table(
@@ -2046,7 +4996,7 @@ def write_detailed_results_report(
         "## Full-Universe Sensitivity (including hospitals, universities, and political orgs)",
         "",
         "The primary results exclude hospitals, universities, and political organizations for client-peer "
-        "comparability. This sensitivity reruns the main share tests on the full valid Form 990/990-EZ/990-PF "
+        "comparability. This sensitivity reruns the main raw-dollar tests on the full valid Form 990/990-EZ/990-PF "
         "universe so readers can see whether that comparability choice changes the substantive conclusion.",
         "",
         _markdown_table(
@@ -2114,7 +5064,7 @@ def write_detailed_results_report(
         "",
         "![Form 990 contribution channels by group](figures/individual_focus_contributions_mix.png)",
         "",
-        "### Welch ANOVA on share-of-contribution metrics (Form 990 only)",
+        "### Supplemental rank/permutation tests on share-of-contribution metrics (Form 990 only)",
         "",
         _markdown_table(
             focus_anova,
@@ -2152,17 +5102,18 @@ def write_detailed_results_report(
         "",
         "### Year-by-Year Focused Comparisons (Form 990 only, BH vs pooled benchmarks)",
         "",
-        "The pooled tests above can hide year-to-year changes. The Welch ANOVA below isolates "
-        "Black Hills versus pooled benchmark for each share-of-contributions metric within each "
-        "tax year, so a single year of unusual filings cannot drive a multi-year conclusion.",
+        "The pooled tests above can hide year-to-year changes. The rank/permutation tests below "
+        "isolate Black Hills versus pooled benchmark for each share-of-contributions metric within "
+        "each tax year, so a single year of unusual filings cannot drive a multi-year conclusion.",
         "",
         _markdown_table(
             focus_by_year,
-            ["tax_year", "variable", "statistic", "p_value", "p_value_fdr_bh", "n"],
+            ["tax_year", "test", "variable", "statistic", "p_value", "p_value_fdr_bh", "n"],
             {
                 "tax_year": "Tax year",
+                "test": "Test",
                 "variable": "Variable",
-                "statistic": "Welch statistic",
+                "statistic": "Statistic",
                 "p_value": "P-value",
                 "p_value_fdr_bh": "FDR p-value",
                 "n": "N",
@@ -2193,14 +5144,14 @@ def write_detailed_results_report(
             {
                 "tax_year": "Tax year",
                 "variable": "Variable",
-                "statistic": "Welch statistic",
+                "statistic": "Kruskal-Wallis H",
                 "p_value": "P-value",
                 "p_value_fdr_bh": "FDR p-value",
                 "n": "N",
             },
         ),
         "",
-        "## Overall Revenue-Mix Tests",
+        "## Supplemental Overall Revenue-Mix Tests",
         "",
         _markdown_table(
             multivariate,
@@ -2276,7 +5227,7 @@ def write_detailed_results_report(
         "",
         "## Bottom Line",
         "",
-        "Review the five-region Welch ANOVA table and follow-up Black Hills versus benchmark tests. Aggregate dollar mixes and concentration charts provide complementary context when organization-level p-values are noisy.",
+        "Review the raw-dollar five-region Kruskal-Wallis table and follow-up Black Hills versus benchmark rank/permutation tests for the primary Q9 answer. Aggregate-dollar mix charts and compositional tests provide supplemental revenue-mix context.",
         "",
         "## Key Files in This Results Folder",
         "",
@@ -2284,6 +5235,16 @@ def write_detailed_results_report(
         "- `tables/statistical_tests_univariate.csv`: pooled and sensitivity univariate tests",
         "- `tables/statistical_tests_by_year_univariate.csv`: year-by-year hypothesis tests",
         "- `tables/statistical_tests_multivariate.csv`: pooled compositional and multivariate tests",
+        "- `tables/raw_field_mapping_validation.csv`: raw-to-harmonized field checks for the requested Q9 variables",
+        "- `tables/client_five_region_raw_level_rank_tests.csv`: primary five-region raw-dollar Kruskal-Wallis table",
+        "- `tables/client_bh_vs_benchmark_raw_level_rank_tests.csv`: primary Black Hills versus benchmark raw-dollar Mann-Whitney/permutation checks",
+        "- `tables/client_pairwise_black_hills_region_raw_level_rank_tests.csv`: exploratory Black Hills versus each benchmark-region raw-dollar pairwise tests",
+        "- `tables/client_raw_level_region_summary.csv`: raw-dollar medians, means, and nonzero rates by region",
+        "- `tables/client_raw_level_normality_diagnostics.csv`: raw and log1p normality/skew diagnostics",
+        "- `tables/client_five_region_share_rank_tests.csv`: supplemental source-share five-region rank tests",
+        "- `tables/client_bh_vs_benchmark_share_rank_tests.csv`: supplemental source-share Black Hills versus benchmark tests",
+        "- `tables/client_bh_vs_benchmark_log_level_rank_tests.csv`: supplemental log-dollar Mann-Whitney/permutation checks",
+        "- `client_notebook_assets/`: notebook-equivalent client charts, including raw-dollar median/distribution visuals and descriptive stacked-share visuals",
         "- `tables/concentration_by_group.csv`: Gini, HHI, and top-5 concentration metrics",
         "- `tables/component_overlap_by_group.csv`: group-level reconciliation diagnostics for overlapping components",
         "- `tables/negative_residual_diagnostics.csv`: rows needing residual/share diagnostics",
@@ -2300,12 +5261,22 @@ def run_analysis(
     years: list[int],
     include_sensitivity: bool,
     exclude_outliers: bool,
+    docs_dir: Path | None = None,
+    show_chart_reporter_count: bool = False,
 ) -> None:
     """Run the full revenue-source analysis workflow."""
 
     info("Starting revenue-source analysis.")
-    paths = ensure_output_dirs(output_dir, results_dir=results_dir)
+    paths = ensure_output_dirs(
+        output_dir,
+        results_dir=results_dir,
+        docs_dir=docs_dir,
+        show_chart_reporter_count=show_chart_reporter_count,
+    )
     gt_raw = load_givingtuesday_analysis(data_root, years)
+    raw_benchmark = load_givingtuesday_raw_benchmark(data_root, years)
+    raw_field_validation = build_raw_field_validation_table(raw_benchmark, gt_raw)
+    write_table(raw_field_validation, paths.tables_dir / "raw_field_mapping_validation.csv")
     full_universe_analysis: pd.DataFrame | None = None
     if exclude_outliers:
         full_universe_analysis = prepare_givingtuesday_analysis(gt_raw, exclude_outliers=False)
@@ -2369,9 +5340,12 @@ def run_analysis(
                 "total_contributions",
                 "program_service_revenue",
                 "government_grants_received",
-                "other_institutional_contributions",
-                "individual_likely_contributions",
-                "mixed_other_contributions",
+                "federated_campaigns",
+                "related_org_contributions",
+                "membership_dues",
+                "fundraising_events_contributions",
+                "mixed_unclassified_contributions",
+                "residual_other_revenue",
             ]
         ],
     )
@@ -2647,6 +5621,7 @@ def run_analysis(
     write_table(regression_results, paths.tables_dir / "statistical_tests_regression.csv")
     write_table(multivariate_results, paths.tables_dir / "statistical_tests_multivariate.csv")
     write_table(by_year_multivariate_results, paths.tables_dir / "statistical_tests_by_year_multivariate.csv")
+    client_equivalent_tables = write_client_equivalent_tables(analysis, paths.tables_dir)
 
     bootstrap_rows = []
     for variable in SHARE_COMPONENTS:
@@ -2664,6 +5639,12 @@ def run_analysis(
     write_table(individual_focus_by_year_bootstrap, paths.tables_dir / "individual_focus_bootstrap_ci_by_year.csv")
 
     create_figures(analysis, tables, paths.figures_dir)
+    create_client_notebook_equivalent_outputs(
+        analysis,
+        tables,
+        paths,
+        full_universe_frame=full_universe_analysis,
+    )
     save_individual_focus_chart(
         individual_focus_mix,
         paths.figures_dir / "individual_focus_contributions_mix.png",
@@ -2694,6 +5675,8 @@ def run_analysis(
             "component_overlap_by_group.csv",
             "component_overlap_by_group_year.csv",
             "component_overlap_by_form.csv",
+            "raw_field_mapping_validation.csv",
+            *[f"{name}.csv" for name in client_equivalent_tables],
             "individual_focus_mix_by_group.csv",
             "individual_focus_mix_by_region.csv",
             "individual_focus_mix_by_year.csv",
@@ -2752,7 +5735,19 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
     parser.add_argument("--data-root", type=Path, default=DEFAULT_DATA_ROOT, help="Project 01_data root. Defaults to python.utils.paths.DATA.")
     parser.add_argument("--output-dir", type=Path, default=None, help="Output directory. Defaults to DATA/analysis/revenue_sources_black_hills.")
     parser.add_argument("--results-dir", type=Path, default=None, help="User-facing results bundle directory. Defaults to python/analysis/revenue_sources_black_hills/results.")
-    parser.add_argument("--years", type=int, nargs="+", default=[2022, 2023, 2024], help="Tax years to include.")
+    parser.add_argument(
+        "--docs-dir",
+        type=Path,
+        default=None,
+        help=(
+            "Directory to write the externally-distributed client presentation "
+            "Markdown and its image assets. Defaults to the repository docs/ "
+            "directory. Override this (for example to a temp path) when running "
+            "the workflow in a context where the real docs/ should not be "
+            "touched, such as automated tests or scratch runs."
+        ),
+    )
+    parser.add_argument("--years", type=int, nargs="+", default=[2022], help="Tax years to include.")
     parser.add_argument("--include-sensitivity", action=argparse.BooleanOptionalAction, default=True, help="Run sensitivity analyses.")
     parser.add_argument(
         "--exclude-outliers",
@@ -2762,6 +5757,16 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
             "Exclude hospital, university, and political-organization proxy rows "
             "from the primary frame for client-peer comparability. Use "
             "--no-exclude-outliers to make the full valid universe primary."
+        ),
+    )
+    parser.add_argument(
+        "--show-chart-n",
+        action=argparse.BooleanOptionalAction,
+        default=False,
+        help=(
+            "Print the positive-reporter count (n=...) above each bar on the "
+            "2022 pairwise client charts. Default is off; slide bullets still "
+            "report n regardless."
         ),
     )
     return parser.parse_args(argv)
@@ -2777,9 +5782,11 @@ def main(argv: list[str] | None = None) -> None:
         data_root=data_root,
         output_dir=output_dir,
         results_dir=args.results_dir.resolve() if args.results_dir else None,
+        docs_dir=args.docs_dir.resolve() if args.docs_dir else None,
         years=args.years,
         include_sensitivity=args.include_sensitivity,
         exclude_outliers=args.exclude_outliers,
+        show_chart_reporter_count=args.show_chart_n,
     )
 
 
