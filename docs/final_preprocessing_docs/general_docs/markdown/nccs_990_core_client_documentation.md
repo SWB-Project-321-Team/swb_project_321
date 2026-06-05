@@ -6,14 +6,13 @@ The NCCS 990 Core dataset is a processed public filing dataset from the National
 
 In this project, NCCS 990 Core is used as a source-specific Form 990 analysis layer. It provides organization identity, filing year, filing context, revenue, expenses, assets, net assets, program service revenue, contribution candidates, and classification support. The pipeline also uses NCCS BMF bridge files to connect Core filing records to the project counties and regions.
 
-The detailed technical pipeline documentation is `docs/final_preprocessing_docs/technical_docs/pipeline_docs/nccs_990_core_pipeline.md`.
-
 ## Data Provenance
 
 - Producer: National Center for Charitable Statistics at the Urban Institute.
 - Core catalog page: `https://nccs.urban.org/nccs/catalogs/catalog-core.html`.
 - BMF bridge catalog page: `https://nccs.urban.org/nccs/catalogs/catalog-bmf.html`.
-- Raw dictionaries: NCCS Core public charity, private foundation, and harmonized BMF bridge dictionaries.
+- Source documentation: NCCS Core public charity, private foundation, and harmonized BMF bridge catalog documentation.
+- Source file families used: NCCS Core public charity files, NCCS Core private foundation files, and NCCS BMF bridge files for tax year `2022`.
 
 ## Collection Method
 
@@ -25,19 +24,19 @@ The current pipeline scope is tax year `2022`. It includes selected Core public 
 
 Important limitations:
 
-- Core is currently `2022` only in this project.
-- Some Core public charity files can overlap by source variant. The pipeline preserves those overlapping `PC` and `PZ` rows because they represent source-specific Core records.
+- Core is currently `2022` only in this project because it is the only post-COVID year available in the NCCS Core files used here.
+- Some Core public charity files can overlap by source variant. In plain terms, `PC` records are public charity records from the full Form 990 source files, while `PZ` records are harmonized public charity records that can include fields shared across Form 990 and Form 990-EZ source files. The pipeline preserves overlapping `PC` and `PZ` rows because they come from different NCCS source versions, so they should not be automatically collapsed as duplicates.
 - Filing-form context is not always populated in the same way across all Core files.
 - Geography comes through bridge files and should be treated as a current-address approximation rather than a perfect filing-address history.
 - Revenue-source fields are kept faithful to Core source fields and are not forced to match GivingTuesday contribution categories.
 
-## Download And S3 Storage
+## Source Files Used
 
-Raw Core files, dictionaries, bridge BMF files, and release metadata are downloaded locally, uploaded unchanged to Bronze S3 under `bronze/nccs_990/core/`, and checked against expected file sizes. Filtered Core outputs are stored under `silver/nccs_990/core/`, and analysis documentation is stored under `silver/nccs_990/core/analysis/`.
+Raw Core files, dictionaries, bridge BMF files, and release metadata are downloaded from the public NCCS Core and BMF catalog sources. The project uses the Core files and BMF bridge files needed to identify records connected to the project counties and benchmark regions.
 
 ## Datatype Transformation
 
-Raw Core CSV files and dictionaries are preserved unchanged in Bronze S3. After filtering to the project geography, the pipeline writes per-file filtered CSV outputs, a combined filtered Core Parquet file, and final analysis Parquet outputs.
+Raw Core CSV files and dictionaries are preserved as source inputs. After filtering to the project geography, the processing creates per-file filtered outputs, a combined filtered Core file, and final analysis-ready CSV deliverables.
 
 ## Data Cleaning
 
@@ -46,29 +45,20 @@ The cleaning process keeps the raw Core files unchanged, then creates project-sp
 - Selects the Core files and BMF bridge files needed for tax year `2022`.
 - Uses the BMF bridge files to connect filings to counties and regions.
 - Keeps only records connected to the project counties and regions.
-- Writes filtered outputs by source file, then creates one combined filtered Core Parquet file.
+- Writes filtered outputs by source file, then creates one combined filtered Core file.
 - Preserves source context fields so users can see which Core file and source variant each row came from.
-- Preserves intentional `PC` and `PZ` overlap rows rather than collapsing them into one organization-year.
+- Preserves intentional `PC` and `PZ` overlap rows rather than collapsing them into one organization-year; these are different NCCS source versions of public charity filing records.
 - Standardizes identity, tax year, state, ZIP, county, and region fields where needed.
 - Calculates analysis fields such as revenue, expenses, assets, net assets, surplus, net margin, months of reserves, program service revenue, and contribution candidates where Core source fields support them.
 - Supplements missing NTEE and subsection classifications from BMF and IRS EO BMF when needed.
 - Creates helper flags for hospitals, universities, and political organizations so analysts can apply consistent exclusions.
 - Marks missing NTEE values and zero-expense reserve cases explicitly so they are visible to analysts.
 
-## Analysis-Ready Outputs
+## Analysis-Ready CSV Deliverables
 
-- Row-level analysis dataset: `silver/nccs_990/core/analysis/nccs_990_core_analysis_variables.parquet`.
-- Geography metrics: `silver/nccs_990/core/analysis/nccs_990_core_analysis_geography_metrics.parquet`.
-- Pipeline documentation: `silver/nccs_990/core/analysis/documentation/nccs_990_core_pipeline.md`.
-- Variable mapping: `silver/nccs_990/core/analysis/variable_mappings/nccs_990_core_analysis_variable_mapping.md`.
-- Coverage evidence: `silver/nccs_990/core/analysis/quality/coverage/nccs_990_core_analysis_variable_coverage.csv`.
+- `nccs_990_core_analysis_variables.csv`
+- `nccs_990_core_analysis_geography_metrics.csv`
 
 ## Analysis Data Dictionary
 
-Use `docs/final_preprocessing_docs/technical_docs/analysis_variable_mappings/nccs_990_core_analysis_variable_mapping.md` as the analysis-ready data dictionary. Use `docs/final_preprocessing_docs/technical_docs/quality/coverage_evidence/nccs_990_core_analysis_variable_coverage.csv` to confirm populated counts and coverage.
-
-## Supporting Raw Dictionaries
-
-- `docs/final_preprocessing_docs/technical_docs/source_dictionaries/nccs_990_core/CORE-HRMN_dd.csv`.
-- `docs/final_preprocessing_docs/technical_docs/source_dictionaries/nccs_990_core/DD-PF-HRMN-V0.csv`.
-- `docs/final_preprocessing_docs/technical_docs/source_dictionaries/nccs_990_core/harmonized_data_dictionary.xlsx`.
+The deliverable package includes a separate data dictionary for the analysis-ready CSV files.

@@ -8,15 +8,16 @@ The files used here include a Combined Forms DataMart and separate Basic Fields 
 
 This dataset is useful because it contains more detailed financial information than registry-style sources such as BMF. It is also important to interpret carefully: different organizations file different versions of the Form 990 family, and the IRS forms do not always separate donor types in the way analysts may want.
 
-The detailed technical pipeline documentation is `docs/final_preprocessing_docs/technical_docs/pipeline_docs/givingtuesday_datamart_pipeline.md`.
-
 ## Data Provenance
 
 - Producer: GivingTuesday.
 - Source page: `https://990data.givingtuesday.org/datamarts/`.
 - Public catalog API: `https://grantstory-api.gtdata.org/v2/public/678d25291eceb5d121099200/items?limit=200`.
-- Per-file download URLs are selected from the GivingTuesday catalog and recorded in the pipeline manifests.
-- Raw dictionary support comes from the exported GivingTuesday catalog and field dictionary files.
+- Source file names used for the project:
+  - `2025_10_18_All_Years_990StandardFields.csv`
+  - `2025_10_28_All_Years_990EZStandardFields.csv`
+  - `2025_08_29_All_Years_990PFStandardFields.csv`
+  - `2025_07_10_All_Years_990_990ez_990pf_990n_Combined_DataMart.csv`
 
 ## Collection Method
 
@@ -34,15 +35,13 @@ Important limitations:
 - Forms 990-EZ and 990-PF do not report all of the same contribution subcategories that full Form 990 filers report.
 - The selected GivingTuesday fields do not always include all classification fields needed for this project, so the analysis layer supplements missing classification information from NCCS BMF and IRS EO BMF registry sources.
 
-## Download And S3 Storage
+## Source Files Used
 
-Required raw GivingTuesday CSV files and metadata are downloaded locally, uploaded unchanged to Bronze S3 under `bronze/givingtuesday_990/datamarts/raw/` and `bronze/givingtuesday_990/datamarts/metadata/`, and checked against expected file sizes. This gives the project a preserved copy of the downloaded source files.
-
-Intermediate project-ready outputs are stored under the GivingTuesday Bronze and Silver prefixes. Final analysis documentation and analysis outputs are stored under `silver/givingtuesday_990/analysis/`.
+The project uses GivingTuesday's public DataMart catalog to identify and download the selected Basic Fields files for Forms 990, 990-EZ, and 990-PF. The Combined Forms DataMart is used upstream for record admission and filtering support. The final row-level analysis dataset is based on the selected Basic Fields files, with classification enrichment from registry sources when needed.
 
 ## Datatype Transformation
 
-The raw GivingTuesday CSV files are preserved unchanged in Bronze S3. Later pipeline steps convert the data into Parquet files, which are easier and faster to read in Python. These converted files include a normalized Combined Forms cache, pre-Silver files, Silver project-region files, and final analysis outputs.
+The raw GivingTuesday CSV files are converted into smaller project-specific files after filtering to the project geography and tax-year scope. Intermediate working formats are used for processing efficiency, while the client deliverable uses CSV files.
 
 ## Data Cleaning
 
@@ -61,23 +60,13 @@ The cleaning process keeps the raw source files unchanged, then creates smaller 
 - Creates helper flags for hospitals, universities, and political organizations so analysts can include or exclude those groups consistently.
 - Leaves fields blank when the source does not support a reliable value, rather than filling them from a weaker source.
 
-## Analysis-Ready Outputs
+## Analysis-Ready CSV Deliverables
 
-- Row-level analysis dataset: `silver/givingtuesday_990/analysis/givingtuesday_990_basic_allforms_analysis_variables.parquet`.
-- Region metrics: `silver/givingtuesday_990/analysis/givingtuesday_990_basic_allforms_analysis_region_metrics.parquet`.
-- Pipeline documentation: `silver/givingtuesday_990/analysis/documentation/givingtuesday_datamart_pipeline.md`.
-- Variable mapping: `silver/givingtuesday_990/analysis/variable_mappings/givingtuesday_basic_analysis_variable_mapping.md`.
-- Coverage evidence: `silver/givingtuesday_990/analysis/quality/coverage/givingtuesday_990_basic_allforms_analysis_variable_coverage.csv`.
+- `givingtuesday_990_basic_allforms_analysis_variables.csv`
+- `givingtuesday_990_basic_allforms_analysis_region_metrics.csv`
 
 ## Analysis Data Dictionary
 
-Use `docs/final_preprocessing_docs/technical_docs/analysis_variable_mappings/givingtuesday_basic_analysis_variable_mapping.md` as the analysis-ready data dictionary. Use `docs/final_preprocessing_docs/technical_docs/quality/coverage_evidence/givingtuesday_990_basic_allforms_analysis_variable_coverage.csv` to confirm populated counts and coverage.
+The deliverable package includes a separate data dictionary for the analysis-ready CSV files.
 
 For contribution and revenue-source analysis, the most important point is that the DataMart follows the structure of the IRS forms. Full Form 990 filers provide the most detailed contribution subcategories. Form 990-EZ and Form 990-PF filers provide less detail. Some categories, especially "other contributions" on Form 990, cannot be cleanly split into individual giving versus institutional giving without additional data that is not in this DataMart.
-
-## Supporting Raw Dictionaries
-
-- `docs/final_preprocessing_docs/technical_docs/source_dictionaries/givingtuesday_datamarts/datamart_catalog.md`.
-- `docs/final_preprocessing_docs/technical_docs/source_dictionaries/givingtuesday_datamarts/datamart_fields.md`.
-- `docs/final_preprocessing_docs/technical_docs/source_dictionaries/givingtuesday_datamarts/datamart_catalog.csv`.
-- `docs/final_preprocessing_docs/technical_docs/source_dictionaries/givingtuesday_datamarts/datamart_fields.csv`.

@@ -3503,7 +3503,7 @@ def build_2022_full_answer_slide_lines(
             "- **Unit:** Organization-level reported dollars per source, not regional aggregate totals or stacked-bar percentages.",
             "- **Comparison:** Black Hills vs each benchmark region separately (four pairwise tests per source).",
             f"- **Statistic:** Permutation test on the median difference among organizations with a **positive** value for that source ({PERMUTATION_ITERATIONS_2022:,} reshuffles); 95% percentile bootstrap CI on the same median gap ({BOOTSTRAP_ITERATIONS_2022:,} resamples). Slide bullets report medians for those reporters only.",
-            "- **Significance rule:** p < 0.05 on the pairwise permutation test (not FDR-adjusted on this slide).",
+            "- **Significance rule:** p < 0.05 on the pairwise permutation test.",
             "",
         ]
     )
