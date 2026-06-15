@@ -132,6 +132,26 @@ REGION_COLORS = {
     "Benchmark": "#7C8795",
 }
 
+REPORT_REGION_ORDER = ["Black Hills", "Billings", "Flagstaff", "Missoula", "Sioux Falls"]
+
+REPORT_REGION_COLORS = {
+    "Black Hills": "#66C2A5",
+    "Billings": "#FC8D62",
+    "Flagstaff": "#8DA0CB",
+    "Missoula": "#E78AC3",
+    "Sioux Falls": "#A6D854",
+}
+
+REPORT_CHART_STYLE = {
+    "font.family": "Arial",
+    "font.size": 8,
+    "axes.titlesize": 8,
+    "axes.labelsize": 8,
+    "xtick.labelsize": 8,
+    "ytick.labelsize": 8,
+    "legend.fontsize": 8,
+}
+
 DISPLAY_LABELS = {
     "total_revenue": "Total revenue",
     "program_service_revenue": "Program service revenue",
@@ -3118,11 +3138,9 @@ def save_2022_pairwise_median_charts(
 
     Each chart is a single-axis bar chart showing the **positive-only**
     (zero-excluded) median dollar amount for Black Hills next to all four
-    benchmark regions. Bars are annotated above with `$median` and, when
-    ``show_reporter_count`` is True, a second line ``n=<reporters>``. The
-    Pairwise permutation p-values and bootstrap CIs are reported on slide
-    bullets and in ``client_2022_pairwise_presentation_summary.csv``, not on
-    the chart axis (region names only) so labels stay readable.
+    benchmark regions. Exact values, reporter counts, pairwise permutation
+    p-values, and bootstrap CIs are reported in the accompanying tables rather
+    than inside the chart.
     ``presentation_table`` is accepted for API compatibility but is not
     drawn on the chart.
 
@@ -3134,12 +3152,10 @@ def save_2022_pairwise_median_charts(
     output_dir.mkdir(parents=True, exist_ok=True)
     year_frame = frame.loc[frame["tax_year"].astype(str).eq("2022")].copy()
     display_summary = pairwise_presentation_summary(year_frame, variables)
-    benchmark_regions = [region for region in REGION_ORDER if region != "Black Hills"]
-    chart_regions = ["Black Hills", *benchmark_regions]
+    chart_regions = REPORT_REGION_ORDER
     chart_paths: dict[str, Path] = {}
 
     for variable in variables:
-        label = CLIENT_RAW_DISPLAY_LABELS.get(variable, DISPLAY_LABELS.get(variable, variable))
         variable_slug = slugify_label(variable)
         variable_rows = display_summary.loc[display_summary["variable"].eq(variable)].copy()
 
@@ -3154,68 +3170,34 @@ def save_2022_pairwise_median_charts(
             .reset_index()
         )
         medians = region_table["positive_median"].to_numpy(dtype=float)
-        positive_n = region_table["positive_n"].to_numpy(dtype=float)
         median_max = float(np.nanmax(medians)) if np.isfinite(medians).any() else 0.0
-        upper = max(1.0, median_max * 1.32)
+        upper = max(1.0, median_max * 1.12)
 
-        fig, ax = plt.subplots(figsize=(10.0, 5.6))
-        x = np.arange(len(chart_regions))
-        colors = [REGION_COLORS.get(region, "#7C8795") for region in chart_regions]
-        bar_edge = ["#1F1F1F" if region == "Black Hills" else "none" for region in chart_regions]
-        bar_linewidth = [1.4 if region == "Black Hills" else 0.0 for region in chart_regions]
-        ax.bar(
-            x,
-            np.nan_to_num(medians, nan=0.0),
-            color=colors,
-            edgecolor=bar_edge,
-            linewidth=bar_linewidth,
-            width=0.66,
-        )
-
-        for idx, (region, value, n_pos) in enumerate(zip(chart_regions, medians, positive_n)):
-            if pd.isna(value) or n_pos <= 0:
-                ax.text(
-                    idx,
-                    upper * 0.02,
-                    "no reporters",
-                    ha="center",
-                    va="bottom",
-                    fontsize=9,
-                    color="#777777",
-                )
-                continue
-            bar_label = (
-                f"${value:,.0f}\nn={int(n_pos):,}"
-                if show_reporter_count
-                else f"${value:,.0f}"
+        with plt.rc_context(REPORT_CHART_STYLE):
+            fig, ax = plt.subplots(figsize=(7.2, 4.0))
+            x = np.arange(len(chart_regions))
+            ax.bar(
+                x,
+                np.nan_to_num(medians, nan=0.0),
+                color=[REPORT_REGION_COLORS[region] for region in chart_regions],
+                edgecolor="none",
+                linewidth=0,
+                width=0.66,
             )
-            ax.text(
-                idx,
-                float(value) + upper * 0.012,
-                bar_label,
-                ha="center",
-                va="bottom",
-                fontsize=9,
-                color="#333333",
-            )
-
-        ax.set_xticks(x, chart_regions, rotation=0, ha="center")
-        ax.set_xlim(-0.55, len(chart_regions) - 0.45)
-        ax.yaxis.set_major_formatter(lambda value, _: f"${value:,.0f}")
-        ax.grid(axis="y", alpha=0.25)
-        ax.set_ylabel("2022 median $ among reporters")
-        ax.set_ylim(0, upper)
-
-        ax.set_title(
-            f"{label}: 2022 median dollars among organizations that report this source",
-            fontsize=12.5,
-            weight="bold",
-            pad=10,
-        )
-        fig.tight_layout()
-        output_path = output_dir / f"client_2022_pairwise_positive_median_{variable_slug}.png"
-        fig.savefig(output_path, dpi=200, bbox_inches="tight")
-        plt.close(fig)
+            ax.set_xticks(x, chart_regions, rotation=0, ha="center")
+            ax.set_xlim(-0.55, len(chart_regions) - 0.45)
+            ax.yaxis.set_major_formatter(lambda value, _: format_compact_axis_dollars(value))
+            ax.grid(axis="y", alpha=0.18, linewidth=0.6)
+            ax.set_axisbelow(True)
+            ax.set_ylabel("Median dollars")
+            ax.set_xlabel("")
+            ax.set_ylim(0, upper)
+            ax.spines["top"].set_visible(False)
+            ax.spines["right"].set_visible(False)
+            fig.tight_layout()
+            output_path = output_dir / f"client_2022_pairwise_positive_median_{variable_slug}.png"
+            fig.savefig(output_path, dpi=300, bbox_inches="tight")
+            plt.close(fig)
         info(f"Saved client chart: {output_path}")
         chart_paths[variable] = output_path
 
@@ -3339,88 +3321,53 @@ def save_2022_positive_median_overview(
     value_matrix = (
         overview.pivot(index="variable", columns="region_label", values="positive_median")
         .reindex(CLIENT_PRESENTATION_VARIABLES)
-        .reindex(columns=REGION_ORDER)
+        .reindex(columns=REPORT_REGION_ORDER)
     )
     value_matrix.index = [
         CLIENT_RAW_DISPLAY_LABELS.get(variable, DISPLAY_LABELS.get(variable, variable))
         for variable in value_matrix.index
     ]
-    fig, ax = plt.subplots(figsize=(18, 8.8))
-    x_centers = np.arange(len(REGION_ORDER), dtype=float)
-    bar_width = 0.072
-    offsets = np.linspace(-0.38, 0.38, len(CLIENT_PRESENTATION_VARIABLES))
-    finite_values = value_matrix.to_numpy(dtype=float)
-    finite_values = finite_values[np.isfinite(finite_values)]
-    upper = max(1.0, float(finite_values.max()) * 1.28) if finite_values.size else 1.0
+    display_ticks = {
+        "Black Hills": "Black\nHills",
+        "Billings": "Billings",
+        "Flagstaff": "Flagstaff",
+        "Missoula": "Missoula",
+        "Sioux Falls": "Sioux\nFalls",
+    }
 
-    for source_index, variable in enumerate(CLIENT_PRESENTATION_VARIABLES):
-        source_label = CLIENT_RAW_DISPLAY_LABELS.get(variable, DISPLAY_LABELS.get(variable, variable))
-        values = value_matrix.loc[source_label, REGION_ORDER].to_numpy(dtype=float)
-        x = x_centers + offsets[source_index]
-        ax.bar(
-            x,
-            np.nan_to_num(values, nan=0.0),
-            width=bar_width,
-            color=SOURCE_COLORS.get(variable, "#6F7F8F"),
-            edgecolor="none",
-            label=textwrap.fill(source_label, width=24),
-        )
-        for x_value, value in zip(x, values):
-            if pd.isna(value):
-                continue
-            y_value = float(value)
-            ax.text(
-                x_value,
-                y_value + upper * 0.008,
-                f"${y_value:,.0f}",
-                ha="center",
-                va="bottom",
-                fontsize=7.6,
-                color="#333333",
-                rotation=90,
+    with plt.rc_context(REPORT_CHART_STYLE):
+        fig, axes = plt.subplots(5, 2, figsize=(8.0, 10.0), sharey=False)
+        axes = np.asarray(axes).ravel()
+        x = np.arange(len(REPORT_REGION_ORDER))
+        for ax, variable in zip(axes, CLIENT_PRESENTATION_VARIABLES):
+            source_label = CLIENT_RAW_DISPLAY_LABELS.get(variable, DISPLAY_LABELS.get(variable, variable))
+            values = value_matrix.loc[source_label, REPORT_REGION_ORDER].to_numpy(dtype=float)
+            finite = values[np.isfinite(values)]
+            upper = max(1.0, float(finite.max()) * 1.12) if finite.size else 1.0
+            ax.bar(
+                x,
+                np.nan_to_num(values, nan=0.0),
+                color=[REPORT_REGION_COLORS[region] for region in REPORT_REGION_ORDER],
+                edgecolor="none",
+                linewidth=0,
+                width=0.68,
             )
+            ax.set_title(textwrap.fill(source_label, width=30), weight="bold", pad=4)
+            ax.set_xticks(x, [display_ticks[region] for region in REPORT_REGION_ORDER])
+            ax.set_xlabel("")
+            ax.set_ylabel("Median dollars")
+            ax.set_ylim(0, upper)
+            ax.yaxis.set_major_formatter(lambda value, _: format_compact_axis_dollars(value))
+            ax.grid(axis="y", alpha=0.18, linewidth=0.6)
+            ax.set_axisbelow(True)
+            ax.spines["top"].set_visible(False)
+            ax.spines["right"].set_visible(False)
 
-    ax.set_title(
-        "2022 median dollars by source and region (positive reporters only)",
-        fontsize=15,
-        weight="bold",
-        pad=18,
-    )
-    ax.set_xlabel("")
-    ax.set_ylabel("Median dollars among positive reporters")
-    ax.set_xticks(x_centers)
-    ax.set_xticklabels(REGION_ORDER, rotation=0, ha="center", fontsize=11, weight="bold")
-    for tick_label in ax.get_xticklabels():
-        region = tick_label.get_text()
-        if region in REGION_COLORS:
-            tick_label.set_color(REGION_COLORS[region])
-    ax.set_ylim(0, upper)
-    ax.yaxis.set_major_formatter(lambda value, _: format_compact_axis_dollars(value))
-    ax.tick_params(axis="x", length=0)
-    ax.grid(axis="y", alpha=0.25)
-    ax.legend(
-        title="Revenue source",
-        loc="center left",
-        bbox_to_anchor=(1.01, 0.5),
-        ncol=1,
-        frameon=False,
-        fontsize=8.5,
-    )
-
-    fig.text(
-        0.01,
-        0.01,
-        "Each bar shows the median dollar amount among organizations with a positive value for that source; colors identify revenue sources.",
-        ha="left",
-        va="bottom",
-        fontsize=9,
-        color="#555555",
-    )
-    fig.tight_layout(rect=(0, 0.06, 1, 0.98))
-    fig.savefig(output_path, dpi=200, bbox_inches="tight")
-    grouped_bar_output_path = output_dir / "client_2022_positive_median_grouped_bar_by_region.png"
-    fig.savefig(grouped_bar_output_path, dpi=200, bbox_inches="tight")
-    plt.close(fig)
+        fig.tight_layout(h_pad=1.25, w_pad=1.0)
+        fig.savefig(output_path, dpi=300, bbox_inches="tight")
+        grouped_bar_output_path = output_dir / "client_2022_positive_median_grouped_bar_by_region.png"
+        fig.savefig(grouped_bar_output_path, dpi=300, bbox_inches="tight")
+        plt.close(fig)
     stale_heatmap_output_path = output_dir / "client_2022_positive_median_heatmap_by_region.png"
     if stale_heatmap_output_path.exists():
         stale_heatmap_output_path.unlink()

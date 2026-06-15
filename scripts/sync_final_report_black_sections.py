@@ -2,17 +2,25 @@
 
 from __future__ import annotations
 
+import re
 from copy import deepcopy
 from pathlib import Path
 
 import pandas as pd
 from docx import Document
+from docx.enum.table import WD_CELL_VERTICAL_ALIGNMENT
+from docx.enum.text import WD_ALIGN_PARAGRAPH
 from docx.oxml import OxmlElement
 from docx.oxml.ns import qn
+from docx.shared import Pt, RGBColor
 from docx.table import Table
 from docx.text.paragraph import Paragraph
+from lxml import etree
 
 REVENUE_DEFINITION_COLUMN_FRACTIONS = (0.17, 0.33, 0.50)
+ADDED_TABLE_HEADER_FILL = "DEEAF0"
+BODY_FONT_SIZE_PT = 8
+HEADER_FONT_SIZE_PT = 13
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
 MD_PATH = REPO_ROOT / "docs/final_report/Philanthropic characteristics of the Black Hills Area and co (1).md"
@@ -20,6 +28,10 @@ DOCX_PATH = REPO_ROOT / "docs/final_report/Philanthropic characteristics of the 
 PAIRWISE_CSV = (
     REPO_ROOT
     / "python/analysis/revenue_sources_black_hills/results/tables/client_2022_pairwise_presentation_summary.csv"
+)
+RAW_LEVEL_CSV = (
+    REPO_ROOT
+    / "python/analysis/revenue_sources_black_hills/results/tables/client_raw_level_region_summary.csv"
 )
 SIGNIFICANT_TABLE_HEADERS = [
     "Revenue source",
@@ -31,6 +43,116 @@ SIGNIFICANT_TABLE_HEADERS = [
     "p-value",
 ]
 APPENDIX_TABLE_HEADERS = SIGNIFICANT_TABLE_HEADERS[1:]
+OVERVIEW_TABLE_HEADERS = [
+    "Revenue source",
+    "Black Hills",
+    "Billings",
+    "Flagstaff",
+    "Missoula",
+    "Sioux Falls",
+]
+SOURCE_TABLE_HEADERS = [
+    "Region",
+    "Reporting rate",
+    "Positive reporters (n)",
+    "Median reported dollars",
+    "Black Hills minus benchmark region (95% CI)",
+    "Pairwise p-value vs Black Hills",
+]
+PRIOR_SOURCE_TABLE_HEADERS = [
+    "Region",
+    "Positive reporters (n)",
+    "Median reported dollars",
+    "Black Hills minus region (95% CI)",
+    "p-value",
+]
+LEGACY_SOURCE_TABLE_HEADERS = [
+    *PRIOR_SOURCE_TABLE_HEADERS,
+    "Result",
+]
+REPORT_REGION_ORDER = ["Black Hills", "Billings", "Flagstaff", "Missoula", "Sioux Falls"]
+REPORT_VARIABLES = [
+    "total_revenue",
+    "program_service_revenue",
+    "total_contributions",
+    "government_grants_received",
+    "federated_campaigns",
+    "related_org_contributions",
+    "membership_dues",
+    "fundraising_events_contributions",
+    "mixed_unclassified_contributions",
+    "residual_other_revenue",
+]
+REPORT_DISPLAY_LABELS = {
+    "total_revenue": "Total revenue",
+    "program_service_revenue": "Program service revenue",
+    "total_contributions": "Total contributions",
+    "government_grants_received": "Government grants received",
+    "federated_campaigns": "Federated campaign contributions",
+    "related_org_contributions": "Related organization contributions",
+    "membership_dues": "Membership dues",
+    "fundraising_events_contributions": "Fundraising event contributions",
+    "mixed_unclassified_contributions": "Mixed or unclassified contributions",
+    "residual_other_revenue": "Other revenue",
+}
+REPORT_TITLE_LABELS = {
+    "total_revenue": "Total Revenue",
+    "program_service_revenue": "Program Service Revenue",
+    "total_contributions": "Total Contributions",
+    "government_grants_received": "Government Grants Received",
+    "federated_campaigns": "Federated Campaign Contributions",
+    "related_org_contributions": "Related Organization Contributions",
+    "membership_dues": "Membership Dues",
+    "fundraising_events_contributions": "Fundraising Event Contributions",
+    "mixed_unclassified_contributions": "Mixed or Unclassified Contributions",
+    "residual_other_revenue": "Other Revenue",
+}
+FIGURE_TITLES = {
+    **{
+        variable: f"Figure 5-{index}: {REPORT_TITLE_LABELS[variable]} by Region"
+        for index, variable in enumerate(REPORT_VARIABLES, start=2)
+    },
+}
+TABLE_TITLES = {
+    "overview": "Table 5-1: Median Reported Dollars by Revenue Source and Region",
+    "aggregate": "Table 5-13: Total Reported Dollars by Revenue Source and Region (Aggregate)",
+    "definitions": "Table 5-12: Revenue Source Definitions",
+    **{
+        variable: f"Table 5-{index}: {REPORT_TITLE_LABELS[variable]} by Region"
+        for index, variable in enumerate(REPORT_VARIABLES, start=2)
+    },
+}
+REPORT_IMAGE_PATHS = [
+    REPO_ROOT / "docs" / "final_report" / "updated_report_assets" / f"updated-report-image-{index:02d}.png"
+    for index in range(22, 32)
+]
+APPENDIX_INTRO = (
+    "The appendix provides the complete 2022 revenue-source comparison details. Table 5-1 lists the median "
+    "reported dollars among organizations with a positive amount for each source. Table 5-13 lists the "
+    "corresponding regional totals summed across all organizations in the analysis file. Figures 5-2 through "
+    "5-11 show each source separately, and their paired tables provide reporting rates, reporter counts, "
+    "medians, median gaps, confidence intervals, and p-values. The comparison columns apply only to each "
+    "benchmark region versus Black Hills; no Black Hills-only p-value or median-gap confidence interval "
+    "exists, so those Black Hills cells are marked NA. "
+    "Table 5-12 defines the revenue sources. Rare revenue sources have fewer reporting organizations; see "
+    "the sample-size discussion in the non-profit revenue analysis section."
+)
+AGGREGATE_TABLE_NOTE = (
+    "Table 5-13 sums reported dollars for each revenue source and region over that source's eligible "
+    "reporting universe in the 2022 analysis file. Totals for total revenue, total contributions, mixed or "
+    "unclassified contributions, and other revenue include all organizations in the file. Government grants, "
+    "federated campaigns, related-organization contributions, membership dues, and fundraising event "
+    "contributions include Form 990 filers only; 990-EZ and 990-PF filers do not report those Part VIII "
+    "sub-lines and are excluded from those rows, not counted as zero. Within Form 990, a blank sub-line is "
+    "treated as zero. Program service revenue includes organizations for which that line is reported on the "
+    "filed form. Regional totals reflect both universe size and report size; a few very large filers can "
+    "dominate the sum. Table 5-1 reports medians among positive reporters only and is the basis for the "
+    "pairwise comparisons in Tables 5-2 through 5-11."
+)
+APPENDIX_FINAL_NOTE = (
+    "The full client presentation and supporting analysis files include reporting rates and additional "
+    "source-by-source interpretation."
+)
 FINDINGS_INTRO_PREFIX = (
     "Among organizations that reported a positive amount for the source, Black Hills showed"
 )
@@ -51,13 +173,14 @@ STALE_RESULTS_PREFIXES = (
 
 GRAY = "666666"
 RESULTS_START = "We compared whether non-profit revenue sources differ"
+REVENUE_COMPARISON_HEADING = "Non-profit revenue source comparison (2022)"
 APPENDIX_START = "Appendix: Non-profit revenue source comparison details"
-CAPTION_MARKER = "Figure 4."
-DATA_SOURCES_HEADING = "GivingTuesday 990 DataMart (data sources)"
-RELEVANT_DETAILS_HEADING = "Non-profit revenue analysis (relevant details)"
+DATA_SOURCES_HEADING = "GivingTuesday 990 DataMart"
+RELEVANT_DETAILS_HEADING = "Non-profit revenue analysis"
 HEADING_4_TITLES = {
     "How many organizations could we compare?",
-    "Findings where Black Hills differed from a benchmark region (2022)",
+    "What the 2022 revenue-source comparison shows",
+    REVENUE_COMPARISON_HEADING,
     DATA_SOURCES_HEADING,
     RELEVANT_DETAILS_HEADING,
 }
@@ -86,27 +209,27 @@ REVENUE_DEFINITION_TABLE_ROWS = [
     [
         "Government grants received",
         "Funds reported from government sources.",
-        "Form 990 Part VIII Line 1e; pairwise tests use Form 990 filers only.",
+        "Form 990 Part VIII Line 1e; comparisons use Form 990 filers only.",
     ],
     [
         "Federated campaign contributions",
         "Support reported through federated campaigns (for example, United Way-style allocations).",
-        "Form 990 Part VIII Line 1a; pairwise tests use Form 990 filers only.",
+        "Form 990 Part VIII Line 1a; comparisons use Form 990 filers only.",
     ],
     [
         "Related organization contributions",
         "Contributions from related organizations or affiliates.",
-        "Form 990 Part VIII Line 1d; pairwise tests use Form 990 filers only.",
+        "Form 990 Part VIII Line 1d; comparisons use Form 990 filers only.",
     ],
     [
         "Membership dues",
         "Membership dues reported on the return.",
-        "Form 990 Part VIII Line 1b; pairwise tests use Form 990 filers only.",
+        "Form 990 Part VIII Line 1b; comparisons use Form 990 filers only.",
     ],
     [
         "Fundraising event contributions",
         "Contributions tied to fundraising events.",
-        "Form 990 Part VIII Line 1c; pairwise tests use Form 990 filers only.",
+        "Form 990 Part VIII Line 1c; comparisons use Form 990 filers only.",
     ],
     [
         "Mixed / unclassified contributions",
@@ -122,18 +245,7 @@ REVENUE_DEFINITION_TABLE_ROWS = [
 REVENUE_DEFINITIONS_CAVEAT_PREFIX = (
     "The data cannot cleanly separate individual giving from foundation grants"
 )
-APPENDIX_H3_TITLES = {
-    "Total revenue",
-    "Program service revenue",
-    "Total contributions",
-    "Government grants received",
-    "Federated campaign contributions",
-    "Related organization contributions",
-    "Membership dues",
-    "Fundraising event contributions",
-    "Mixed / unclassified contributions",
-    "Other revenue",
-}
+APPENDIX_H3_TITLES: set[str] = set()
 
 
 def is_gray_md_line(line: str) -> bool:
@@ -168,7 +280,7 @@ def extract_black_paragraphs_from_md(md_text: str) -> list[str]:
         if stripped.startswith("## ") and not is_gray_md_line(stripped):
             paragraphs.append(stripped.removeprefix("## ").strip())
             continue
-        if stripped.startswith("**Figure "):
+        if stripped.startswith(("**Figure ", "**Table ")) and stripped.endswith("**"):
             paragraphs.append(stripped.replace("**", "").strip())
             continue
         if stripped.startswith("*Figure "):
@@ -210,7 +322,7 @@ def style_for_black_text(text: str, *, in_appendix: bool = False) -> str:
     if stripped.startswith(APPENDIX_START):
         return "Heading 2"
     if stripped in HEADING_4_TITLES:
-        return "Heading 4"
+        return "Heading 3"
     if in_appendix and stripped in APPENDIX_H3_TITLES:
         return "Heading 3"
     return "Normal"
@@ -228,8 +340,7 @@ def set_paragraph_text_black(
     if style is not None:
         set_paragraph_style(paragraph, style)
     run = paragraph.add_run(text)
-    if text.strip().startswith("Figure "):
-        run.italic = True
+    run.font.color.rgb = RGBColor(0, 0, 0)
 
 
 def insert_paragraph_after(
@@ -254,8 +365,41 @@ def insert_paragraph_after(
     return new_para
 
 
+def insert_paragraph_before(
+    paragraph: Paragraph,
+    text: str,
+    *,
+    style: str | None = None,
+) -> Paragraph:
+    resolved_style = style if style is not None else style_for_black_text(text)
+    new_p = deepcopy(paragraph._element)
+    for child in list(new_p):
+        if child.tag.endswith("}r") or child.tag.endswith("}hyperlink"):
+            new_p.remove(child)
+    p_pr = new_p.find(qn("w:pPr"))
+    if p_pr is not None:
+        p_style = p_pr.find(qn("w:pStyle"))
+        if p_style is not None:
+            p_pr.remove(p_style)
+    paragraph._element.addprevious(new_p)
+    new_para = Paragraph(new_p, paragraph._parent)
+    set_paragraph_text_black(new_para, text, style=resolved_style)
+    return new_para
+
+
 def remove_paragraph(paragraph: Paragraph) -> None:
     paragraph._element.getparent().remove(paragraph._element)
+
+
+def remove_image_paragraph(paragraph: Paragraph) -> None:
+    relationship_ids = {
+        blip.get(qn("r:embed"))
+        for blip in paragraph._element.findall(".//" + qn("a:blip"))
+        if blip.get(qn("r:embed"))
+    }
+    remove_paragraph(paragraph)
+    for relationship_id in relationship_ids:
+        paragraph.part.drop_rel(relationship_id)
 
 
 def remove_aggregate_share_table(doc: Document) -> None:
@@ -474,25 +618,24 @@ def sync_data_sources_block(doc: Document, data_pre: list[str]) -> None:
             continue
         if paragraph_is_gray(paragraph) and text.startswith("Selection and demographic"):
             break
-        if paragraph_is_gray(paragraph):
+        if paragraph_is_gray(paragraph) and text == "Note appendices for details.":
             anchor = paragraph
 
     if anchor is None:
         return
 
     to_remove: list[Paragraph] = []
-    removing = False
+    in_data_sources = False
     for paragraph in doc.paragraphs:
-        if paragraph._element is anchor._element:
-            removing = True
+        text = paragraph.text.strip()
+        if paragraph_is_gray(paragraph) and text == "Data sources":
+            in_data_sources = True
             continue
-        if not removing:
+        if not in_data_sources:
             continue
-        if paragraph_is_gray(paragraph) and paragraph.text.strip().startswith(
-            "Selection and demographic"
-        ):
+        if paragraph_is_gray(paragraph) and text.startswith("Selection and demographic"):
             break
-        if not paragraph_is_gray(paragraph) and paragraph.text.strip():
+        if not paragraph_is_gray(paragraph) and text:
             to_remove.append(paragraph)
 
     for paragraph in reversed(to_remove):
@@ -500,7 +643,7 @@ def sync_data_sources_block(doc: Document, data_pre: list[str]) -> None:
 
     current = anchor
     if heading:
-        current = insert_paragraph_after(current, heading, style="Heading 4")
+        current = insert_paragraph_after(current, heading, style="Heading 3")
     for text in body:
         current = insert_paragraph_after(current, text, style="Normal")
 
@@ -511,32 +654,19 @@ def split_md_sections(black_paragraphs: list[str]) -> tuple[list[str], list[str]
     appendix: list[str] = []
     section = "pre"
     for text in black_paragraphs:
-        if text.startswith(RESULTS_START):
+        normalized = text.lstrip("# ").strip()
+        if normalized.startswith(RESULTS_START) or normalized == REVENUE_COMPARISON_HEADING:
             section = "results"
-        elif text.startswith(APPENDIX_START):
+        elif normalized.startswith(APPENDIX_START):
             section = "appendix"
+            text = normalized
         if section == "pre":
             pre.append(text)
         elif section == "results":
-            results.append(text)
+            results.append(normalized if normalized == REVENUE_COMPARISON_HEADING else text)
         else:
             appendix.append(text)
     return pre, results, appendix
-
-
-def split_results_around_caption(results: list[str]) -> tuple[list[str], str | None, list[str]]:
-    before: list[str] = []
-    after: list[str] = []
-    caption: str | None = None
-    for text in results:
-        if caption is None and (CAPTION_MARKER in text or text.startswith("Median reported")):
-            caption = text
-            continue
-        if caption is None:
-            before.append(text)
-        else:
-            after.append(text)
-    return before, caption, after
 
 
 def remove_stale_pre_paragraphs(doc: Document) -> None:
@@ -563,19 +693,42 @@ def find_appendix_paragraph_index(doc: Document) -> int:
     raise RuntimeError("Could not find appendix section in document.")
 
 
-def ensure_appendix_heading(doc: Document) -> None:
-    if any(p.text.strip().startswith(APPENDIX_START) for p in doc.paragraphs):
-        return
+def find_gray_conclusions_paragraph(doc: Document) -> Paragraph:
     for paragraph in doc.paragraphs:
-        if paragraph.text.strip().startswith("The tables below list all p-values"):
-            new_p = deepcopy(paragraph._element)
-            for child in list(new_p):
-                if child.tag.endswith("}r"):
-                    new_p.remove(child)
-            paragraph._element.addprevious(new_p)
-            heading = Paragraph(new_p, paragraph._parent)
-            set_paragraph_text_black(heading, APPENDIX_START, style="Heading 2")
-            return
+        if paragraph_is_gray(paragraph) and paragraph.text.strip() == "Conclusions":
+            return paragraph
+    raise RuntimeError("Could not find the gray Conclusions heading.")
+
+
+def ensure_canonical_appendix_heading(doc: Document) -> Paragraph:
+    conclusions = find_gray_conclusions_paragraph(doc)
+    conclusions_idx = paragraph_index(doc, conclusions)
+    headings = [
+        paragraph
+        for paragraph in doc.paragraphs
+        if paragraph.text.strip().startswith(APPENDIX_START)
+    ]
+    canonical = next(
+        (paragraph for paragraph in headings if paragraph_index(doc, paragraph) > conclusions_idx),
+        None,
+    )
+
+    for paragraph in reversed(headings):
+        if canonical is None or paragraph._element is not canonical._element:
+            remove_paragraph(paragraph)
+
+    if canonical is not None:
+        set_paragraph_text_black(canonical, APPENDIX_START, style="Heading 2")
+        return canonical
+
+    paragraphs = doc.paragraphs
+    conclusions_idx = paragraph_index(doc, conclusions)
+    anchor = conclusions
+    for candidate in paragraphs[conclusions_idx + 1 :]:
+        if not paragraph_is_gray(candidate):
+            break
+        anchor = candidate
+    return insert_paragraph_after(anchor, APPENDIX_START, style="Heading 2")
 
 
 def find_nonprofit_results_anchor(doc: Document) -> Paragraph:
@@ -589,6 +742,20 @@ def find_nonprofit_results_anchor(doc: Document) -> Paragraph:
             candidate = paragraphs[j]
             if paragraph_is_gray(candidate) and "Main analysis content goes here" in candidate.text:
                 return candidate
+
+        anchor = paragraph
+        for j in range(idx + 1, len(paragraphs)):
+            candidate = paragraphs[j]
+            text = candidate.text.strip()
+            if text.startswith(APPENDIX_START):
+                break
+            if text == REVENUE_COMPARISON_HEADING or text.startswith(RESULTS_START):
+                return anchor
+            if paragraph_is_gray(candidate) or paragraph_has_image(candidate):
+                anchor = candidate
+        raise RuntimeError(
+            "Could not find anchor before the non-profit revenue comparison block."
+        )
     raise RuntimeError("Could not find non-profit results anchor paragraph.")
 
 
@@ -642,83 +809,53 @@ def sync_nonprofit_relevant_details(doc: Document, relevant_pre: list[str]) -> N
 
     current = target_reader
     if heading:
-        current = insert_paragraph_after(current, heading, style="Heading 4")
+        current = insert_paragraph_after(current, heading, style="Heading 3")
     for text in details:
-        current = insert_paragraph_after(current, text, style="Normal")
-
-    upsert_revenue_definitions_table(doc)
-
+        current = insert_paragraph_after(current, text, style=style_for_black_text(text))
 
 def replace_results_block(doc: Document, results: list[str]) -> None:
-    ensure_appendix_heading(doc)
-    appendix_idx = find_appendix_paragraph_index(doc)
+    conclusions_idx = paragraph_index(doc, find_gray_conclusions_paragraph(doc))
     anchor = find_nonprofit_results_anchor(doc)
     anchor_idx = paragraph_index(doc, anchor)
-    image_para: Paragraph | None = None
     to_remove: list[Paragraph] = []
+    images_to_remove: list[Paragraph] = []
 
     for i, paragraph in enumerate(doc.paragraphs):
-        if i >= appendix_idx:
+        if i >= conclusions_idx:
             break
         text = paragraph.text.strip()
         if paragraph_is_gray(paragraph):
             continue
         if i < anchor_idx and (
             text.startswith(RESULTS_START)
+            or text == REVENUE_COMPARISON_HEADING
             or text.startswith("Each revenue source was analyzed")
             or text.startswith("Figure 4.")
-            or text.startswith("How many organizations could we compare")
             or text.startswith("Findings where Black Hills differed")
+            or text.startswith("What the 2022 revenue-source comparison shows")
         ):
             to_remove.append(paragraph)
             continue
         if i <= anchor_idx:
             continue
         if paragraph_has_image(paragraph):
-            if image_para is None:
-                image_para = paragraph
-            else:
-                to_remove.append(paragraph)
+            images_to_remove.append(paragraph)
             continue
         if text:
             to_remove.append(paragraph)
 
     for paragraph in reversed(to_remove):
         remove_paragraph(paragraph)
+    for paragraph in reversed(images_to_remove):
+        remove_image_paragraph(paragraph)
 
-    before, caption, after = split_results_around_caption(results)
-    anchor = find_nonprofit_results_anchor(doc)
     current = anchor
-    for text in before:
-        current = insert_paragraph_after(current, text, style="Normal")
-
-    if image_para is None:
-        for paragraph in doc.paragraphs:
-            if paragraph_has_image(paragraph):
-                image_para = paragraph
-                break
-
-    if caption and image_para is not None:
-        caption_para = paragraph_following_element(image_para)
-        if caption_para is not None and not paragraph_has_image(caption_para):
-            set_paragraph_text_black(caption_para, caption, style="Normal")
-            current = caption_para
-        else:
-            current = insert_paragraph_after(image_para, caption, style="Normal")
-    elif image_para is not None:
-        current = image_para
-    else:
-        current = anchor
-
-    for text in after:
+    for text in results:
         current = insert_paragraph_after(
             current,
             text,
             style=style_for_black_text(text),
         )
-
-    upsert_significant_results_table(doc)
-
 
 def format_p_value(p_value: float) -> str:
     if pd.isna(p_value):
@@ -754,27 +891,18 @@ def format_direction(row: pd.Series) -> str:
 def load_significant_results_table_rows() -> list[list[str]]:
     """Significant 2022 pairwise rows in presentation table order."""
 
-    presentation_order = [
-        ("federated_campaigns", "Sioux Falls"),
-        ("fundraising_events_contributions", "Billings"),
-        ("fundraising_events_contributions", "Missoula"),
-        ("fundraising_events_contributions", "Sioux Falls"),
-        ("government_grants_received", "Billings"),
-        ("government_grants_received", "Flagstaff"),
-        ("mixed_unclassified_contributions", "Flagstaff"),
-        ("residual_other_revenue", "Billings"),
-        ("residual_other_revenue", "Sioux Falls"),
-        ("program_service_revenue", "Flagstaff"),
-    ]
     df = pd.read_csv(PAIRWISE_CSV)
+    df = df.loc[df["p_value"].lt(0.05)].copy()
+    df["variable_order"] = df["variable"].map({value: index for index, value in enumerate(REPORT_VARIABLES)})
+    df["region_order"] = df["benchmark_region"].map(
+        {value: index for index, value in enumerate(REPORT_REGION_ORDER)}
+    )
+    df = df.sort_values(["variable_order", "region_order"])
     rows: list[list[str]] = []
-    for variable, benchmark in presentation_order:
-        match = df.loc[
-            df["variable"].eq(variable) & df["benchmark_region"].eq(benchmark)
-        ].iloc[0]
+    for _, match in df.iterrows():
         rows.append(
             [
-                str(match["variable_label"]),
+                REPORT_DISPLAY_LABELS[str(match["variable"])],
                 str(match["benchmark_region"]),
                 format_direction(match),
                 f"${float(match['black_hills_positive_median']):,.0f}",
@@ -789,7 +917,12 @@ def load_significant_results_table_rows() -> list[list[str]]:
 def find_appendix_template_table(doc: Document) -> Table:
     for table in doc.tables:
         header = [cell.text.strip() for cell in table.rows[0].cells]
-        if header == APPENDIX_TABLE_HEADERS:
+        if header in (
+            APPENDIX_TABLE_HEADERS,
+            SOURCE_TABLE_HEADERS,
+            PRIOR_SOURCE_TABLE_HEADERS,
+            LEGACY_SOURCE_TABLE_HEADERS,
+        ):
             return table
     raise RuntimeError("Could not find appendix table template in document.")
 
@@ -943,6 +1076,366 @@ def apply_figure_captions(doc: Document, captions: list[str]) -> None:
         caption_idx += 1
 
 
+def format_report_run(run, *, bold: bool = False, size_pt: int = BODY_FONT_SIZE_PT) -> None:
+    run.font.name = "Arial"
+    r_pr = run._element.get_or_add_rPr()
+    r_fonts = r_pr.get_or_add_rFonts()
+    r_fonts.set(qn("w:ascii"), "Arial")
+    r_fonts.set(qn("w:hAnsi"), "Arial")
+    r_fonts.set(qn("w:eastAsia"), "Arial")
+    run.font.size = Pt(size_pt)
+    run.font.color.rgb = RGBColor(0, 0, 0)
+    run.bold = bold
+    run.italic = False
+    run.underline = False
+
+
+def clear_paragraph_borders(paragraph: Paragraph) -> None:
+    p_pr = paragraph._element.get_or_add_pPr()
+    p_bdr = p_pr.find(qn("w:pBdr"))
+    if p_bdr is not None:
+        p_pr.remove(p_bdr)
+
+
+def format_added_paragraph(paragraph: Paragraph) -> None:
+    text = paragraph.text.strip()
+    is_title = bool(re.match(r"^(Figure|Table) 5-\d+:", text))
+    is_heading = paragraph.style.name.startswith("Heading") or text in HEADING_4_TITLES
+    for run in paragraph.runs:
+        size_pt = HEADER_FONT_SIZE_PT if is_heading else BODY_FONT_SIZE_PT
+        format_report_run(
+            run,
+            bold=is_title or is_heading or bool(run.bold),
+            size_pt=size_pt,
+        )
+    if is_title:
+        clear_paragraph_borders(paragraph)
+        paragraph.paragraph_format.keep_with_next = True
+        paragraph.paragraph_format.space_before = Pt(4)
+        paragraph.paragraph_format.space_after = Pt(2)
+
+
+def format_added_table(table: Table) -> None:
+    for row_index, row in enumerate(table.rows):
+        for column_index, cell in enumerate(row.cells):
+            if row_index == 0:
+                tc_pr = cell._tc.get_or_add_tcPr()
+                shading = tc_pr.find(qn("w:shd"))
+                if shading is None:
+                    shading = OxmlElement("w:shd")
+                    tc_pr.append(shading)
+                shading.set(qn("w:fill"), ADDED_TABLE_HEADER_FILL)
+            cell.vertical_alignment = WD_CELL_VERTICAL_ALIGNMENT.CENTER
+            for paragraph in cell.paragraphs:
+                paragraph.paragraph_format.space_before = Pt(0)
+                paragraph.paragraph_format.space_after = Pt(0)
+                paragraph.alignment = (
+                    WD_ALIGN_PARAGRAPH.LEFT if column_index == 0 else WD_ALIGN_PARAGRAPH.CENTER
+                )
+                for run in paragraph.runs:
+                    format_report_run(run, bold=row_index == 0)
+
+
+def replace_added_image_blobs(doc: Document) -> None:
+    image_paragraphs = [paragraph for paragraph in doc.paragraphs if paragraph_has_image(paragraph)]
+    if len(doc.inline_shapes) != 30:
+        raise RuntimeError(f"Expected 30 embedded report images, found {len(doc.inline_shapes)}")
+    if len(image_paragraphs) < 10:
+        raise RuntimeError(f"Expected at least 10 image paragraphs, found {len(image_paragraphs)}")
+    for paragraph, image_path in zip(image_paragraphs[-10:], REPORT_IMAGE_PATHS):
+        if not image_path.exists():
+            raise FileNotFoundError(image_path)
+        blips = paragraph._element.findall(".//" + qn("a:blip"))
+        if len(blips) != 1:
+            raise RuntimeError(f"Expected one image relationship in paragraph for {image_path.name}")
+        relationship_id = blips[0].get(qn("r:embed"))
+        image_part = doc.part.related_parts[relationship_id]
+        image_part._blob = image_path.read_bytes()
+
+
+def clear_image_paragraph_text(paragraph: Paragraph) -> None:
+    for text_node in paragraph._element.findall(".//" + qn("w:t")):
+        text_node.getparent().remove(text_node)
+
+
+def remove_q9_layout_paragraphs(doc: Document) -> None:
+    legacy_headings = {
+        "Total revenue",
+        "Program service revenue",
+        "Total contributions",
+        "Government grants received",
+        "Federated campaign contributions",
+        "Related organization contributions",
+        "Membership dues",
+        "Fundraising event contributions",
+        "Mixed / unclassified contributions",
+        "Other revenue",
+    }
+    report_titles = {*FIGURE_TITLES.values(), *TABLE_TITLES.values()}
+    to_remove: list[Paragraph] = []
+    in_appendix = False
+    for paragraph in doc.paragraphs:
+        text = paragraph.text.strip()
+        if text.startswith(APPENDIX_START):
+            in_appendix = True
+            continue
+        if paragraph_is_gray(paragraph) or paragraph_has_image(paragraph):
+            continue
+        if in_appendix:
+            to_remove.append(paragraph)
+        elif text.startswith("Figure 4.") or text in report_titles:
+            to_remove.append(paragraph)
+        elif text in legacy_headings:
+            to_remove.append(paragraph)
+    for paragraph in reversed(to_remove):
+        remove_paragraph(paragraph)
+
+
+def remove_old_q9_value_tables(doc: Document) -> None:
+    for table in list(doc.tables):
+        header = [cell.text.strip() for cell in table.rows[0].cells]
+        if (
+            header == APPENDIX_TABLE_HEADERS
+            or header == OVERVIEW_TABLE_HEADERS
+            or header == SOURCE_TABLE_HEADERS
+            or header == PRIOR_SOURCE_TABLE_HEADERS
+            or header == LEGACY_SOURCE_TABLE_HEADERS
+        ):
+            table._element.getparent().remove(table._element)
+
+
+def insert_report_table_after(
+    doc: Document,
+    paragraph: Paragraph,
+    headers: list[str],
+    rows: list[list[str]],
+    fractions: tuple[float, ...],
+) -> Table:
+    table = doc.add_table(rows=1 + len(rows), cols=len(headers))
+    table.style = "Table Grid"
+    for row_index, values in enumerate([headers, *rows]):
+        for column_index, value in enumerate(values):
+            cell = table.rows[row_index].cells[column_index]
+            cell.text = str(value)
+    table_element = table._tbl
+    doc.element.body.remove(table_element)
+    paragraph._element.addnext(table_element)
+    set_table_full_page_width(table, doc, fractions)
+    format_added_table(table)
+    return table
+
+
+def insert_paragraph_after_table(table: Table, text: str) -> Paragraph:
+    new_p = OxmlElement("w:p")
+    table._tbl.addnext(new_p)
+    paragraph = Paragraph(new_p, table._parent)
+    set_paragraph_text_black(paragraph, text, style="Normal")
+    return paragraph
+
+
+def report_values() -> tuple[pd.DataFrame, pd.DataFrame]:
+    summary = pd.read_csv(PAIRWISE_CSV)
+    rows: list[dict[str, object]] = []
+    for variable in REPORT_VARIABLES:
+        variable_rows = summary.loc[summary["variable"].eq(variable)]
+        first = variable_rows.iloc[0]
+        rows.append(
+            {
+                "variable": variable,
+                "region": "Black Hills",
+                "positive_n": int(first["black_hills_positive_n"]),
+                "median": float(first["black_hills_positive_median"]),
+                "reporting_rate": float(first["black_hills_nonzero_percent"]),
+            }
+        )
+        for region in REPORT_REGION_ORDER[1:]:
+            row = variable_rows.loc[variable_rows["benchmark_region"].eq(region)].iloc[0]
+            rows.append(
+                {
+                    "variable": variable,
+                    "region": region,
+                    "positive_n": int(row["benchmark_positive_n"]),
+                    "median": float(row["benchmark_positive_median"]),
+                    "reporting_rate": float(row["benchmark_nonzero_percent"]),
+                }
+            )
+    return summary, pd.DataFrame(rows)
+
+
+def load_overview_rows(values: pd.DataFrame) -> list[list[str]]:
+    rows: list[list[str]] = []
+    for variable in REPORT_VARIABLES:
+        subset = values.loc[values["variable"].eq(variable)].set_index("region").reindex(REPORT_REGION_ORDER)
+        rows.append(
+            [
+                REPORT_DISPLAY_LABELS[variable],
+                *[f"${float(subset.loc[region, 'median']):,.0f}" for region in REPORT_REGION_ORDER],
+            ]
+        )
+    return rows
+
+
+def load_aggregate_rows() -> list[list[str]]:
+    frame = pd.read_csv(RAW_LEVEL_CSV)
+    rows: list[list[str]] = []
+    for variable in REPORT_VARIABLES:
+        subset = frame.loc[frame["variable"].eq(variable)].set_index("region_label").reindex(
+            REPORT_REGION_ORDER
+        )
+        rows.append(
+            [
+                REPORT_DISPLAY_LABELS[variable],
+                *[
+                    f"${round(float(subset.loc[region, 'mean']) * float(subset.loc[region, 'n'])):,.0f}"
+                    for region in REPORT_REGION_ORDER
+                ],
+            ]
+        )
+    return rows
+
+
+def load_source_rows(summary: pd.DataFrame, values: pd.DataFrame, variable: str) -> list[list[str]]:
+    variable_summary = summary.loc[summary["variable"].eq(variable)].set_index("benchmark_region")
+    variable_values = values.loc[values["variable"].eq(variable)].set_index("region")
+    rows = [
+        [
+            "Black Hills",
+            f"{100 * float(variable_values.loc['Black Hills', 'reporting_rate']):.1f}%",
+            f"{int(variable_values.loc['Black Hills', 'positive_n']):,}",
+            f"${float(variable_values.loc['Black Hills', 'median']):,.0f}",
+            "NA",
+            "NA",
+        ]
+    ]
+    for region in REPORT_REGION_ORDER[1:]:
+        row = variable_summary.loc[region]
+        rows.append(
+            [
+                region,
+                f"{100 * float(variable_values.loc[region, 'reporting_rate']):.1f}%",
+                f"{int(variable_values.loc[region, 'positive_n']):,}",
+                f"${float(variable_values.loc[region, 'median']):,.0f}",
+                format_gap_ci(row),
+                format_p_value(float(row["p_value"])),
+            ]
+        )
+    return rows
+
+
+def gray_teammate_footnotes(doc: Document) -> None:
+    target_prefixes = (
+        "State tax provisions reflect rules in effect for the 2022 tax year",
+        "Both r and rs are correlation coefficients",
+    )
+    footnotes_part = next(
+        (
+            part
+            for part in doc.part.package.parts
+            if str(part.partname) == "/word/footnotes.xml"
+        ),
+        None,
+    )
+    if footnotes_part is None:
+        raise RuntimeError("Could not locate footnotes.xml")
+
+    root = etree.fromstring(footnotes_part.blob)
+    namespace = {"w": "http://schemas.openxmlformats.org/wordprocessingml/2006/main"}
+    matched: set[str] = set()
+    for footnote in root.xpath("//w:footnote", namespaces=namespace):
+        text = "".join(footnote.xpath(".//w:t/text()", namespaces=namespace)).strip()
+        prefix = next((item for item in target_prefixes if text.startswith(item)), None)
+        if prefix is None:
+            continue
+        matched.add(prefix)
+        for run in footnote.xpath(".//w:r", namespaces=namespace):
+            run_properties = run.find(qn("w:rPr"))
+            if run_properties is None:
+                run_properties = etree.Element(qn("w:rPr"))
+                run.insert(0, run_properties)
+            color = run_properties.find(qn("w:color"))
+            if color is None:
+                color = etree.Element(qn("w:color"))
+                run_properties.append(color)
+            color.set(qn("w:val"), GRAY)
+
+    missing = set(target_prefixes) - matched
+    if missing:
+        raise RuntimeError(f"Could not locate teammate footnotes: {sorted(missing)}")
+    footnotes_part._blob = etree.tostring(
+        root,
+        xml_declaration=True,
+        encoding="UTF-8",
+        standalone=True,
+    )
+
+
+def rebuild_q9_figures_and_tables(doc: Document) -> None:
+    replace_added_image_blobs(doc)
+    remove_q9_layout_paragraphs(doc)
+    remove_old_q9_value_tables(doc)
+    summary, values = report_values()
+    image_paragraphs = [paragraph for paragraph in doc.paragraphs if paragraph_has_image(paragraph)]
+    if len(image_paragraphs) < 10:
+        raise RuntimeError(f"Expected at least 10 Q9 image paragraphs, found {len(image_paragraphs)}")
+    appendix_images = image_paragraphs[-10:]
+
+    appendix_heading = next(
+        paragraph for paragraph in doc.paragraphs if paragraph.text.strip().startswith(APPENDIX_START)
+    )
+    appendix_intro = insert_paragraph_after(appendix_heading, APPENDIX_INTRO, style="Normal")
+    format_added_paragraph(appendix_intro)
+    overview_table_title = insert_paragraph_after(
+        appendix_intro,
+        TABLE_TITLES["overview"],
+        style="Normal",
+    )
+    overview_table = insert_report_table_after(
+        doc,
+        overview_table_title,
+        OVERVIEW_TABLE_HEADERS,
+        load_overview_rows(values),
+        (0.28, 0.144, 0.144, 0.144, 0.144, 0.144),
+    )
+    aggregate_note = insert_paragraph_after_table(overview_table, AGGREGATE_TABLE_NOTE)
+    format_added_paragraph(aggregate_note)
+    aggregate_table_title = insert_paragraph_after(
+        aggregate_note,
+        TABLE_TITLES["aggregate"],
+        style="Normal",
+    )
+    format_added_paragraph(aggregate_table_title)
+    insert_report_table_after(
+        doc,
+        aggregate_table_title,
+        OVERVIEW_TABLE_HEADERS,
+        load_aggregate_rows(),
+        (0.28, 0.144, 0.144, 0.144, 0.144, 0.144),
+    )
+
+    last_table: Table | None = None
+    for image_paragraph, variable in zip(appendix_images, REPORT_VARIABLES):
+        insert_paragraph_before(image_paragraph, FIGURE_TITLES[variable], style="Normal")
+        table_title = insert_paragraph_after(image_paragraph, TABLE_TITLES[variable], style="Normal")
+        last_table = insert_report_table_after(
+            doc,
+            table_title,
+            SOURCE_TABLE_HEADERS,
+            load_source_rows(summary, values, variable),
+            (0.12, 0.12, 0.13, 0.16, 0.34, 0.13),
+        )
+    if last_table is not None:
+        definitions_title = insert_paragraph_after_table(last_table, TABLE_TITLES["definitions"])
+        definitions_table = insert_report_table_after(
+            doc,
+            definitions_title,
+            REVENUE_DEFINITION_TABLE_HEADERS,
+            REVENUE_DEFINITION_TABLE_ROWS,
+            REVENUE_DEFINITION_COLUMN_FRACTIONS,
+        )
+        final_note = insert_paragraph_after_table(definitions_table, APPENDIX_FINAL_NOTE)
+        format_added_paragraph(final_note)
+
+
 def apply_black_paragraph_formatting(doc: Document) -> None:
     """Ensure synced black text uses Normal/Heading styles, not inherited Heading 2."""
 
@@ -956,9 +1449,18 @@ def apply_black_paragraph_formatting(doc: Document) -> None:
         if not text:
             continue
         set_paragraph_style(paragraph, style_for_black_text(text, in_appendix=in_appendix))
-        if text.startswith("Figure "):
-            for run in paragraph.runs:
-                run.italic = True
+        format_added_paragraph(paragraph)
+
+    for table in doc.tables:
+        header = [cell.text.strip() for cell in table.rows[0].cells]
+        if (
+            header == REVENUE_DEFINITION_TABLE_HEADERS
+            or header == SIGNIFICANT_TABLE_HEADERS
+            or header == OVERVIEW_TABLE_HEADERS
+            or header == SOURCE_TABLE_HEADERS
+            or header == LEGACY_SOURCE_TABLE_HEADERS
+        ):
+            format_added_table(table)
 
 
 def remove_empty_black_paragraphs(doc: Document) -> None:
@@ -983,31 +1485,11 @@ def sync_docx(docx_path: Path, black_paragraphs: list[str]) -> Path:
 
     replace_results_block(doc, results)
 
-    ensure_appendix_heading(doc)
-    appendix_idx = 0
-    in_appendix = False
-    for paragraph in doc.paragraphs:
-        text = paragraph.text.strip()
-        if text.startswith(APPENDIX_START):
-            in_appendix = True
-        elif not in_appendix and text.startswith("The tables below list all p-values"):
-            in_appendix = True
-        if not in_appendix or paragraph_is_gray(paragraph) or paragraph_has_image(paragraph):
-            continue
-        text = paragraph.text.strip()
-        if not text:
-            continue
-        if appendix_idx < len(appendix):
-            set_paragraph_text_black(
-                paragraph,
-                appendix[appendix_idx],
-                style=style_for_black_text(appendix[appendix_idx], in_appendix=True),
-            )
-            appendix_idx += 1
-
-    apply_figure_captions(doc, extract_figure_captions_from_md(MD_PATH.read_text(encoding="utf-8")))
-    apply_black_paragraph_formatting(doc)
+    ensure_canonical_appendix_heading(doc)
     remove_empty_black_paragraphs(doc)
+    rebuild_q9_figures_and_tables(doc)
+    apply_black_paragraph_formatting(doc)
+    gray_teammate_footnotes(doc)
 
     try:
         doc.save(docx_path)
@@ -1032,25 +1514,29 @@ def main() -> None:
     doc = Document(saved)
     full = "\n".join(p.text for p in doc.paragraphs)
     sig_table_ok = any(
-        len(t.rows) == 11
-        and [c.text.strip() for c in t.rows[0].cells] == SIGNIFICANT_TABLE_HEADERS
-        and "Government grants received" in t.rows[6].cells[0].text
+        [c.text.strip() for c in t.rows[0].cells] == SIGNIFICANT_TABLE_HEADERS
         for t in doc.tables
     )
+    figure_count = sum(full.count(f"Figure 5-{index}:") for index in range(2, 12))
+    table_count = sum(full.count(f"Table 5-{index}:") for index in range(1, 14))
     print(
         f"{saved.name}: gray intact={gray_check in full}, "
         f"sample-size heading={'How many organizations could we compare?' in full}, "
         f"eligible pool 256={'256 Black Hills organization-years' in full}, "
         f"nonprofit data ref={'described under Data sources' in full}, "
-        f"ci note={'Significance is based on the two-sided permutation test' in full}, "
-        f"sig results table={sig_table_ok}, "
+        f"main-body p-value language={'p-value' in full.split('Conclusions', 1)[0]}, "
+        f"sig results table removed={not sig_table_ok}, "
         f"aggregate gone={'Black Hills share of aggregate' not in full}, "
-        f"figure labels={'Figure 14.' in full}, "
+        f"figure 5-1 removed={'Figure 5-1:' not in full}, "
+        f"figures 5-2 to 5-11={figure_count == 10}, "
+        f"tables 5-1 to 5-13={table_count == 13}, "
+        f"embedded images={len(doc.inline_shapes)}, "
         f"results body Normal={all(doc.paragraphs[i].style.name == 'Normal' for i in range(len(doc.paragraphs)) if doc.paragraphs[i].text.strip().startswith('Only organizations that reported'))}, "
-        f"h4 sample size={any(p.text.strip()=='How many organizations could we compare?' and p.style.name=='Heading 4' for p in doc.paragraphs)}, "
+        f"h3 sample size={any(p.text.strip()=='How many organizations could we compare?' and p.style.name=='Heading 3' for p in doc.paragraphs)}, "
         f"revenue defs table={any([c.text.strip() for c in t.rows[0].cells]==REVENUE_DEFINITION_TABLE_HEADERS for t in doc.tables)}, "
-        f"h4 data sources={any(p.text.strip()==DATA_SOURCES_HEADING and p.style.name=='Heading 4' for p in doc.paragraphs)}, "
-        f"h4 relevant details={any(p.text.strip()==RELEVANT_DETAILS_HEADING and p.style.name=='Heading 4' for p in doc.paragraphs)}"
+        f"h3 data sources={any(p.text.strip()==DATA_SOURCES_HEADING and p.style.name=='Heading 3' for p in doc.paragraphs)}, "
+        f"h3 relevant details={any(p.text.strip()==RELEVANT_DETAILS_HEADING and p.style.name=='Heading 3' for p in doc.paragraphs)}, "
+        f"h3 revenue comparison={sum(1 for p in doc.paragraphs if p.text.strip()==REVENUE_COMPARISON_HEADING)==1}"
     )
 
 
