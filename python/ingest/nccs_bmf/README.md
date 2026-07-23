@@ -1,5 +1,7 @@
 # NCCS BMF Pipeline
 
+> **Infrastructure status (2026-07-23):** public-source discovery and local processing remain documented, but the former project S3 bucket was intentionally deleted. Upload and S3 verification steps are historical and must not recreate `swb-321-irs990-teos`.
+
 This pipeline discovers, downloads, uploads, verifies, filters, and uploads yearly representative NCCS BMF assets.
 It also now builds and uploads official `2022-2024` BMF analysis outputs.
 
@@ -39,8 +41,8 @@ Additional analysis outputs:
 - `01_data/staging/nccs_bmf/nccs_bmf_analysis_geography_metrics.parquet`
 - `01_data/staging/nccs_bmf/nccs_bmf_analysis_field_metrics.parquet`
 - `01_data/raw/nccs_bmf/metadata/nccs_bmf_analysis_variable_coverage.csv`
-- `docs/final_preprocessing_docs/technical_docs/analysis_variable_mappings/nccs_bmf_analysis_variable_mapping.md`
-- `docs/final_preprocessing_docs/technical_docs/pipeline_docs/nccs_bmf_pipeline.md`
+- `docs/deliverables/preprocessing/technical_reference/variable_mappings/nccs_bmf_analysis_variable_mapping.md`
+- `docs/deliverables/preprocessing/technical_reference/pipelines/nccs_bmf_pipeline.md`
 
 Official analysis S3 layout:
 - `silver/nccs_bmf/analysis/nccs_bmf_analysis_variables.parquet`

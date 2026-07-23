@@ -63,7 +63,6 @@ from ingest._shared.analysis_support import (
     apply_imputed_flag_family,
     build_ntee_proxy_flag,
     build_political_proxy_flag,
-    discover_bmf_exact_year_lookup_inputs,
     load_bmf_classification_lookup,
     load_irs_bmf_classification_lookup,
     normalize_bool_text,
@@ -560,7 +559,6 @@ def build_analysis_outputs(
 
     required_tax_years = sorted(source_df["tax_year"].dropna().astype("string").unique().tolist())
     print(f"[analysis] Required tax years for BMF enrichment: {required_tax_years}", flush=True)
-    print(f"[analysis] Available exact-year lookup files: {discover_bmf_exact_year_lookup_inputs()}", flush=True)
     bmf_lookup_df = load_bmf_classification_lookup(required_tax_years)
     irs_lookup_df = load_irs_bmf_classification_lookup()
     classification_summary = apply_classification_fallbacks(

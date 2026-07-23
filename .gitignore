@@ -1,11 +1,22 @@
 # Data and credentials (per README – no raw/curated data in repo)
 data/
 *.csv
-!docs/990/sample_parsed_irs_990_10.csv
 tests/sample_990_api_output/
 *.parquet
 *.xlsx
 *.xls
+# Documentation packages intentionally include small dictionaries, manifests,
+# audit evidence, and metadata snapshots in structured formats.
+!docs/**/*.csv
+!docs/**/*.parquet
+!docs/**/*.xlsx
+!docs/**/*.xls
+# Organization-level combined-990 diagnostics are data artifacts, not
+# documentation metadata. Keep them in the external project data root.
+docs/deliverables/preprocessing/technical_reference/s3_metadata/silver/combined_990/metadata/diag_overlap_by_ein.csv
+docs/deliverables/preprocessing/technical_reference/s3_metadata/silver/combined_990/metadata/diag_overlap_by_ein_tax_year.csv
+docs/deliverables/preprocessing/technical_reference/s3_metadata/silver/combined_990/metadata/master_conflict_detail.csv
+docs/deliverables/preprocessing/technical_reference/s3_metadata/silver/combined_990/metadata/master_conflict_detail.parquet
 .env
 .env.*
 *.pem
@@ -36,8 +47,34 @@ build/
 .ipynb_checkpoints/
 */.ipynb_checkpoints/
 
-# IDE / OS
+# Test, type-checker, and coverage caches
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.hypothesis/
+.tox/
+.nox/
+.coverage
+.coverage.*
+coverage.xml
+htmlcov/
+
+# Local agent and IDE configuration
+AGENTS.md
+.cursor/
 .idea/
 .vscode/
+
+# Editor, OS, and temporary files
 .DS_Store
 Thumbs.db
+*.log
+*.tmp
+*.bak
+*.swp
+*.swo
+*.orig
+*.rej
+
+# Local generated work and temporary validation artifacts
+tmp/

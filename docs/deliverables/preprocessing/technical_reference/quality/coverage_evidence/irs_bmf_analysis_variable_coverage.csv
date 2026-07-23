@@ -1,0 +1,73 @@
+canonical_variable,availability_status,variable_role,draft_variable,tax_year,row_count,populated_count,fill_rate,notes
+analysis_calculated_grants_total_amount,unavailable,unavailable,Grants (total amount),2022,77,0,0.0,IRS EO BMF does not carry this 990-style revenue-source field.
+analysis_calculated_grants_total_amount,unavailable,unavailable,Grants (total amount),2023,218,0,0.0,IRS EO BMF does not carry this 990-style revenue-source field.
+analysis_calculated_grants_total_amount,unavailable,unavailable,Grants (total amount),2024,3221,0,0.0,IRS EO BMF does not carry this 990-style revenue-source field.
+analysis_calculated_months_of_reserves,unavailable,unavailable,Months of reserves,2022,77,0,0.0,IRS EO BMF cannot calculate months of reserves without expenses and a direct net-asset field.
+analysis_calculated_months_of_reserves,unavailable,unavailable,Months of reserves,2023,218,0,0.0,IRS EO BMF cannot calculate months of reserves without expenses and a direct net-asset field.
+analysis_calculated_months_of_reserves,unavailable,unavailable,Months of reserves,2024,3221,0,0.0,IRS EO BMF cannot calculate months of reserves without expenses and a direct net-asset field.
+analysis_calculated_net_margin_ratio,unavailable,unavailable,Net margin,2022,77,0,0.0,IRS EO BMF cannot calculate net margin without total expenses.
+analysis_calculated_net_margin_ratio,unavailable,unavailable,Net margin,2023,218,0,0.0,IRS EO BMF cannot calculate net margin without total expenses.
+analysis_calculated_net_margin_ratio,unavailable,unavailable,Net margin,2024,3221,0,0.0,IRS EO BMF cannot calculate net margin without total expenses.
+analysis_calculated_ntee_broad_code,available,calculated,Broad NTEE field classification code,2022,77,76,0.987012987012987,Broad field representation metric built from the analyst-facing resolved NTEE field.
+analysis_calculated_ntee_broad_code,available,calculated,Broad NTEE field classification code,2023,218,214,0.981651376146789,Broad field representation metric built from the analyst-facing resolved NTEE field.
+analysis_calculated_ntee_broad_code,available,calculated,Broad NTEE field classification code,2024,3221,3162,0.9816827072337784,Broad field representation metric built from the analyst-facing resolved NTEE field.
+analysis_calculated_surplus_amount,unavailable,unavailable,Surplus,2022,77,0,0.0,IRS EO BMF does not provide a revenue-minus-expense surplus field.
+analysis_calculated_surplus_amount,unavailable,unavailable,Surplus,2023,218,0,0.0,IRS EO BMF does not provide a revenue-minus-expense surplus field.
+analysis_calculated_surplus_amount,unavailable,unavailable,Surplus,2024,3221,0,0.0,IRS EO BMF does not provide a revenue-minus-expense surplus field.
+analysis_calculated_total_contributions_amount,unavailable,unavailable,Total contributions,2022,77,0,0.0,IRS EO BMF does not carry this 990-style revenue-source field.
+analysis_calculated_total_contributions_amount,unavailable,unavailable,Total contributions,2023,218,0,0.0,IRS EO BMF does not carry this 990-style revenue-source field.
+analysis_calculated_total_contributions_amount,unavailable,unavailable,Total contributions,2024,3221,0,0.0,IRS EO BMF does not carry this 990-style revenue-source field.
+analysis_imputed_is_hospital,available,imputed,Hospital flag,2022,77,77,1.0,Complete hospital flag for analysis exclusions.
+analysis_imputed_is_hospital,available,imputed,Hospital flag,2023,218,218,1.0,Complete hospital flag for analysis exclusions.
+analysis_imputed_is_hospital,available,imputed,Hospital flag,2024,3221,3221,1.0,Complete hospital flag for analysis exclusions.
+analysis_imputed_is_political_org,available,imputed,Political organization flag,2022,77,77,1.0,Complete political-organization flag for analysis exclusions.
+analysis_imputed_is_political_org,available,imputed,Political organization flag,2023,218,218,1.0,Complete political-organization flag for analysis exclusions.
+analysis_imputed_is_political_org,available,imputed,Political organization flag,2024,3221,3221,1.0,Complete political-organization flag for analysis exclusions.
+analysis_imputed_is_university,available,imputed,University flag,2022,77,77,1.0,Complete university flag for analysis exclusions.
+analysis_imputed_is_university,available,imputed,University flag,2023,218,218,1.0,Complete university flag for analysis exclusions.
+analysis_imputed_is_university,available,imputed,University flag,2024,3221,3221,1.0,Complete university flag for analysis exclusions.
+analysis_is_hospital,available,proxy,Hospital flag,2022,77,76,0.987012987012987,Analyst-facing hospital proxy from the resolved NTEE field.
+analysis_is_hospital,available,proxy,Hospital flag,2023,218,214,0.981651376146789,Analyst-facing hospital proxy from the resolved NTEE field.
+analysis_is_hospital,available,proxy,Hospital flag,2024,3221,3162,0.9816827072337784,Analyst-facing hospital proxy from the resolved NTEE field.
+analysis_is_political_org,available,proxy,Political organization flag,2022,77,77,1.0,Analyst-facing political proxy from the resolved subsection field.
+analysis_is_political_org,available,proxy,Political organization flag,2023,218,218,1.0,Analyst-facing political proxy from the resolved subsection field.
+analysis_is_political_org,available,proxy,Political organization flag,2024,3221,3221,1.0,Analyst-facing political proxy from the resolved subsection field.
+analysis_is_university,available,proxy,University flag,2022,77,76,0.987012987012987,Analyst-facing university proxy from the resolved NTEE field.
+analysis_is_university,available,proxy,University flag,2023,218,214,0.981651376146789,Analyst-facing university proxy from the resolved NTEE field.
+analysis_is_university,available,proxy,University flag,2024,3221,3162,0.9816827072337784,Analyst-facing university proxy from the resolved NTEE field.
+analysis_missing_classification_flag,available,calculated,,2022,77,77,1.0,Final unresolved-classification flag for analyst filtering.
+analysis_missing_classification_flag,available,calculated,,2023,218,218,1.0,Final unresolved-classification flag for analyst filtering.
+analysis_missing_classification_flag,available,calculated,,2024,3221,3221,1.0,Final unresolved-classification flag for analyst filtering.
+analysis_net_asset_amount,unavailable,unavailable,Net asset,2022,77,0,0.0,IRS EO BMF does not provide a direct net-asset field.
+analysis_net_asset_amount,unavailable,unavailable,Net asset,2023,218,0,0.0,IRS EO BMF does not provide a direct net-asset field.
+analysis_net_asset_amount,unavailable,unavailable,Net asset,2024,3221,0,0.0,IRS EO BMF does not provide a direct net-asset field.
+analysis_ntee_code,available,direct,NTEE filed classification code,2022,77,68,0.8831168831168831,Source-direct IRS EO BMF classification retained without overwrite.
+analysis_ntee_code,available,direct,NTEE filed classification code,2023,218,174,0.7981651376146789,Source-direct IRS EO BMF classification retained without overwrite.
+analysis_ntee_code,available,direct,NTEE filed classification code,2024,3221,2470,0.7668425954672462,Source-direct IRS EO BMF classification retained without overwrite.
+analysis_ntee_code_fallback_enriched,available,enriched,NTEE filed classification code,2022,77,76,0.987012987012987,Analyst-facing resolved NTEE code with explicit IRS-first precedence.
+analysis_ntee_code_fallback_enriched,available,enriched,NTEE filed classification code,2023,218,214,0.981651376146789,Analyst-facing resolved NTEE code with explicit IRS-first precedence.
+analysis_ntee_code_fallback_enriched,available,enriched,NTEE filed classification code,2024,3221,3162,0.9816827072337784,Analyst-facing resolved NTEE code with explicit IRS-first precedence.
+analysis_other_contributions_amount,unavailable,unavailable,Other contributions,2022,77,0,0.0,IRS EO BMF does not carry this 990-style revenue-source field.
+analysis_other_contributions_amount,unavailable,unavailable,Other contributions,2023,218,0,0.0,IRS EO BMF does not carry this 990-style revenue-source field.
+analysis_other_contributions_amount,unavailable,unavailable,Other contributions,2024,3221,0,0.0,IRS EO BMF does not carry this 990-style revenue-source field.
+analysis_program_service_revenue_amount,unavailable,unavailable,Program service revenue,2022,77,0,0.0,IRS EO BMF does not carry this 990-style revenue-source field.
+analysis_program_service_revenue_amount,unavailable,unavailable,Program service revenue,2023,218,0,0.0,IRS EO BMF does not carry this 990-style revenue-source field.
+analysis_program_service_revenue_amount,unavailable,unavailable,Program service revenue,2024,3221,0,0.0,IRS EO BMF does not carry this 990-style revenue-source field.
+analysis_subsection_code,available,direct,Subsection code,2022,77,77,1.0,Source-direct IRS EO BMF subsection retained without overwrite.
+analysis_subsection_code,available,direct,Subsection code,2023,218,218,1.0,Source-direct IRS EO BMF subsection retained without overwrite.
+analysis_subsection_code,available,direct,Subsection code,2024,3221,3221,1.0,Source-direct IRS EO BMF subsection retained without overwrite.
+analysis_subsection_code_fallback_enriched,available,enriched,Subsection code,2022,77,77,1.0,Analyst-facing resolved subsection code with explicit IRS-first precedence.
+analysis_subsection_code_fallback_enriched,available,enriched,Subsection code,2023,218,218,1.0,Analyst-facing resolved subsection code with explicit IRS-first precedence.
+analysis_subsection_code_fallback_enriched,available,enriched,Subsection code,2024,3221,3221,1.0,Analyst-facing resolved subsection code with explicit IRS-first precedence.
+analysis_total_assets_amount,available,direct,Total assets,2022,77,77,1.0,Source-direct IRS EO BMF amount retained as nullable numeric.
+analysis_total_assets_amount,available,direct,Total assets,2023,218,213,0.9770642201834863,Source-direct IRS EO BMF amount retained as nullable numeric.
+analysis_total_assets_amount,available,direct,Total assets,2024,3221,3209,0.996274448928904,Source-direct IRS EO BMF amount retained as nullable numeric.
+analysis_total_expense_amount,unavailable,unavailable,Total expense,2022,77,0,0.0,IRS EO BMF does not provide a direct expense field.
+analysis_total_expense_amount,unavailable,unavailable,Total expense,2023,218,0,0.0,IRS EO BMF does not provide a direct expense field.
+analysis_total_expense_amount,unavailable,unavailable,Total expense,2024,3221,0,0.0,IRS EO BMF does not provide a direct expense field.
+analysis_total_income_amount,available,direct,Total income,2022,77,77,1.0,Source-direct IRS EO BMF amount retained as nullable numeric.
+analysis_total_income_amount,available,direct,Total income,2023,218,213,0.9770642201834863,Source-direct IRS EO BMF amount retained as nullable numeric.
+analysis_total_income_amount,available,direct,Total income,2024,3221,3209,0.996274448928904,Source-direct IRS EO BMF amount retained as nullable numeric.
+analysis_total_revenue_amount,available,direct,Total revenue,2022,77,71,0.922077922077922,Source-direct IRS EO BMF amount retained as nullable numeric.
+analysis_total_revenue_amount,available,direct,Total revenue,2023,218,203,0.9311926605504587,Source-direct IRS EO BMF amount retained as nullable numeric.
+analysis_total_revenue_amount,available,direct,Total revenue,2024,3221,2936,0.9115181620614716,Source-direct IRS EO BMF amount retained as nullable numeric.

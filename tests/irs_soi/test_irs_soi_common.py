@@ -4,6 +4,7 @@ Tests for IRS SOI county discovery and filtering helpers.
 
 from __future__ import annotations
 
+import importlib.util
 import os
 import sys
 from pathlib import Path
@@ -19,9 +20,13 @@ except ImportError:
 _FILE_DIR = Path(__file__).resolve().parent
 _REPO_ROOT = _FILE_DIR.parent.parent
 _SOI_DIR = _REPO_ROOT / "python" / "ingest" / "irs_soi"
-if str(_SOI_DIR) not in sys.path:
-    sys.path.insert(0, str(_SOI_DIR))
-import common as soi_common  # noqa: E402
+_COMMON_PATH = _SOI_DIR / "common.py"
+_COMMON_SPEC = importlib.util.spec_from_file_location("irs_soi_common_for_tests", _COMMON_PATH)
+if _COMMON_SPEC is None or _COMMON_SPEC.loader is None:
+    raise ImportError(f"Unable to load IRS SOI common module from {_COMMON_PATH}")
+soi_common = importlib.util.module_from_spec(_COMMON_SPEC)
+sys.modules.setdefault("irs_soi_common_for_tests", soi_common)
+_COMMON_SPEC.loader.exec_module(soi_common)
 
 FIXTURES = _FILE_DIR / "fixtures"
 LANDING_HTML = (FIXTURES / "county_landing.html").read_text(encoding="utf-8")

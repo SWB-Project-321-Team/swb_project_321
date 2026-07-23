@@ -14,7 +14,7 @@ Writes:
 
 Run from repo root: python python/ingest/location_processing/03_build_zip_list_for_geoids.py
 
-ZIP–county source: HUD USPS Crosswalk or data.world (see docs/990/990_data_fetch_plan.md).
+ZIP–county source: HUD USPS Crosswalk or data.world (see docs/data_sources/irs_990/990_data_fetch_plan.md).
 """
 
 import sys

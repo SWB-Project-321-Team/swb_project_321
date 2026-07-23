@@ -366,7 +366,7 @@ This pipeline follows a filtered-only combine contract (combine stages use filte
 ## Raw Source Dictionaries
 
 - Official IRS EO BMF dictionary: `documentation/final_preprocessing_docs/technical_docs/source_dictionaries/irs_eo_bmf/eo-info.pdf`
-- Local client package copy: `docs/final_preprocessing_docs/technical_docs/source_dictionaries/irs_eo_bmf/eo-info.pdf`
+- Local client package copy: `docs/deliverables/preprocessing/technical_reference/source_dictionaries/irs_eo_bmf/eo-info.pdf`
 - Applies to the raw IRS EO BMF state CSVs used by this pipeline.
 
 ### Step 01: state-file retrieval

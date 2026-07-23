@@ -1,5 +1,7 @@
 # 990 Open Questions
 
+> **Status reviewed 2026-07-23:** questions below remain unresolved unless their row explicitly says otherwise. References to published S3 artifacts are historical because the former project bucket was intentionally deleted.
+
 These are the unresolved issues that materially affect the 990-family deliverables. Routine field
 mapping work does not belong here.
 

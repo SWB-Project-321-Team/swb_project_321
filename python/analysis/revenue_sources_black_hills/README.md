@@ -1,5 +1,7 @@
 # Black Hills Revenue Sources Analysis
 
+> **Documentation reviewed 2026-07-23:** the workflow and retained outputs were reviewed without rerunning the analysis. “Current” findings below refer to the latest artifacts present in this repository, not a newly refreshed dataset.
+
 This folder contains the revenue-source comparison analysis for Black Hills
 nonprofit organizations versus benchmark-region nonprofit organizations. The
 analysis answers this client question:

@@ -1,0 +1,258 @@
+output_column,column_group,source_family,source_variant,original_column,is_harmonized,is_derived,schema_version,notes
+harm_ein,harmonized,,,,True,False,1.6.0,Master-selected harmonized field at organization-year grain.
+harm_tax_year,harmonized,,,,True,False,1.6.0,Master-selected harmonized field at organization-year grain.
+harm_filing_form,harmonized,,,,True,False,1.6.0,Master-selected harmonized field at organization-year grain.
+harm_org_name,harmonized,,,,True,False,1.6.0,Master-selected harmonized field at organization-year grain.
+harm_state,harmonized,,,,True,False,1.6.0,Master-selected harmonized field at organization-year grain.
+harm_zip5,harmonized,,,,True,False,1.6.0,Master-selected harmonized field at organization-year grain.
+harm_county_fips,harmonized,,,,True,False,1.6.0,Master-selected harmonized field at organization-year grain.
+harm_region,harmonized,,,,True,False,1.6.0,Master-selected harmonized field at organization-year grain.
+harm_ntee_code,harmonized,,,,True,False,1.6.0,Master-selected harmonized field at organization-year grain.
+harm_subsection_code,harmonized,,,,True,False,1.6.0,Master-selected harmonized field at organization-year grain.
+harm_revenue_amount,harmonized,,,,True,False,1.6.0,Master-selected harmonized field at organization-year grain.
+harm_expenses_amount,harmonized,,,,True,False,1.6.0,Master-selected harmonized field at organization-year grain.
+harm_assets_amount,harmonized,,,,True,False,1.6.0,Master-selected harmonized field at organization-year grain.
+harm_income_amount,harmonized,,,,True,False,1.6.0,Master-selected harmonized field at organization-year grain.
+harm_gross_receipts_under_25000_flag,harmonized,,,,True,False,1.6.0,Master-selected harmonized field at organization-year grain.
+harm_is_hospital,harmonized,,,,True,False,1.6.0,Master-selected harmonized field at organization-year grain.
+harm_is_university,harmonized,,,,True,False,1.6.0,Master-selected harmonized field at organization-year grain.
+harm_ein__source_family,field_provenance,,,,False,True,1.6.0,Per-field value-origin provenance for the selected master value.
+harm_ein__source_variant,field_provenance,,,,False,True,1.6.0,Per-field value-origin provenance for the selected master value.
+harm_ein__source_column,field_provenance,,,,False,True,1.6.0,Per-field value-origin provenance for the selected master value.
+harm_ein__source_time_basis,field_provenance,,,,False,True,1.6.0,Canonical time-basis label for the selected master value's source family.
+harm_ein__selected_row_source_family,field_provenance,,,,False,True,1.6.0,Selected donor-row provenance for the union row that supplied the chosen master value.
+harm_ein__selected_row_source_variant,field_provenance,,,,False,True,1.6.0,Selected donor-row provenance for the union row that supplied the chosen master value.
+harm_ein__selected_row_time_basis,field_provenance,,,,False,True,1.6.0,Selected donor-row provenance for the union row that supplied the chosen master value.
+harm_ein__selected_row_tax_year,field_provenance,,,,False,True,1.6.0,Selected donor-row provenance for the union row that supplied the chosen master value.
+harm_ein__source_tax_year,field_provenance,,,,False,True,1.6.0,Selected-value year provenance used to distinguish exact-year vs cross-year fills.
+harm_ein__source_year_offset,field_provenance,,,,False,True,1.6.0,Selected-value year provenance used to distinguish exact-year vs cross-year fills.
+harm_tax_year__source_family,field_provenance,,,,False,True,1.6.0,Per-field value-origin provenance for the selected master value.
+harm_tax_year__source_variant,field_provenance,,,,False,True,1.6.0,Per-field value-origin provenance for the selected master value.
+harm_tax_year__source_column,field_provenance,,,,False,True,1.6.0,Per-field value-origin provenance for the selected master value.
+harm_tax_year__source_time_basis,field_provenance,,,,False,True,1.6.0,Canonical time-basis label for the selected master value's source family.
+harm_tax_year__selected_row_source_family,field_provenance,,,,False,True,1.6.0,Selected donor-row provenance for the union row that supplied the chosen master value.
+harm_tax_year__selected_row_source_variant,field_provenance,,,,False,True,1.6.0,Selected donor-row provenance for the union row that supplied the chosen master value.
+harm_tax_year__selected_row_time_basis,field_provenance,,,,False,True,1.6.0,Selected donor-row provenance for the union row that supplied the chosen master value.
+harm_tax_year__selected_row_tax_year,field_provenance,,,,False,True,1.6.0,Selected donor-row provenance for the union row that supplied the chosen master value.
+harm_tax_year__source_tax_year,field_provenance,,,,False,True,1.6.0,Selected-value year provenance used to distinguish exact-year vs cross-year fills.
+harm_tax_year__source_year_offset,field_provenance,,,,False,True,1.6.0,Selected-value year provenance used to distinguish exact-year vs cross-year fills.
+harm_filing_form__source_family,field_provenance,,,,False,True,1.6.0,Per-field value-origin provenance for the selected master value.
+harm_filing_form__source_variant,field_provenance,,,,False,True,1.6.0,Per-field value-origin provenance for the selected master value.
+harm_filing_form__source_column,field_provenance,,,,False,True,1.6.0,Per-field value-origin provenance for the selected master value.
+harm_filing_form__source_time_basis,field_provenance,,,,False,True,1.6.0,Canonical time-basis label for the selected master value's source family.
+harm_filing_form__selected_row_source_family,field_provenance,,,,False,True,1.6.0,Selected donor-row provenance for the union row that supplied the chosen master value.
+harm_filing_form__selected_row_source_variant,field_provenance,,,,False,True,1.6.0,Selected donor-row provenance for the union row that supplied the chosen master value.
+harm_filing_form__selected_row_time_basis,field_provenance,,,,False,True,1.6.0,Selected donor-row provenance for the union row that supplied the chosen master value.
+harm_filing_form__selected_row_tax_year,field_provenance,,,,False,True,1.6.0,Selected donor-row provenance for the union row that supplied the chosen master value.
+harm_filing_form__source_tax_year,field_provenance,,,,False,True,1.6.0,Selected-value year provenance used to distinguish exact-year vs cross-year fills.
+harm_filing_form__source_year_offset,field_provenance,,,,False,True,1.6.0,Selected-value year provenance used to distinguish exact-year vs cross-year fills.
+harm_org_name__source_family,field_provenance,,,,False,True,1.6.0,Per-field value-origin provenance for the selected master value.
+harm_org_name__source_variant,field_provenance,,,,False,True,1.6.0,Per-field value-origin provenance for the selected master value.
+harm_org_name__source_column,field_provenance,,,,False,True,1.6.0,Per-field value-origin provenance for the selected master value.
+harm_org_name__source_time_basis,field_provenance,,,,False,True,1.6.0,Canonical time-basis label for the selected master value's source family.
+harm_org_name__selected_row_source_family,field_provenance,,,,False,True,1.6.0,Selected donor-row provenance for the union row that supplied the chosen master value.
+harm_org_name__selected_row_source_variant,field_provenance,,,,False,True,1.6.0,Selected donor-row provenance for the union row that supplied the chosen master value.
+harm_org_name__selected_row_time_basis,field_provenance,,,,False,True,1.6.0,Selected donor-row provenance for the union row that supplied the chosen master value.
+harm_org_name__selected_row_tax_year,field_provenance,,,,False,True,1.6.0,Selected donor-row provenance for the union row that supplied the chosen master value.
+harm_org_name__source_tax_year,field_provenance,,,,False,True,1.6.0,Selected-value year provenance used to distinguish exact-year vs cross-year fills.
+harm_org_name__source_year_offset,field_provenance,,,,False,True,1.6.0,Selected-value year provenance used to distinguish exact-year vs cross-year fills.
+harm_state__source_family,field_provenance,,,,False,True,1.6.0,Per-field value-origin provenance for the selected master value.
+harm_state__source_variant,field_provenance,,,,False,True,1.6.0,Per-field value-origin provenance for the selected master value.
+harm_state__source_column,field_provenance,,,,False,True,1.6.0,Per-field value-origin provenance for the selected master value.
+harm_state__source_time_basis,field_provenance,,,,False,True,1.6.0,Canonical time-basis label for the selected master value's source family.
+harm_state__selected_row_source_family,field_provenance,,,,False,True,1.6.0,Selected donor-row provenance for the union row that supplied the chosen master value.
+harm_state__selected_row_source_variant,field_provenance,,,,False,True,1.6.0,Selected donor-row provenance for the union row that supplied the chosen master value.
+harm_state__selected_row_time_basis,field_provenance,,,,False,True,1.6.0,Selected donor-row provenance for the union row that supplied the chosen master value.
+harm_state__selected_row_tax_year,field_provenance,,,,False,True,1.6.0,Selected donor-row provenance for the union row that supplied the chosen master value.
+harm_state__source_tax_year,field_provenance,,,,False,True,1.6.0,Selected-value year provenance used to distinguish exact-year vs cross-year fills.
+harm_state__source_year_offset,field_provenance,,,,False,True,1.6.0,Selected-value year provenance used to distinguish exact-year vs cross-year fills.
+harm_zip5__source_family,field_provenance,,,,False,True,1.6.0,Per-field value-origin provenance for the selected master value.
+harm_zip5__source_variant,field_provenance,,,,False,True,1.6.0,Per-field value-origin provenance for the selected master value.
+harm_zip5__source_column,field_provenance,,,,False,True,1.6.0,Per-field value-origin provenance for the selected master value.
+harm_zip5__source_time_basis,field_provenance,,,,False,True,1.6.0,Canonical time-basis label for the selected master value's source family.
+harm_zip5__selected_row_source_family,field_provenance,,,,False,True,1.6.0,Selected donor-row provenance for the union row that supplied the chosen master value.
+harm_zip5__selected_row_source_variant,field_provenance,,,,False,True,1.6.0,Selected donor-row provenance for the union row that supplied the chosen master value.
+harm_zip5__selected_row_time_basis,field_provenance,,,,False,True,1.6.0,Selected donor-row provenance for the union row that supplied the chosen master value.
+harm_zip5__selected_row_tax_year,field_provenance,,,,False,True,1.6.0,Selected donor-row provenance for the union row that supplied the chosen master value.
+harm_zip5__source_tax_year,field_provenance,,,,False,True,1.6.0,Selected-value year provenance used to distinguish exact-year vs cross-year fills.
+harm_zip5__source_year_offset,field_provenance,,,,False,True,1.6.0,Selected-value year provenance used to distinguish exact-year vs cross-year fills.
+harm_county_fips__source_family,field_provenance,,,,False,True,1.6.0,Per-field value-origin provenance for the selected master value.
+harm_county_fips__source_variant,field_provenance,,,,False,True,1.6.0,Per-field value-origin provenance for the selected master value.
+harm_county_fips__source_column,field_provenance,,,,False,True,1.6.0,Per-field value-origin provenance for the selected master value.
+harm_county_fips__source_time_basis,field_provenance,,,,False,True,1.6.0,Canonical time-basis label for the selected master value's source family.
+harm_county_fips__selected_row_source_family,field_provenance,,,,False,True,1.6.0,Selected donor-row provenance for the union row that supplied the chosen master value.
+harm_county_fips__selected_row_source_variant,field_provenance,,,,False,True,1.6.0,Selected donor-row provenance for the union row that supplied the chosen master value.
+harm_county_fips__selected_row_time_basis,field_provenance,,,,False,True,1.6.0,Selected donor-row provenance for the union row that supplied the chosen master value.
+harm_county_fips__selected_row_tax_year,field_provenance,,,,False,True,1.6.0,Selected donor-row provenance for the union row that supplied the chosen master value.
+harm_county_fips__source_tax_year,field_provenance,,,,False,True,1.6.0,Selected-value year provenance used to distinguish exact-year vs cross-year fills.
+harm_county_fips__source_year_offset,field_provenance,,,,False,True,1.6.0,Selected-value year provenance used to distinguish exact-year vs cross-year fills.
+harm_region__source_family,field_provenance,,,,False,True,1.6.0,Per-field value-origin provenance for the selected master value.
+harm_region__source_variant,field_provenance,,,,False,True,1.6.0,Per-field value-origin provenance for the selected master value.
+harm_region__source_column,field_provenance,,,,False,True,1.6.0,Per-field value-origin provenance for the selected master value.
+harm_region__source_time_basis,field_provenance,,,,False,True,1.6.0,Canonical time-basis label for the selected master value's source family.
+harm_region__selected_row_source_family,field_provenance,,,,False,True,1.6.0,Selected donor-row provenance for the union row that supplied the chosen master value.
+harm_region__selected_row_source_variant,field_provenance,,,,False,True,1.6.0,Selected donor-row provenance for the union row that supplied the chosen master value.
+harm_region__selected_row_time_basis,field_provenance,,,,False,True,1.6.0,Selected donor-row provenance for the union row that supplied the chosen master value.
+harm_region__selected_row_tax_year,field_provenance,,,,False,True,1.6.0,Selected donor-row provenance for the union row that supplied the chosen master value.
+harm_region__source_tax_year,field_provenance,,,,False,True,1.6.0,Selected-value year provenance used to distinguish exact-year vs cross-year fills.
+harm_region__source_year_offset,field_provenance,,,,False,True,1.6.0,Selected-value year provenance used to distinguish exact-year vs cross-year fills.
+harm_ntee_code__source_family,field_provenance,,,,False,True,1.6.0,Per-field value-origin provenance for the selected master value.
+harm_ntee_code__source_variant,field_provenance,,,,False,True,1.6.0,Per-field value-origin provenance for the selected master value.
+harm_ntee_code__source_column,field_provenance,,,,False,True,1.6.0,Per-field value-origin provenance for the selected master value.
+harm_ntee_code__source_time_basis,field_provenance,,,,False,True,1.6.0,Canonical time-basis label for the selected master value's source family.
+harm_ntee_code__selected_row_source_family,field_provenance,,,,False,True,1.6.0,Selected donor-row provenance for the union row that supplied the chosen master value.
+harm_ntee_code__selected_row_source_variant,field_provenance,,,,False,True,1.6.0,Selected donor-row provenance for the union row that supplied the chosen master value.
+harm_ntee_code__selected_row_time_basis,field_provenance,,,,False,True,1.6.0,Selected donor-row provenance for the union row that supplied the chosen master value.
+harm_ntee_code__selected_row_tax_year,field_provenance,,,,False,True,1.6.0,Selected donor-row provenance for the union row that supplied the chosen master value.
+harm_ntee_code__source_tax_year,field_provenance,,,,False,True,1.6.0,Selected-value year provenance used to distinguish exact-year vs cross-year fills.
+harm_ntee_code__source_year_offset,field_provenance,,,,False,True,1.6.0,Selected-value year provenance used to distinguish exact-year vs cross-year fills.
+harm_subsection_code__source_family,field_provenance,,,,False,True,1.6.0,Per-field value-origin provenance for the selected master value.
+harm_subsection_code__source_variant,field_provenance,,,,False,True,1.6.0,Per-field value-origin provenance for the selected master value.
+harm_subsection_code__source_column,field_provenance,,,,False,True,1.6.0,Per-field value-origin provenance for the selected master value.
+harm_subsection_code__source_time_basis,field_provenance,,,,False,True,1.6.0,Canonical time-basis label for the selected master value's source family.
+harm_subsection_code__selected_row_source_family,field_provenance,,,,False,True,1.6.0,Selected donor-row provenance for the union row that supplied the chosen master value.
+harm_subsection_code__selected_row_source_variant,field_provenance,,,,False,True,1.6.0,Selected donor-row provenance for the union row that supplied the chosen master value.
+harm_subsection_code__selected_row_time_basis,field_provenance,,,,False,True,1.6.0,Selected donor-row provenance for the union row that supplied the chosen master value.
+harm_subsection_code__selected_row_tax_year,field_provenance,,,,False,True,1.6.0,Selected donor-row provenance for the union row that supplied the chosen master value.
+harm_subsection_code__source_tax_year,field_provenance,,,,False,True,1.6.0,Selected-value year provenance used to distinguish exact-year vs cross-year fills.
+harm_subsection_code__source_year_offset,field_provenance,,,,False,True,1.6.0,Selected-value year provenance used to distinguish exact-year vs cross-year fills.
+harm_revenue_amount__source_family,field_provenance,,,,False,True,1.6.0,Per-field value-origin provenance for the selected master value.
+harm_revenue_amount__source_variant,field_provenance,,,,False,True,1.6.0,Per-field value-origin provenance for the selected master value.
+harm_revenue_amount__source_column,field_provenance,,,,False,True,1.6.0,Per-field value-origin provenance for the selected master value.
+harm_revenue_amount__source_time_basis,field_provenance,,,,False,True,1.6.0,Canonical time-basis label for the selected master value's source family.
+harm_revenue_amount__selected_row_source_family,field_provenance,,,,False,True,1.6.0,Selected donor-row provenance for the union row that supplied the chosen master value.
+harm_revenue_amount__selected_row_source_variant,field_provenance,,,,False,True,1.6.0,Selected donor-row provenance for the union row that supplied the chosen master value.
+harm_revenue_amount__selected_row_time_basis,field_provenance,,,,False,True,1.6.0,Selected donor-row provenance for the union row that supplied the chosen master value.
+harm_revenue_amount__selected_row_tax_year,field_provenance,,,,False,True,1.6.0,Selected donor-row provenance for the union row that supplied the chosen master value.
+harm_revenue_amount__source_tax_year,field_provenance,,,,False,True,1.6.0,Selected-value year provenance used to distinguish exact-year vs cross-year fills.
+harm_revenue_amount__source_year_offset,field_provenance,,,,False,True,1.6.0,Selected-value year provenance used to distinguish exact-year vs cross-year fills.
+harm_expenses_amount__source_family,field_provenance,,,,False,True,1.6.0,Per-field value-origin provenance for the selected master value.
+harm_expenses_amount__source_variant,field_provenance,,,,False,True,1.6.0,Per-field value-origin provenance for the selected master value.
+harm_expenses_amount__source_column,field_provenance,,,,False,True,1.6.0,Per-field value-origin provenance for the selected master value.
+harm_expenses_amount__source_time_basis,field_provenance,,,,False,True,1.6.0,Canonical time-basis label for the selected master value's source family.
+harm_expenses_amount__selected_row_source_family,field_provenance,,,,False,True,1.6.0,Selected donor-row provenance for the union row that supplied the chosen master value.
+harm_expenses_amount__selected_row_source_variant,field_provenance,,,,False,True,1.6.0,Selected donor-row provenance for the union row that supplied the chosen master value.
+harm_expenses_amount__selected_row_time_basis,field_provenance,,,,False,True,1.6.0,Selected donor-row provenance for the union row that supplied the chosen master value.
+harm_expenses_amount__selected_row_tax_year,field_provenance,,,,False,True,1.6.0,Selected donor-row provenance for the union row that supplied the chosen master value.
+harm_expenses_amount__source_tax_year,field_provenance,,,,False,True,1.6.0,Selected-value year provenance used to distinguish exact-year vs cross-year fills.
+harm_expenses_amount__source_year_offset,field_provenance,,,,False,True,1.6.0,Selected-value year provenance used to distinguish exact-year vs cross-year fills.
+harm_assets_amount__source_family,field_provenance,,,,False,True,1.6.0,Per-field value-origin provenance for the selected master value.
+harm_assets_amount__source_variant,field_provenance,,,,False,True,1.6.0,Per-field value-origin provenance for the selected master value.
+harm_assets_amount__source_column,field_provenance,,,,False,True,1.6.0,Per-field value-origin provenance for the selected master value.
+harm_assets_amount__source_time_basis,field_provenance,,,,False,True,1.6.0,Canonical time-basis label for the selected master value's source family.
+harm_assets_amount__selected_row_source_family,field_provenance,,,,False,True,1.6.0,Selected donor-row provenance for the union row that supplied the chosen master value.
+harm_assets_amount__selected_row_source_variant,field_provenance,,,,False,True,1.6.0,Selected donor-row provenance for the union row that supplied the chosen master value.
+harm_assets_amount__selected_row_time_basis,field_provenance,,,,False,True,1.6.0,Selected donor-row provenance for the union row that supplied the chosen master value.
+harm_assets_amount__selected_row_tax_year,field_provenance,,,,False,True,1.6.0,Selected donor-row provenance for the union row that supplied the chosen master value.
+harm_assets_amount__source_tax_year,field_provenance,,,,False,True,1.6.0,Selected-value year provenance used to distinguish exact-year vs cross-year fills.
+harm_assets_amount__source_year_offset,field_provenance,,,,False,True,1.6.0,Selected-value year provenance used to distinguish exact-year vs cross-year fills.
+harm_income_amount__source_family,field_provenance,,,,False,True,1.6.0,Per-field value-origin provenance for the selected master value.
+harm_income_amount__source_variant,field_provenance,,,,False,True,1.6.0,Per-field value-origin provenance for the selected master value.
+harm_income_amount__source_column,field_provenance,,,,False,True,1.6.0,Per-field value-origin provenance for the selected master value.
+harm_income_amount__source_time_basis,field_provenance,,,,False,True,1.6.0,Canonical time-basis label for the selected master value's source family.
+harm_income_amount__selected_row_source_family,field_provenance,,,,False,True,1.6.0,Selected donor-row provenance for the union row that supplied the chosen master value.
+harm_income_amount__selected_row_source_variant,field_provenance,,,,False,True,1.6.0,Selected donor-row provenance for the union row that supplied the chosen master value.
+harm_income_amount__selected_row_time_basis,field_provenance,,,,False,True,1.6.0,Selected donor-row provenance for the union row that supplied the chosen master value.
+harm_income_amount__selected_row_tax_year,field_provenance,,,,False,True,1.6.0,Selected donor-row provenance for the union row that supplied the chosen master value.
+harm_income_amount__source_tax_year,field_provenance,,,,False,True,1.6.0,Selected-value year provenance used to distinguish exact-year vs cross-year fills.
+harm_income_amount__source_year_offset,field_provenance,,,,False,True,1.6.0,Selected-value year provenance used to distinguish exact-year vs cross-year fills.
+harm_gross_receipts_under_25000_flag__source_family,field_provenance,,,,False,True,1.6.0,Per-field value-origin provenance for the selected master value.
+harm_gross_receipts_under_25000_flag__source_variant,field_provenance,,,,False,True,1.6.0,Per-field value-origin provenance for the selected master value.
+harm_gross_receipts_under_25000_flag__source_column,field_provenance,,,,False,True,1.6.0,Per-field value-origin provenance for the selected master value.
+harm_gross_receipts_under_25000_flag__source_time_basis,field_provenance,,,,False,True,1.6.0,Canonical time-basis label for the selected master value's source family.
+harm_gross_receipts_under_25000_flag__selected_row_source_family,field_provenance,,,,False,True,1.6.0,Selected donor-row provenance for the union row that supplied the chosen master value.
+harm_gross_receipts_under_25000_flag__selected_row_source_variant,field_provenance,,,,False,True,1.6.0,Selected donor-row provenance for the union row that supplied the chosen master value.
+harm_gross_receipts_under_25000_flag__selected_row_time_basis,field_provenance,,,,False,True,1.6.0,Selected donor-row provenance for the union row that supplied the chosen master value.
+harm_gross_receipts_under_25000_flag__selected_row_tax_year,field_provenance,,,,False,True,1.6.0,Selected donor-row provenance for the union row that supplied the chosen master value.
+harm_gross_receipts_under_25000_flag__source_tax_year,field_provenance,,,,False,True,1.6.0,Selected-value year provenance used to distinguish exact-year vs cross-year fills.
+harm_gross_receipts_under_25000_flag__source_year_offset,field_provenance,,,,False,True,1.6.0,Selected-value year provenance used to distinguish exact-year vs cross-year fills.
+harm_is_hospital__source_family,field_provenance,,,,False,True,1.6.0,Per-field value-origin provenance for the selected master value.
+harm_is_hospital__source_variant,field_provenance,,,,False,True,1.6.0,Per-field value-origin provenance for the selected master value.
+harm_is_hospital__source_column,field_provenance,,,,False,True,1.6.0,Per-field value-origin provenance for the selected master value.
+harm_is_hospital__source_time_basis,field_provenance,,,,False,True,1.6.0,Canonical time-basis label for the selected master value's source family.
+harm_is_hospital__selected_row_source_family,field_provenance,,,,False,True,1.6.0,Selected donor-row provenance for the union row that supplied the chosen master value.
+harm_is_hospital__selected_row_source_variant,field_provenance,,,,False,True,1.6.0,Selected donor-row provenance for the union row that supplied the chosen master value.
+harm_is_hospital__selected_row_time_basis,field_provenance,,,,False,True,1.6.0,Selected donor-row provenance for the union row that supplied the chosen master value.
+harm_is_hospital__selected_row_tax_year,field_provenance,,,,False,True,1.6.0,Selected donor-row provenance for the union row that supplied the chosen master value.
+harm_is_hospital__source_tax_year,field_provenance,,,,False,True,1.6.0,Selected-value year provenance used to distinguish exact-year vs cross-year fills.
+harm_is_hospital__source_year_offset,field_provenance,,,,False,True,1.6.0,Selected-value year provenance used to distinguish exact-year vs cross-year fills.
+harm_is_university__source_family,field_provenance,,,,False,True,1.6.0,Per-field value-origin provenance for the selected master value.
+harm_is_university__source_variant,field_provenance,,,,False,True,1.6.0,Per-field value-origin provenance for the selected master value.
+harm_is_university__source_column,field_provenance,,,,False,True,1.6.0,Per-field value-origin provenance for the selected master value.
+harm_is_university__source_time_basis,field_provenance,,,,False,True,1.6.0,Canonical time-basis label for the selected master value's source family.
+harm_is_university__selected_row_source_family,field_provenance,,,,False,True,1.6.0,Selected donor-row provenance for the union row that supplied the chosen master value.
+harm_is_university__selected_row_source_variant,field_provenance,,,,False,True,1.6.0,Selected donor-row provenance for the union row that supplied the chosen master value.
+harm_is_university__selected_row_time_basis,field_provenance,,,,False,True,1.6.0,Selected donor-row provenance for the union row that supplied the chosen master value.
+harm_is_university__selected_row_tax_year,field_provenance,,,,False,True,1.6.0,Selected donor-row provenance for the union row that supplied the chosen master value.
+harm_is_university__source_tax_year,field_provenance,,,,False,True,1.6.0,Selected-value year provenance used to distinguish exact-year vs cross-year fills.
+harm_is_university__source_year_offset,field_provenance,,,,False,True,1.6.0,Selected-value year provenance used to distinguish exact-year vs cross-year fills.
+harm_revenue_amount__is_reference_snapshot_value,field_semantic_diagnostic,,,,False,True,1.6.0,Per-field semantic flag showing whether the selected financial value came from BMF or a filing source.
+harm_revenue_amount__is_filing_value,field_semantic_diagnostic,,,,False,True,1.6.0,Per-field semantic flag showing whether the selected financial value came from BMF or a filing source.
+harm_expenses_amount__is_reference_snapshot_value,field_semantic_diagnostic,,,,False,True,1.6.0,Per-field semantic flag showing whether the selected financial value came from BMF or a filing source.
+harm_expenses_amount__is_filing_value,field_semantic_diagnostic,,,,False,True,1.6.0,Per-field semantic flag showing whether the selected financial value came from BMF or a filing source.
+harm_assets_amount__is_reference_snapshot_value,field_semantic_diagnostic,,,,False,True,1.6.0,Per-field semantic flag showing whether the selected financial value came from BMF or a filing source.
+harm_assets_amount__is_filing_value,field_semantic_diagnostic,,,,False,True,1.6.0,Per-field semantic flag showing whether the selected financial value came from BMF or a filing source.
+harm_income_amount__is_reference_snapshot_value,field_semantic_diagnostic,,,,False,True,1.6.0,Per-field semantic flag showing whether the selected financial value came from BMF or a filing source.
+harm_income_amount__is_filing_value,field_semantic_diagnostic,,,,False,True,1.6.0,Per-field semantic flag showing whether the selected financial value came from BMF or a filing source.
+master_group_row_count,master_group_diagnostic,,,,False,True,1.6.0,Organization-year group membership diagnostic.
+master_source_family_count,master_group_diagnostic,,,,False,True,1.6.0,Organization-year group membership diagnostic.
+master_source_families,master_group_diagnostic,,,,False,True,1.6.0,Organization-year group membership diagnostic.
+master_has_givingtuesday_datamart,master_group_diagnostic,,,,False,True,1.6.0,Organization-year group membership diagnostic.
+master_has_nccs_postcard,master_group_diagnostic,,,,False,True,1.6.0,Organization-year group membership diagnostic.
+master_has_nccs_efile,master_group_diagnostic,,,,False,True,1.6.0,Organization-year group membership diagnostic.
+master_has_nccs_bmf,master_group_diagnostic,,,,False,True,1.6.0,Organization-year group membership diagnostic.
+master_identity_selected_sources,master_group_diagnostic,,,,False,True,1.6.0,"Analyst-facing summary of selected sources, record type, or conflict status."
+master_financial_selected_sources,master_group_diagnostic,,,,False,True,1.6.0,"Analyst-facing summary of selected sources, record type, or conflict status."
+master_classification_selected_sources,master_group_diagnostic,,,,False,True,1.6.0,"Analyst-facing summary of selected sources, record type, or conflict status."
+master_primary_identity_source,master_group_diagnostic,,,,False,True,1.6.0,"Analyst-facing summary of selected sources, record type, or conflict status."
+master_primary_financial_source,master_group_diagnostic,,,,False,True,1.6.0,"Analyst-facing summary of selected sources, record type, or conflict status."
+master_primary_classification_source,master_group_diagnostic,,,,False,True,1.6.0,"Analyst-facing summary of selected sources, record type, or conflict status."
+master_has_any_selected_financial_values,master_group_diagnostic,,,,False,True,1.6.0,"Analyst-facing summary of selected sources, record type, or conflict status."
+master_has_reference_selected_values,master_group_diagnostic,,,,False,True,1.6.0,"Analyst-facing summary of selected sources, record type, or conflict status."
+master_has_filing_selected_values,master_group_diagnostic,,,,False,True,1.6.0,"Analyst-facing summary of selected sources, record type, or conflict status."
+master_record_type,master_group_diagnostic,,,,False,True,1.6.0,"Analyst-facing summary of selected sources, record type, or conflict status."
+master_has_conflicts,master_group_diagnostic,,,,False,True,1.6.0,"Analyst-facing summary of selected sources, record type, or conflict status."
+master_conflict_field_count,master_group_diagnostic,,,,False,True,1.6.0,"Analyst-facing summary of selected sources, record type, or conflict status."
+master_conflict_fields,master_group_diagnostic,,,,False,True,1.6.0,"Analyst-facing summary of selected sources, record type, or conflict status."
+harm_ein__conflict,master_conflict_diagnostic,,,,False,True,1.6.0,True when multiple distinct nonblank values existed in the organization-year group.
+harm_ein__distinct_nonblank_value_count,master_conflict_diagnostic,,,,False,True,1.6.0,Count of distinct nonblank candidate values seen in the organization-year group.
+harm_tax_year__conflict,master_conflict_diagnostic,,,,False,True,1.6.0,True when multiple distinct nonblank values existed in the organization-year group.
+harm_tax_year__distinct_nonblank_value_count,master_conflict_diagnostic,,,,False,True,1.6.0,Count of distinct nonblank candidate values seen in the organization-year group.
+harm_filing_form__conflict,master_conflict_diagnostic,,,,False,True,1.6.0,True when multiple distinct nonblank values existed in the organization-year group.
+harm_filing_form__distinct_nonblank_value_count,master_conflict_diagnostic,,,,False,True,1.6.0,Count of distinct nonblank candidate values seen in the organization-year group.
+harm_org_name__conflict,master_conflict_diagnostic,,,,False,True,1.6.0,True when multiple distinct nonblank values existed in the organization-year group.
+harm_org_name__distinct_nonblank_value_count,master_conflict_diagnostic,,,,False,True,1.6.0,Count of distinct nonblank candidate values seen in the organization-year group.
+harm_state__conflict,master_conflict_diagnostic,,,,False,True,1.6.0,True when multiple distinct nonblank values existed in the organization-year group.
+harm_state__distinct_nonblank_value_count,master_conflict_diagnostic,,,,False,True,1.6.0,Count of distinct nonblank candidate values seen in the organization-year group.
+harm_zip5__conflict,master_conflict_diagnostic,,,,False,True,1.6.0,True when multiple distinct nonblank values existed in the organization-year group.
+harm_zip5__distinct_nonblank_value_count,master_conflict_diagnostic,,,,False,True,1.6.0,Count of distinct nonblank candidate values seen in the organization-year group.
+harm_county_fips__conflict,master_conflict_diagnostic,,,,False,True,1.6.0,True when multiple distinct nonblank values existed in the organization-year group.
+harm_county_fips__distinct_nonblank_value_count,master_conflict_diagnostic,,,,False,True,1.6.0,Count of distinct nonblank candidate values seen in the organization-year group.
+harm_region__conflict,master_conflict_diagnostic,,,,False,True,1.6.0,True when multiple distinct nonblank values existed in the organization-year group.
+harm_region__distinct_nonblank_value_count,master_conflict_diagnostic,,,,False,True,1.6.0,Count of distinct nonblank candidate values seen in the organization-year group.
+harm_ntee_code__conflict,master_conflict_diagnostic,,,,False,True,1.6.0,True when multiple distinct nonblank values existed in the organization-year group.
+harm_ntee_code__distinct_nonblank_value_count,master_conflict_diagnostic,,,,False,True,1.6.0,Count of distinct nonblank candidate values seen in the organization-year group.
+harm_subsection_code__conflict,master_conflict_diagnostic,,,,False,True,1.6.0,True when multiple distinct nonblank values existed in the organization-year group.
+harm_subsection_code__distinct_nonblank_value_count,master_conflict_diagnostic,,,,False,True,1.6.0,Count of distinct nonblank candidate values seen in the organization-year group.
+harm_revenue_amount__conflict,master_conflict_diagnostic,,,,False,True,1.6.0,True when multiple distinct nonblank values existed in the organization-year group.
+harm_revenue_amount__distinct_nonblank_value_count,master_conflict_diagnostic,,,,False,True,1.6.0,Count of distinct nonblank candidate values seen in the organization-year group.
+harm_expenses_amount__conflict,master_conflict_diagnostic,,,,False,True,1.6.0,True when multiple distinct nonblank values existed in the organization-year group.
+harm_expenses_amount__distinct_nonblank_value_count,master_conflict_diagnostic,,,,False,True,1.6.0,Count of distinct nonblank candidate values seen in the organization-year group.
+harm_assets_amount__conflict,master_conflict_diagnostic,,,,False,True,1.6.0,True when multiple distinct nonblank values existed in the organization-year group.
+harm_assets_amount__distinct_nonblank_value_count,master_conflict_diagnostic,,,,False,True,1.6.0,Count of distinct nonblank candidate values seen in the organization-year group.
+harm_income_amount__conflict,master_conflict_diagnostic,,,,False,True,1.6.0,True when multiple distinct nonblank values existed in the organization-year group.
+harm_income_amount__distinct_nonblank_value_count,master_conflict_diagnostic,,,,False,True,1.6.0,Count of distinct nonblank candidate values seen in the organization-year group.
+harm_gross_receipts_under_25000_flag__conflict,master_conflict_diagnostic,,,,False,True,1.6.0,True when multiple distinct nonblank values existed in the organization-year group.
+harm_gross_receipts_under_25000_flag__distinct_nonblank_value_count,master_conflict_diagnostic,,,,False,True,1.6.0,Count of distinct nonblank candidate values seen in the organization-year group.
+harm_is_hospital__conflict,master_conflict_diagnostic,,,,False,True,1.6.0,True when multiple distinct nonblank values existed in the organization-year group.
+harm_is_hospital__distinct_nonblank_value_count,master_conflict_diagnostic,,,,False,True,1.6.0,Count of distinct nonblank candidate values seen in the organization-year group.
+harm_is_university__conflict,master_conflict_diagnostic,,,,False,True,1.6.0,True when multiple distinct nonblank values existed in the organization-year group.
+harm_is_university__distinct_nonblank_value_count,master_conflict_diagnostic,,,,False,True,1.6.0,Count of distinct nonblank candidate values seen in the organization-year group.
+harm_revenue_amount_num,numeric_helper,,,,False,True,1.6.0,Parsed numeric helper recomputed from the selected master string amount.
+harm_expenses_amount_num,numeric_helper,,,,False,True,1.6.0,Parsed numeric helper recomputed from the selected master string amount.
+harm_assets_amount_num,numeric_helper,,,,False,True,1.6.0,Parsed numeric helper recomputed from the selected master string amount.
+harm_income_amount_num,numeric_helper,,,,False,True,1.6.0,Parsed numeric helper recomputed from the selected master string amount.
+harm_revenue_amount_num_parse_ok,numeric_helper,,,,False,True,1.6.0,Parsed numeric helper recomputed from the selected master string amount.
+harm_expenses_amount_num_parse_ok,numeric_helper,,,,False,True,1.6.0,Parsed numeric helper recomputed from the selected master string amount.
+harm_assets_amount_num_parse_ok,numeric_helper,,,,False,True,1.6.0,Parsed numeric helper recomputed from the selected master string amount.
+harm_income_amount_num_parse_ok,numeric_helper,,,,False,True,1.6.0,Parsed numeric helper recomputed from the selected master string amount.

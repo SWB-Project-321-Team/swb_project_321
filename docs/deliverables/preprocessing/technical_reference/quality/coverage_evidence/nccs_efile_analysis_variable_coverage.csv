@@ -1,0 +1,96 @@
+canonical_variable,availability_status,variable_role,draft_variable,tax_year,form_type,row_count,populated_count,fill_rate,notes
+analysis_total_revenue_amount,available,direct,Total revenue,all,all,3866,3853,0.9966373512674599,Efile total revenue direct field.
+analysis_total_revenue_amount,available,direct,Total revenue,2022,990,1118,1118,1.0,Efile total revenue direct field.
+analysis_total_revenue_amount,available,direct,Total revenue,2022,990EZ,583,577,0.9897084048027445,Efile total revenue direct field.
+analysis_total_revenue_amount,available,direct,Total revenue,2023,990,1070,1070,1.0,Efile total revenue direct field.
+analysis_total_revenue_amount,available,direct,Total revenue,2023,990EZ,567,561,0.9894179894179894,Efile total revenue direct field.
+analysis_total_revenue_amount,available,direct,Total revenue,2024,990,249,249,1.0,Efile total revenue direct field.
+analysis_total_revenue_amount,available,direct,Total revenue,2024,990EZ,279,278,0.996415770609319,Efile total revenue direct field.
+analysis_total_expense_amount,available,direct,Total expense,all,all,3866,3828,0.9901707190894982,Efile total expense direct field.
+analysis_total_expense_amount,available,direct,Total expense,2022,990,1118,1118,1.0,Efile total expense direct field.
+analysis_total_expense_amount,available,direct,Total expense,2022,990EZ,583,569,0.9759862778730704,Efile total expense direct field.
+analysis_total_expense_amount,available,direct,Total expense,2023,990,1070,1070,1.0,Efile total expense direct field.
+analysis_total_expense_amount,available,direct,Total expense,2023,990EZ,567,552,0.9735449735449735,Efile total expense direct field.
+analysis_total_expense_amount,available,direct,Total expense,2024,990,249,249,1.0,Efile total expense direct field.
+analysis_total_expense_amount,available,direct,Total expense,2024,990EZ,279,270,0.967741935483871,Efile total expense direct field.
+analysis_total_assets_amount,available,direct,Total assets,all,all,3866,2437,0.6303673047077082,Direct asset field used for the draft's total-assets questions.
+analysis_total_assets_amount,available,direct,Total assets,2022,990,1118,1118,1.0,Direct asset field used for the draft's total-assets questions.
+analysis_total_assets_amount,available,direct,Total assets,2022,990EZ,583,0,0.0,Direct asset field used for the draft's total-assets questions.
+analysis_total_assets_amount,available,direct,Total assets,2023,990,1070,1070,1.0,Direct asset field used for the draft's total-assets questions.
+analysis_total_assets_amount,available,direct,Total assets,2023,990EZ,567,0,0.0,Direct asset field used for the draft's total-assets questions.
+analysis_total_assets_amount,available,direct,Total assets,2024,990,249,249,1.0,Direct asset field used for the draft's total-assets questions.
+analysis_total_assets_amount,available,direct,Total assets,2024,990EZ,279,0,0.0,Direct asset field used for the draft's total-assets questions.
+analysis_net_asset_amount,available,proxy,Net asset,all,all,3866,2437,0.6303673047077082,Conservative proxy preserved for draft financial-performance work.
+analysis_net_asset_amount,available,proxy,Net asset,2022,990,1118,1118,1.0,Conservative proxy preserved for draft financial-performance work.
+analysis_net_asset_amount,available,proxy,Net asset,2022,990EZ,583,0,0.0,Conservative proxy preserved for draft financial-performance work.
+analysis_net_asset_amount,available,proxy,Net asset,2023,990,1070,1070,1.0,Conservative proxy preserved for draft financial-performance work.
+analysis_net_asset_amount,available,proxy,Net asset,2023,990EZ,567,0,0.0,Conservative proxy preserved for draft financial-performance work.
+analysis_net_asset_amount,available,proxy,Net asset,2024,990,249,249,1.0,Conservative proxy preserved for draft financial-performance work.
+analysis_net_asset_amount,available,proxy,Net asset,2024,990EZ,279,0,0.0,Conservative proxy preserved for draft financial-performance work.
+analysis_calculated_surplus_amount,available,direct,Surplus,all,all,3866,3843,0.9940506983962752,Current-year revenue-less-expense amount already produced upstream.
+analysis_calculated_surplus_amount,available,direct,Surplus,2022,990,1118,1118,1.0,Current-year revenue-less-expense amount already produced upstream.
+analysis_calculated_surplus_amount,available,direct,Surplus,2022,990EZ,583,574,0.9845626072041166,Current-year revenue-less-expense amount already produced upstream.
+analysis_calculated_surplus_amount,available,direct,Surplus,2023,990,1070,1070,1.0,Current-year revenue-less-expense amount already produced upstream.
+analysis_calculated_surplus_amount,available,direct,Surplus,2023,990EZ,567,558,0.9841269841269841,Current-year revenue-less-expense amount already produced upstream.
+analysis_calculated_surplus_amount,available,direct,Surplus,2024,990,249,249,1.0,Current-year revenue-less-expense amount already produced upstream.
+analysis_calculated_surplus_amount,available,direct,Surplus,2024,990EZ,279,274,0.982078853046595,Current-year revenue-less-expense amount already produced upstream.
+analysis_calculated_net_margin_ratio,available,calculated,Net margin,all,all,3866,3773,0.9759441282979824,"Null when revenue is missing, zero, or negative."
+analysis_calculated_net_margin_ratio,available,calculated,Net margin,2022,990,1118,1107,0.9901610017889088,"Null when revenue is missing, zero, or negative."
+analysis_calculated_net_margin_ratio,available,calculated,Net margin,2022,990EZ,583,562,0.9639794168096055,"Null when revenue is missing, zero, or negative."
+analysis_calculated_net_margin_ratio,available,calculated,Net margin,2023,990,1070,1059,0.9897196261682243,"Null when revenue is missing, zero, or negative."
+analysis_calculated_net_margin_ratio,available,calculated,Net margin,2023,990EZ,567,536,0.9453262786596119,"Null when revenue is missing, zero, or negative."
+analysis_calculated_net_margin_ratio,available,calculated,Net margin,2024,990,249,248,0.9959839357429718,"Null when revenue is missing, zero, or negative."
+analysis_calculated_net_margin_ratio,available,calculated,Net margin,2024,990EZ,279,261,0.9354838709677419,"Null when revenue is missing, zero, or negative."
+analysis_calculated_months_of_reserves,available,calculated,Months of reserves,all,all,3866,2428,0.628039317123642,Uses the conservative asset-based net-asset proxy.
+analysis_calculated_months_of_reserves,available,calculated,Months of reserves,2022,990,1118,1115,0.9973166368515206,Uses the conservative asset-based net-asset proxy.
+analysis_calculated_months_of_reserves,available,calculated,Months of reserves,2022,990EZ,583,0,0.0,Uses the conservative asset-based net-asset proxy.
+analysis_calculated_months_of_reserves,available,calculated,Months of reserves,2023,990,1070,1065,0.9953271028037384,Uses the conservative asset-based net-asset proxy.
+analysis_calculated_months_of_reserves,available,calculated,Months of reserves,2023,990EZ,567,0,0.0,Uses the conservative asset-based net-asset proxy.
+analysis_calculated_months_of_reserves,available,calculated,Months of reserves,2024,990,249,248,0.9959839357429718,Uses the conservative asset-based net-asset proxy.
+analysis_calculated_months_of_reserves,available,calculated,Months of reserves,2024,990EZ,279,0,0.0,Uses the conservative asset-based net-asset proxy.
+analysis_ntee_code,available,enriched,NTEE filed classification code,all,all,3866,3779,0.9774961200206932,"Classification enrichment only, not a row-admission filter."
+analysis_ntee_code,available,enriched,NTEE filed classification code,2022,990,1118,1100,0.9838998211091234,"Classification enrichment only, not a row-admission filter."
+analysis_ntee_code,available,enriched,NTEE filed classification code,2022,990EZ,583,563,0.9656946826758147,"Classification enrichment only, not a row-admission filter."
+analysis_ntee_code,available,enriched,NTEE filed classification code,2023,990,1070,1052,0.983177570093458,"Classification enrichment only, not a row-admission filter."
+analysis_ntee_code,available,enriched,NTEE filed classification code,2023,990EZ,567,548,0.9664902998236331,"Classification enrichment only, not a row-admission filter."
+analysis_ntee_code,available,enriched,NTEE filed classification code,2024,990,249,244,0.9799196787148594,"Classification enrichment only, not a row-admission filter."
+analysis_ntee_code,available,enriched,NTEE filed classification code,2024,990EZ,279,272,0.974910394265233,"Classification enrichment only, not a row-admission filter."
+analysis_subsection_code,available,enriched,Subsection code,all,all,3866,3815,0.9868080703569581,Supports political-organization classification.
+analysis_subsection_code,available,enriched,Subsection code,2022,990,1118,1109,0.9919499105545617,Supports political-organization classification.
+analysis_subsection_code,available,enriched,Subsection code,2022,990EZ,583,569,0.9759862778730704,Supports political-organization classification.
+analysis_subsection_code,available,enriched,Subsection code,2023,990,1070,1062,0.9925233644859813,Supports political-organization classification.
+analysis_subsection_code,available,enriched,Subsection code,2023,990EZ,567,555,0.9788359788359788,Supports political-organization classification.
+analysis_subsection_code,available,enriched,Subsection code,2024,990,249,245,0.9839357429718876,Supports political-organization classification.
+analysis_subsection_code,available,enriched,Subsection code,2024,990EZ,279,275,0.985663082437276,Supports political-organization classification.
+analysis_calculated_ntee_broad_code,available,calculated,Broad NTEE field classification code,all,all,3866,3779,0.9774961200206932,Broad field category used in field-composition analyses.
+analysis_calculated_ntee_broad_code,available,calculated,Broad NTEE field classification code,2022,990,1118,1100,0.9838998211091234,Broad field category used in field-composition analyses.
+analysis_calculated_ntee_broad_code,available,calculated,Broad NTEE field classification code,2022,990EZ,583,563,0.9656946826758147,Broad field category used in field-composition analyses.
+analysis_calculated_ntee_broad_code,available,calculated,Broad NTEE field classification code,2023,990,1070,1052,0.983177570093458,Broad field category used in field-composition analyses.
+analysis_calculated_ntee_broad_code,available,calculated,Broad NTEE field classification code,2023,990EZ,567,548,0.9664902998236331,Broad field category used in field-composition analyses.
+analysis_calculated_ntee_broad_code,available,calculated,Broad NTEE field classification code,2024,990,249,244,0.9799196787148594,Broad field category used in field-composition analyses.
+analysis_calculated_ntee_broad_code,available,calculated,Broad NTEE field classification code,2024,990EZ,279,272,0.974910394265233,Broad field category used in field-composition analyses.
+analysis_is_hospital,available,direct,Hospital flag,all,all,3866,35,0.009053285049146405,Canonical efile source-backed hospital flag.
+analysis_is_hospital,available,direct,Hospital flag,2022,990,1118,17,0.01520572450805009,Canonical efile source-backed hospital flag.
+analysis_is_hospital,available,direct,Hospital flag,2022,990EZ,583,1,0.0017152658662092624,Canonical efile source-backed hospital flag.
+analysis_is_hospital,available,direct,Hospital flag,2023,990,1070,16,0.014953271028037384,Canonical efile source-backed hospital flag.
+analysis_is_hospital,available,direct,Hospital flag,2023,990EZ,567,0,0.0,Canonical efile source-backed hospital flag.
+analysis_is_hospital,available,direct,Hospital flag,2024,990,249,1,0.004016064257028112,Canonical efile source-backed hospital flag.
+analysis_is_hospital,available,direct,Hospital flag,2024,990EZ,279,0,0.0,Canonical efile source-backed hospital flag.
+analysis_is_university,available,direct,University flag,all,all,3866,114,0.029487842731505433,Canonical efile source-backed university flag.
+analysis_is_university,available,direct,University flag,2022,990,1118,52,0.046511627906976744,Canonical efile source-backed university flag.
+analysis_is_university,available,direct,University flag,2022,990EZ,583,7,0.012006861063464836,Canonical efile source-backed university flag.
+analysis_is_university,available,direct,University flag,2023,990,1070,43,0.04018691588785047,Canonical efile source-backed university flag.
+analysis_is_university,available,direct,University flag,2023,990EZ,567,6,0.010582010582010581,Canonical efile source-backed university flag.
+analysis_is_university,available,direct,University flag,2024,990,249,2,0.008032128514056224,Canonical efile source-backed university flag.
+analysis_is_university,available,direct,University flag,2024,990EZ,279,4,0.014336917562724014,Canonical efile source-backed university flag.
+analysis_is_political_org,available,proxy,Political organization flag,all,all,3866,3815,0.9868080703569581,Canonical political-organization proxy for exclusion analyses.
+analysis_is_political_org,available,proxy,Political organization flag,2022,990,1118,1109,0.9919499105545617,Canonical political-organization proxy for exclusion analyses.
+analysis_is_political_org,available,proxy,Political organization flag,2022,990EZ,583,569,0.9759862778730704,Canonical political-organization proxy for exclusion analyses.
+analysis_is_political_org,available,proxy,Political organization flag,2023,990,1070,1062,0.9925233644859813,Canonical political-organization proxy for exclusion analyses.
+analysis_is_political_org,available,proxy,Political organization flag,2023,990EZ,567,555,0.9788359788359788,Canonical political-organization proxy for exclusion analyses.
+analysis_is_political_org,available,proxy,Political organization flag,2024,990,249,245,0.9839357429718876,Canonical political-organization proxy for exclusion analyses.
+analysis_is_political_org,available,proxy,Political organization flag,2024,990EZ,279,275,0.985663082437276,Canonical political-organization proxy for exclusion analyses.
+analysis_program_service_revenue_amount,unavailable,unavailable,Program service revenue,all,all,3866,0,0.0,Keep unavailable rather than backfilling from GT.
+analysis_calculated_total_contributions_amount,unavailable,unavailable,Total contributions,all,all,3866,0,0.0,Keep unavailable rather than backfilling from GT.
+analysis_other_contributions_amount,unavailable,unavailable,Other contributions,all,all,3866,0,0.0,Keep unavailable rather than backfilling from GT.
+analysis_calculated_grants_total_amount,unavailable,unavailable,Grants (total amount),all,all,3866,0,0.0,Keep unavailable rather than backfilling from GT.

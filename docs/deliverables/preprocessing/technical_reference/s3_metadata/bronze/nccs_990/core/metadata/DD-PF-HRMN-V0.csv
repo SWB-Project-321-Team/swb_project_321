@@ -1,0 +1,392 @@
+VAR_NAME_NEW,VAR_DATA_TYPE,VAR_NA_PERCENT,VAR_COVERAGE,VAR_CARDINALITY_PERCENT,LABEL,DESCRIPTION,FORM,FORM_TYPE,FORM_PART,FORM_LINE_NUMBER
+F9_00_ORG_EIN,INTEGER,0,1987-2023,6.66898941099902,EIN,Orgainization Employer Identification Number (EIN),F990,PC,PART-00,Section D
+F9_00_FISCAL_YEAR_END,INTEGER,0,1987-2006,0.00202660732760411,,,,,,
+F9_00_FISCAL_YEAR_START,INTEGER,0,1987-2020,0.00160110544201184,,,,,,
+IRS_ACTIVITY_CODE_1,VARCHAR,0,1987-2020,0.185603528613877,,,,,,
+IRS_ACTIVITY_CODE_2,VARCHAR,0,1987-2020,0.0132870738998402,,,,,,
+IRS_ACTIVITY_CODE_3,VARCHAR,0,1987-2020,0.0112619065024668,,,,,,
+PF_01_REV_CONTR_REC_BOOKS,DOUBLE,0,1987-1990; 1995-2023,15.0039117586968,Revenue and Expenses per Books,Contributions Received - Revenue and Expenses per Books,F990,PF,PART-01,Line 01 Column (A)
+PF_01_REV_CONTR_REC_BOOKS,DOUBLE,0,1987-1990; 1995-2023,15.0039117586968,Revenue and Expenses per Books,Contributions Received - Revenue and Expenses per Books,F990,PF,PART-01,Line 01 Column (A)
+PF_01_REV_INT_SAVING_BOOKS,DOUBLE,0,1987-2023,3.75444158678511,Revenue and Expenses per Books,Interest on Savings and Temporary Cash Investments - Revenue and Expenses per Books,F990,PF,PART-01,Line 03 Column (A)
+PF_01_REV_INT_SAVING_BOOKS,DOUBLE,0,1987-2023,3.75444158678511,Revenue and Expenses per Books,Interest on Savings and Temporary Cash Investments - Revenue and Expenses per Books,F990,PF,PART-01,Line 03 Column (A)
+PF_01_REV_DIVIDEND_BOOKS,DOUBLE,0,1987-2023,10.4715402607363,Revenue and Expenses per Books,Dividends and Interest from Securities - Revenue and Expenses per Books,F990,PF,PART-01,Line 04 Column (A)
+PF_01_REV_DIVIDEND_BOOKS,DOUBLE,0,1987-2023,10.4715402607363,Revenue and Expenses per Books,Dividends and Interest from Securities - Revenue and Expenses per Books,F990,PF,PART-01,Line 04 Column (A)
+PF_01_REV_SALE_ASSET_NET_BOOKS_GAIN,BIGINT,0,1987-2020,18.335083228372,,,,,,
+PF_01_REV_SALE_ASSET_NET_BOOKS_LOSS,INTEGER,0,1987-2002,5.42704924441267,,,,,,
+PF_01_REV_GRO_PROFIT_BOOKS,DOUBLE,0,1987-2023,0.616619136435421,Revenue and Expenses per Books,Gross Profit - Revenue and Expenses per Books,F990,PF,PART-01,Line 10c Column (A)
+PF_01_REV_GRO_PROFIT_BOOKS,DOUBLE,0,1987-2023,0.616619136435421,Revenue and Expenses per Books,Gross Profit - Revenue and Expenses per Books,F990,PF,PART-01,Line 10c Column (A)
+PF_01_REV_OTH_INCOME_BOOKS,DOUBLE,0,1987-2023,4.82617964475247,Revenue and Expenses per Books,Other Income - Revenue and Expenses per Books,F990,PF,PART-01,Line 11 Column (A)
+PF_01_REV_OTH_INCOME_BOOKS,DOUBLE,0,1987-2023,4.82617964475247,Revenue and Expenses per Books,Other Income - Revenue and Expenses per Books,F990,PF,PART-01,Line 11 Column (A)
+PF_01_EXP_COMP_OFF_BOOKS,DOUBLE,0,1987-2023,3.70415099833404,Revenue and Expenses per Books,Compensation of Officers; Directors; Trustees; etc. - Revenue and Expenses per Books,F990,PF,PART-01,Line 13 Column (A)
+PF_01_EXP_COMP_OFF_BOOKS,DOUBLE,0,1987-2023,3.70415099833404,Revenue and Expenses per Books,Compensation of Officers; Directors; Trustees; etc. - Revenue and Expenses per Books,F990,PF,PART-01,Line 13 Column (A)
+PF_01_EXP_CONTR_PAID_BOOKS,BIGINT,0,1987-2023,13.0617684759153,Revenue and Expenses per Books,Contributions; Gifts; Grants Paid - Revenue and Expenses per Books,F990,PF,PART-01,Line 25 Column (A)
+PF_01_EXP_CONTR_PAID_BOOKS,BIGINT,0,1987-2023,13.0617684759153,Revenue and Expenses per Books,Contributions; Gifts; Grants Paid - Revenue and Expenses per Books,F990,PF,PART-01,Line 25 Column (A)
+PF_01_REV_TOT_BOOKS,BIGINT,0,1987-2023,23.0017533080081,Revenue and Expenses per Books,Total - Revenue and Expenses per Books,F990,PF,PART-01,Line 12 Column (A)
+PF_01_REV_TOT_BOOKS,BIGINT,0,1987-2023,23.0017533080081,Revenue and Expenses per Books,Total - Revenue and Expenses per Books,F990,PF,PART-01,Line 12 Column (A)
+PF_01_EXP_TOT_EXP_DISBMT_BOOKS,BIGINT,0,1987-2023,19.5203233578821,Revenue and Expenses per Books,Total Expenses and Disbursements - Revenue and Expenses per Books,F990,PF,PART-01,Line 26 Column (A)
+PF_01_EXP_TOT_EXP_DISBMT_BOOKS,BIGINT,0,1987-2023,19.5203233578821,Revenue and Expenses per Books,Total Expenses and Disbursements - Revenue and Expenses per Books,F990,PF,PART-01,Line 26 Column (A)
+PF_01_EXCESS_REV_OVER_EXP_BOOKS,BIGINT,0,1987-2023,22.3953251296121,Revenue and Expenses per Books,Excess of Revenue Over Expenses and Disbursements - Revenue and Expenses per Books,F990,PF,PART-01,Line 27a Column (A)
+PF_01_EXCESS_REV_OVER_EXP_BOOKS,BIGINT,0,1987-2023,22.3953251296121,Revenue and Expenses per Books,Excess of Revenue Over Expenses and Disbursements - Revenue and Expenses per Books,F990,PF,PART-01,Line 27a Column (A)
+PF_01_EXP_TOT_EXP_DISBMT_DISBMT,BIGINT,0,1987-2023,17.1534782457644,Disbursements for Charitable Purposes,Total Expenses and Disbursements - Disbursements for Charitable Purposes,F990,PF,PART-01,Line 26 Column (D)
+PF_01_EXP_TOT_EXP_DISBMT_DISBMT,BIGINT,0,1987-2023,17.1534782457644,Disbursements for Charitable Purposes,Total Expenses and Disbursements - Disbursements for Charitable Purposes,F990,PF,PART-01,Line 26 Column (D)
+PF_01_INVEST_INCOME_NET,BIGINT,0,1987-2023,15.3608178177652,Net Investment Income,Net Investment Income,F990,PF,PART-01,Line 27b Column (B)
+PF_01_INVEST_INCOME_NET,BIGINT,0,1987-2023,15.3608178177652,Net Investment Income,Net Investment Income,F990,PF,PART-01,Line 27b Column (B)
+PF_06_TAX_INVEST_INCOME,DOUBLE,0,1987-2023,2.48179607032688,Tax Based on Investment Income,Tax Based on Investment Income,F990,PF,PART-06,Line 05
+PF_06_TAX_INVEST_INCOME,DOUBLE,0,1987-2023,2.48179607032688,Tax Based on Investment Income,Tax Based on Investment Income,F990,PF,PART-06,Line 05
+PF_01_INCOME_NET_ADJ,DOUBLE,0,1987-2023,4.87263614363432,Adjusted Net Income,Adjusted Net Income,F990,PF,PART-01,Line 27c Column (C)
+PF_01_INCOME_NET_ADJ,DOUBLE,0,1987-2023,4.87263614363432,Adjusted Net Income,Adjusted Net Income,F990,PF,PART-01,Line 27c Column (C)
+PF_02_ASSET_TOT_EOY_BV,BIGINT,0,1987-2023,42.6275863278372,Book Value,Total Assets - End of Year - Book Value,F990,PF,PART-02,Line 16 Column (B)
+PF_02_ASSET_TOT_EOY_BV,BIGINT,0,1987-2023,42.6275863278372,Book Value,Total Assets - End of Year - Book Value,F990,PF,PART-02,Line 16 Column (B)
+PF_02_ASSET_INVEST_GOV_EOY_BV,BIGINT,0,1987-2023,8.70113175957926,Book Value,Investments; Government Obligations - End of Year - Book Value,F990,PF,PART-02,Line 10a Column (B)
+PF_02_ASSET_INVEST_GOV_EOY_BV,BIGINT,0,1987-2023,8.70113175957926,Book Value,Investments; Government Obligations - End of Year - Book Value,F990,PF,PART-02,Line 10a Column (B)
+PF_02_ASSET_INVEST_STCK_EOY_BV,BIGINT,0,1987-2023,25.6395570639056,Book Value,Investments; Corporate Stock - End of Year - Book Value,F990,PF,PART-02,Line 10b Column (B)
+PF_02_ASSET_INVEST_STCK_EOY_BV,BIGINT,0,1987-2023,25.6395570639056,Book Value,Investments; Corporate Stock - End of Year - Book Value,F990,PF,PART-02,Line 10b Column (B)
+PF_02_ASSET_INVEST_BOND_EOY_BV,BIGINT,0,1987-2023,12.1970918701936,Book Value,Investments; Corporate Bonds - End of Year - Book Value,F990,PF,PART-02,Line 10c Column (B)
+PF_02_ASSET_INVEST_BOND_EOY_BV,BIGINT,0,1987-2023,12.1970918701936,Book Value,Investments; Corporate Bonds - End of Year - Book Value,F990,PF,PART-02,Line 10c Column (B)
+PF_AX25_INVEST_STATE_SEC_EOY_BV,BIGINT,0,1987-2020,35.5624440826054,End of Year Book Value,State & Local Government Securities - End of Year Book Value,F990,PF,PART-99,AUX-SCHED-25
+PF_AX25_INVEST_STATE_SEC_EOY_BV,BIGINT,0,1987-2020,35.5624440826054,End of Year Book Value,State & Local Government Securities - End of Year Book Value,F990,PF,PART-99,AUX-SCHED-25
+PF_02_LIAB_TOT_EOY_BV,BIGINT,0,1987-2023,4.56095154462549,Book Value,Total Liabilities - End of Year - Book Value,F990,PF,PART-02,Line 23 Column (B)
+PF_02_LIAB_TOT_EOY_BV,BIGINT,0,1987-2023,4.56095154462549,Book Value,Total Liabilities - End of Year - Book Value,F990,PF,PART-02,Line 23 Column (B)
+F9_00_ORG_NAME_L1,VARCHAR,0,1987-2020,11.8898575307267,Organization name line 1,Name of Filing Organization (line 1),F990,PC,PART-00,Section C
+F9_00_ORG_NAME_L1,VARCHAR,0,1987-2020,11.8898575307267,Organization name line 1,Name of Filing Organization (line 1),F990,PC,PART-00,Section C
+F9_00_ORG_NAME_L1,VARCHAR,0,1987-2020,11.8898575307267,Organization name line 1,Name of Filing Organization (line 1),F990,PC,PART-00,Section C
+F9_00_ORG_ADDR_CITY,VARCHAR,0,1987-2020,0.67396835439353,Organization city,Address of Filing Organization (US City),F990,EZ,PART-00,Section C
+F9_00_ORG_ADDR_CITY,VARCHAR,0,1987-2020,0.67396835439353,Organization city,Address of Filing Organization (US City),F990,EZ,PART-00,Section C
+F9_00_ORG_ADDR_CITY,VARCHAR,0,1987-2020,0.67396835439353,Organization city,Address of Filing Organization (Foreign City),F990,PC,PART-00,Section C
+F9_00_ORG_ADDR_CITY,VARCHAR,0,1987-2020,0.67396835439353,Organization city,Address of Filing Organization (Foreign City),F990,PC,PART-00,Section C
+F9_00_ORG_ADDR_CITY,VARCHAR,0,1987-2020,0.67396835439353,Organization city,Address of Filing Organization (US City),F990,PC,PART-00,Section C
+F9_00_ORG_ADDR_CITY,VARCHAR,0,1987-2020,0.67396835439353,Organization city,Address of Filing Organization (US City),F990,PC,PART-00,Section C
+F9_00_ORG_ADDR_STATE,VARCHAR,0,1987-2020,0.00310517419056842,Organization state,Address of Filing Organization (Foreign Province or State),F990,PC,PART-00,Section C
+F9_00_ORG_ADDR_STATE,VARCHAR,0,1987-2020,0.00310517419056842,Organization state,Address of Filing Organization (Foreign Province or State),F990,PC,PART-00,Section C
+F9_00_ORG_ADDR_STATE,VARCHAR,0,1987-2020,0.00310517419056842,Organization state,Address of Filing Organization (US State),F990,PC,PART-00,Section C
+F9_00_ORG_ADDR_STATE,VARCHAR,0,1987-2020,0.00310517419056842,Organization state,Address of Filing Organization (US State),F990,PC,PART-00,Section C
+F9_00_ORG_ADDR_ZIP_FULL,VARCHAR,0,1987-2020,10.6817021788619,,,,,,
+F9_00_ORG_ADDR_ZIP_NEW,INTEGER,0,1987-2000,3.41591318190804,,,,,,
+F9_00_ORG_ADDR_ZIP5,VARCHAR,0,1987-2020,1.11462719992211,,,,,,
+PF_06_EXCISE_TAX_ORG_DATE_RULING,INTEGER,0,1987-1997,0.604087788961739,Date of Ruling Letter,Date of Ruling Letter,F990,PF,PART-06,Line 01a
+PF_06_EXCISE_TAX_ORG_DATE_RULING,INTEGER,0,1987-1997,0.604087788961739,Date of Ruling Letter,Date of Ruling Letter,F990,PF,PART-06,Line 01a
+F9_00_TAX_PERIOD_END_DATE,INTEGER,0,1987-2023,0.0142938112760304,,,,,,
+F9_00_ORG_ADDR_L1,VARCHAR,0,1987-2020,13.0007335974025,Organization street address line 1,Address of Filing Organization (Foreign Line 1),F990,PC,PART-00,Section C
+F9_00_ORG_ADDR_L1,VARCHAR,0,1987-2020,13.0007335974025,Organization street address line 1,Address of Filing Organization (Foreign Line 1),F990,PC,PART-00,Section C
+F9_00_ORG_ADDR_L1,VARCHAR,0,1987-2020,13.0007335974025,Organization street address line 1,Address of Filing Organization (US Line 1),F990,PC,PART-00,Section C
+F9_00_ORG_ADDR_L1,VARCHAR,0,1987-2020,13.0007335974025,Organization street address line 1,Address of Filing Organization (US Line 1),F990,PC,PART-00,Section C
+NCCS_AFF_CODE,VARCHAR,0,1987-2020,0.000493749867304723,,,,,,
+NCCS_ADVRULE_EXPDATE,INTEGER,0,1987-2011,0.0262320102066367,,,,,,
+IRS_CLASS_CODE,VARCHAR,0,1987-2020,0.00770056643589649,,,,,,
+IRS_DEDUCT_CODE,VARCHAR,0,1987-2020,0.000346387010289179,,,,,,
+IRS_DISTRICT_OFFICE,INTEGER,0,1987-2010,0.00513790359932814,,,,,,
+IRS_FILINGREQ_CODE,VARCHAR,0,1987-2020,0.00128658032393124,,,,,,
+PF_02_ASSET_TOT_EOY_FMV,BIGINT,0,1990-2023,44.3685724787036,Fair Market Value,Total Assets - End of Year - Fair Market Value,F990,PF,PART-02,Line 16 Column (C)
+PF_02_ASSET_TOT_EOY_FMV,BIGINT,0,1990-2023,44.3685724787036,Fair Market Value,Total Assets - End of Year - Fair Market Value,F990,PF,PART-02,Line 16 Column (C)
+PF_02_ASSET_CASH_EOY_BV,BIGINT,0,1995-2023,8.97539634597138,Book Value,Cash - End of Year - Book Value,F990,PF,PART-02,Line 01 Column (B)
+PF_02_ASSET_CASH_EOY_BV,BIGINT,0,1995-2023,8.97539634597138,Book Value,Cash - End of Year - Book Value,F990,PF,PART-02,Line 01 Column (B)
+PF_02_ASSET_INVEST_MTG_EOY_BV,BIGINT,0,1995-2023,0.60872039802178,Book Value,Investments; Mortgage Loans - End of Year - Book Value,F990,PF,PART-02,Line 12 Column (B)
+PF_02_ASSET_INVEST_MTG_EOY_BV,BIGINT,0,1995-2023,0.60872039802178,Book Value,Investments; Mortgage Loans - End of Year - Book Value,F990,PF,PART-02,Line 12 Column (B)
+PF_06_EXCISE_TAX_ORG_OPERATING_X,VARCHAR,0,1987-2020,0.000249465395657107,Exempt Operating Foundations,Exempt Operating Foundations,F990,PF,PART-06,Line 01a
+PF_06_EXCISE_TAX_ORG_OPERATING_X,VARCHAR,0,1987-2020,0.000249465395657107,Exempt Operating Foundations,Exempt Operating Foundations,F990,PF,PART-06,Line 01a
+PF_06_EXCISE_TAX_ORG_DMSTC_X,VARCHAR,0,1987-2020,0.000299358474788528,Domestic Organizations Meeting Section 4940(e) Requirements,Domestic Organizations Meeting Section 4940(e) Requirements,F990,PF,PART-06,Line 01b
+PF_06_EXCISE_TAX_ORG_DMSTC_X,VARCHAR,0,1987-2020,0.000299358474788528,Domestic Organizations Meeting Section 4940(e) Requirements,Domestic Organizations Meeting Section 4940(e) Requirements,F990,PF,PART-06,Line 01b
+PF_07_POLI_ACT_X,VARCHAR,0,1987-2023,0.000236048122793582,Legislative and Political Activities?,Legislative and Political Activities?,F990,PF,PART-07-A,Line 01a
+PF_07_POLI_ACT_X,VARCHAR,0,1987-2023,0.000236048122793582,Legislative and Political Activities?,Legislative and Political Activities?,F990,PF,PART-07-A,Line 01a
+PF_07_POLI_ACT_X,VARCHAR,0,1987-2023,0.000236048122793582,Legislative and Political Activities?,Legislative and Political Activities?,F990,PF,PART-07-A,Line 01a
+PF_AX30_LIQUIDATION_STMT,VARCHAR,0,1987-2020,0.00034925155391995,ExplanationTxt,Liquidation Explanation Stmt - ExplanationTxt,F990,PF,PART-99,AUX-SCHED-30
+PF_AX30_LIQUIDATION_STMT,VARCHAR,0,1987-2020,0.00034925155391995,Statement,Liquidation Explanation Stmt - Statement,F990,PF,PART-99,AUX-SCHED-30
+PF_07_POF_X,VARCHAR,0,1987-2023,0.000202326962394499,Private Operating Foundation?,Private Operating Foundation?,F990,PF,PART-07-A,Line 09
+PF_07_POF_X,VARCHAR,0,1987-2023,0.000202326962394499,Private Operating Foundation?,Private Operating Foundation?,F990,PF,PART-07-A,Line 09
+PF_07_4720_ACT_SALE_EXCHANGE_X,VARCHAR,0,1987-2023,0.00010116348119725,Sale or Exchange with a Disqualified Person?,Sale or Exchange with a Disqualified Person?,F990,PF,PART-07-B,Line 01a(1)
+PF_07_4720_ACT_SALE_EXCHANGE_X,VARCHAR,0,1987-2023,0.00010116348119725,Sale or Exchange with a Disqualified Person?,Sale or Exchange with a Disqualified Person?,F990,PF,PART-07-B,Line 01a(1)
+PF_07_4720_ACT_BORROW_LEND_X,VARCHAR,0,1987-2023,0.000134884641596333,Borrow or Lend with a Disqualified Person?,Borrow or Lend with a Disqualified Person?,F990,PF,PART-07-B,Line 01a(2)
+PF_07_4720_ACT_BORROW_LEND_X,VARCHAR,0,1987-2023,0.000134884641596333,Borrow or Lend with a Disqualified Person?,Borrow or Lend with a Disqualified Person?,F990,PF,PART-07-B,Line 01a(2)
+PF_07_4720_ACT_FURNISHED_GOODS_X,VARCHAR,0,1987-2023,0.000134884641596333,Furnished Goods; etc. with a Disqualified Person?,Furnished Goods; etc. with a Disqualified Person?,F990,PF,PART-07-B,Line 01a(3)
+PF_07_4720_ACT_FURNISHED_GOODS_X,VARCHAR,0,1987-2023,0.000134884641596333,Furnished Goods; etc. with a Disqualified Person?,Furnished Goods; etc. with a Disqualified Person?,F990,PF,PART-07-B,Line 01a(3)
+PF_07_4720_ACT_PAY_COMP_X,VARCHAR,0,1987-2023,0.000134884641596333,Pay Compensation to a Disqualified Person?,Pay Compensation to a Disqualified Person?,F990,PF,PART-07-B,Line 01a(4)
+PF_07_4720_ACT_PAY_COMP_X,VARCHAR,0,1987-2023,0.000134884641596333,Pay Compensation to a Disqualified Person?,Pay Compensation to a Disqualified Person?,F990,PF,PART-07-B,Line 01a(4)
+PF_07_4720_ACT_TRANSFER_ASSET_X,VARCHAR,0,1987-2023,0.000139540611376258,Transfer Assets to a Disqualified Person?,Transfer Assets to a Disqualified Person?,F990,PF,PART-07-B,Line 01a(5)
+PF_07_4720_ACT_TRANSFER_ASSET_X,VARCHAR,0,1987-2023,0.000139540611376258,Transfer Assets to a Disqualified Person?,Transfer Assets to a Disqualified Person?,F990,PF,PART-07-B,Line 01a(5)
+PF_07_4720_ACT_PAY_GOV_X,VARCHAR,0,1987-2023,0.000202326962394499,Payment to a Government Official?,Payment to a Government Official?,F990,PF,PART-07-B,Line 01a(6)
+PF_07_4720_ACT_PAY_GOV_X,VARCHAR,0,1987-2023,0.000202326962394499,Payment to a Government Official?,Payment to a Government Official?,F990,PF,PART-07-B,Line 01a(6)
+PF_07_4720_INCOME_UNDIST_PY_X,VARCHAR,0,1987-2020,0.000249465395657107,Undistributed Income Prior Years?,Undistributed Income Prior Years?,F990,PF,PART-07-B,Line 02a
+PF_07_4720_INCOME_UNDIST_PY_X,VARCHAR,0,1987-2020,0.000249465395657107,Undistributed Income Prior Years?,Undistributed Income Prior Years?,F990,PF,PART-07-B,Line 02a
+PF_07_4720_BIZ_HOLDING_X,VARCHAR,0,1987-2023,0.000202326962394499,Business Holdings?,Business Holdings?,F990,PF,PART-07-B,Line 03a
+PF_07_4720_BIZ_HOLDING_X,VARCHAR,0,1987-2023,0.000202326962394499,Business Holdings?,Business Holdings?,F990,PF,PART-07-B,Line 03a
+PF_07_4720_JEOPARDY_INVEST_X,VARCHAR,0,1987-2023,0.000202326962394499,Jeopardy Investments?,Jeopardy Investments?,F990,PF,PART-07-B,Line 04a
+PF_07_4720_JEOPARDY_INVEST_X,VARCHAR,0,1987-2023,0.000202326962394499,Jeopardy Investments?,Jeopardy Investments?,F990,PF,PART-07-B,Line 04a
+PF_07_4720_PAY_INFLUENCE_LEGIS_X,VARCHAR,0,1987-2023,0.000134884641596333,Influence Legislation?,Influence Legislation?,F990,PF,PART-07-B,Line 05a(1)
+PF_07_4720_PAY_INFLUENCE_LEGIS_X,VARCHAR,0,1987-2023,0.000134884641596333,Influence Legislation?,Influence Legislation?,F990,PF,PART-07-B,Line 05a(1)
+PF_07_4720_PAY_INFLUENCE_ELECT_X,VARCHAR,0,1987-2023,0.000139540611376258,Influence Election?,Influence Election?,F990,PF,PART-07-B,Line 05a(2)
+PF_07_4720_PAY_INFLUENCE_ELECT_X,VARCHAR,0,1987-2023,0.000139540611376258,Influence Election?,Influence Election?,F990,PF,PART-07-B,Line 05a(2)
+PF_07_4720_PAY_GRANT_ORG_X,VARCHAR,0,1987-2023,0.000168605801995416,Grants to Organizations?,Grants to Organizations?,F990,PF,PART-07-B,Line 05a(4)
+PF_07_4720_PAY_GRANT_ORG_X,VARCHAR,0,1987-2023,0.000168605801995416,Grants to Organizations?,Grants to Organizations?,F990,PF,PART-07-B,Line 05a(4)
+PF_07_4720_PAY_GRANT_INDIV_X,VARCHAR,0,1987-2023,0.00010116348119725,Grants to Individuals?,Grants to Individuals?,F990,PF,PART-07-B,Line 05a(3)
+PF_07_4720_PAY_GRANT_INDIV_X,VARCHAR,0,1987-2023,0.00010116348119725,Grants to Individuals?,Grants to Individuals?,F990,PF,PART-07-B,Line 05a(3)
+PF_07_4720_PAY_NOCHARIT_X,VARCHAR,0,1987-2023,0.000168605801995416,Noncharitable Purpose?,Noncharitable Purpose?,F990,PF,PART-07-B,Line 05a(5)
+PF_07_4720_PAY_NOCHARIT_X,VARCHAR,0,1987-2023,0.000168605801995416,Noncharitable Purpose?,Noncharitable Purpose?,F990,PF,PART-07-B,Line 05a(5)
+TAX_YEAR,VARCHAR,0,1987-2023,0.00122423846577112,,,,,,
+EIN2,VARCHAR,0,1987-2023,6.66898941099902,,,,,,
+PF_10_INVEST_RETURN_MINIMUM,DOUBLE,0,1990-2023,15.1190773382054,Minimum Investment Return,Minimum Investment Return,F990,PF,PART-10,Line 06
+PF_10_INVEST_RETURN_MINIMUM,DOUBLE,0,1990-2023,15.1190773382054,Minimum Investment Return,Minimum Investment Return,F990,PF,PART-10,Line 06
+PF_13_UNDIST_INCOME_CY,DOUBLE,0,1990-2023,7.6201017027799,Undistributed Income for Current Year,Undistributed Income for Current Year,F990,PF,PART-13,Line 06f Column (D)
+PF_13_UNDIST_INCOME_CY,DOUBLE,0,1990-2023,7.6201017027799,Undistributed Income for Current Year,Undistributed Income for Current Year,F990,PF,PART-13,Line 06f Column (D)
+PF_07_UBIZ_INCOME_OVER_1000_X,BOOLEAN,0,None,,Unrelated Business Income Over $1000?,Unrelated Business Income Over $1000?,F990,PF,PART-07-A,Line 04a
+PF_07_UBIZ_INCOME_OVER_1000_X,BOOLEAN,0,None,,Unrelated Business Income Over $1000?,Unrelated Business Income Over $1000?,F990,PF,PART-07-A,Line 04a
+PF_01_REV_RENT_GRO_BOOKS,DOUBLE,0,1995-2023,1.49228169231758,Revenue and Expenses per Books,Gross Rents - Revenue and Expenses per Books,F990,PF,PART-01,Line 05a Column (A)
+PF_01_REV_RENT_GRO_BOOKS,DOUBLE,0,1995-2023,1.49228169231758,Revenue and Expenses per Books,Gross Rents - Revenue and Expenses per Books,F990,PF,PART-01,Line 05a Column (A)
+PF_01_REV_TOT_NET,BIGINT,0,1995-2023,17.0851541971166,Net Investment Income,Total - Net Investment Income,F990,PF,PART-01,Line 12 Column (B)
+PF_01_REV_TOT_NET,BIGINT,0,1995-2023,17.0851541971166,Net Investment Income,Total - Net Investment Income,F990,PF,PART-01,Line 12 Column (B)
+PF_01_EXP_TOT_EXP_DISBMT_ADJ_NET,BIGINT,0,1995-2023,2.53359576893185,Adjusted Net Income,Total Expenses and Disbursements - Adjusted Net Income,F990,PF,PART-01,Line 26 Column (C)
+PF_01_EXP_TOT_EXP_DISBMT_ADJ_NET,BIGINT,0,1995-2023,2.53359576893185,Adjusted Net Income,Total Expenses and Disbursements - Adjusted Net Income,F990,PF,PART-01,Line 26 Column (C)
+PF_01_EXP_TOT_OPERATING_BOOKS,BIGINT,0,1995-2023,10.3016068559982,Revenue and Expenses per Books,Total Operating and Administrative Expenses - Revenue and Expenses per Books,F990,PF,PART-01,Line 24 Column (A)
+PF_01_EXP_TOT_OPERATING_BOOKS,BIGINT,0,1995-2023,10.3016068559982,Revenue and Expenses per Books,Total Operating and Administrative Expenses - Revenue and Expenses per Books,F990,PF,PART-01,Line 24 Column (A)
+PF_01_EXP_TOT_OPERATING_DISBMT,BIGINT,0,1995-2023,6.63157132162952,Disbursements for Charitable Purposes,Total Operating and Administrative Expenses - Disbursements for Charitable Purposes,F990,PF,PART-01,Line 24 Column (D)
+PF_01_EXP_TOT_OPERATING_DISBMT,BIGINT,0,1995-2023,6.63157132162952,Disbursements for Charitable Purposes,Total Operating and Administrative Expenses - Disbursements for Charitable Purposes,F990,PF,PART-01,Line 24 Column (D)
+PF_01_REV_TOT_ADJ_NET,DOUBLE,0,1995-2023,5.37155479998633,Adjusted Net Income,Total - Adjusted Net Income,F990,PF,PART-01,Line 12 Column (C)
+PF_01_REV_TOT_ADJ_NET,DOUBLE,0,1995-2023,5.37155479998633,Adjusted Net Income,Total - Adjusted Net Income,F990,PF,PART-01,Line 12 Column (C)
+PF_01_EXP_TOT_OPERATING_NET,DOUBLE,0,1995-2023,6.23676494845667,Net Investment Income,Total Operating and Administrative Expenses - Net Investment Income,F990,PF,PART-01,Line 24 Column (B)
+PF_01_EXP_TOT_OPERATING_NET,DOUBLE,0,1995-2023,6.23676494845667,Net Investment Income,Total Operating and Administrative Expenses - Net Investment Income,F990,PF,PART-01,Line 24 Column (B)
+PF_01_EXP_TOT_EXP_DISBMT_NET,BIGINT,0,1995-2023,6.24163636998582,Net Investment Income,Total Expenses and Disbursements - Net Investment Income,F990,PF,PART-01,Line 26 Column (B)
+PF_01_EXP_TOT_EXP_DISBMT_NET,BIGINT,0,1995-2023,6.24163636998582,Net Investment Income,Total Expenses and Disbursements - Net Investment Income,F990,PF,PART-01,Line 26 Column (B)
+PF_02_ASSET_INVEST_OTH_EOY_BV,BIGINT,0,1995-2023,17.2800304935814,Book Value,Investments; Other - End of Year - Book Value,F990,PF,PART-02,Line 13 Column (B)
+PF_02_ASSET_INVEST_OTH_EOY_BV,BIGINT,0,1995-2023,17.2800304935814,Book Value,Investments; Other - End of Year - Book Value,F990,PF,PART-02,Line 13 Column (B)
+PF_AX32_NOTE_BALANCE_DUE,DOUBLE,0,1995-2020,0.761858092372982,Balance due,Note Payable - Balance due,F990,PF,PART-99,AUX-SCHED-32
+PF_AX32_NOTE_BALANCE_DUE,DOUBLE,0,1995-2020,0.761858092372982,Balance due,Note Payable Grp - Balance due,F990,PF,PART-99,AUX-SCHED-32
+PF_02_NAFB_TOT_EOY_BV,BIGINT,0,1995-2020,57.2187556703068,Book Value,Total Net Assets or Fund Balances - End of Year - Book Value,F990,PF,PART-02,Line 30 Column (B)
+PF_02_NAFB_TOT_EOY_BV,BIGINT,0,1995-2020,57.2187556703068,Book Value,Total Net Assets or Fund Balances - End of Year - Book Value,F990,PF,PART-02,Line 30 Column (B)
+PF_02_NAFB_TOT_EOY_BV,BIGINT,0,1995-2020,57.2187556703068,Total Net Assets or Fund Balances at End of Year,Total Net Assets or Fund Balances at End of Year,F990,PF,PART-03,Line 06
+PF_02_NAFB_TOT_EOY_BV,BIGINT,0,1995-2020,57.2187556703068,Total Net Assets or Fund Balances at End of Year,Total Net Assets or Fund Balances at End of Year,F990,PF,PART-03,Line 06
+PF_06_EXCISE_TAX_INVEST_NA,DOUBLE,0,1995-2020,3.3673388014835,N/A,"Investment Income Excise Tax - ""N/A""",F990,PF,PART-06,Line 01
+PF_06_EXCISE_TAX_INVEST_NA,DOUBLE,0,1995-2020,3.3673388014835,N/A,"Investment Income Excise Tax - ""N/A""",F990,PF,PART-06,Line 01
+PF_06_TAX_511,DOUBLE,0,1995-2023,0.0134486649227983,Tax Under Section 511,Tax Under Section 511,F990,PF,PART-06,Line 02
+PF_06_TAX_511,DOUBLE,0,1995-2023,0.0134486649227983,Tax Under Section 511,Tax Under Section 511,F990,PF,PART-06,Line 02
+PF_06_TAX_SUBTITLE_A,DOUBLE,0,1995-2023,0.0564695322725235,Subtitle A Tax,Subtitle A Tax,F990,PF,PART-06,Line 04
+PF_06_TAX_SUBTITLE_A,DOUBLE,0,1995-2023,0.0564695322725235,Subtitle A Tax,Subtitle A Tax,F990,PF,PART-06,Line 04
+PF_06_CREDIT_PAY_TAX_ESTIMATED,DOUBLE,0,1995-2023,2.37487819113228,Estimated Tax Payments and Overpayment Credited,Estimated Tax Payments and Overpayment Credited,F990,PF,PART-06,Line 06a
+PF_06_CREDIT_PAY_TAX_ESTIMATED,DOUBLE,0,1995-2023,2.37487819113228,Estimated Tax Payments and Overpayment Credited,Estimated Tax Payments and Overpayment Credited,F990,PF,PART-06,Line 06a
+PF_06_CREDIT_PAY_TAX_EXTENSION,DOUBLE,0,1995-2023,0.42393015313274,Tax Paid with Extension,Tax Paid with Extension,F990,PF,PART-06,Line 06c
+PF_06_PENALTY_UNDERPAY,DOUBLE,0,1995-2023,0.129062602049175,Penalty for Underpayment,Penalty for Underpayment,F990,PF,PART-06,Line 08
+PF_06_PENALTY_UNDERPAY,DOUBLE,0,1995-2023,0.129062602049175,Penalty for Underpayment,Penalty for Underpayment,F990,PF,PART-06,Line 08
+PF_06_AMT_CREDITED_NY,DOUBLE,0,1995-2023,2.12377452755992,Amount Credited to Next Year,Amount Credited to Next Year,F990,PF,PART-06,Line 11
+PF_06_AMT_CREDITED_NY,DOUBLE,0,1995-2023,2.12377452755992,Amount Credited to Next Year,Amount Credited to Next Year,F990,PF,PART-06,Line 11
+PF_06_CREDIT_PAY_BACKUP_WITHHOLD,DOUBLE,0,1995-2023,0.0794288552622731,Backup Withholding Erroneously Withheld,Backup Withholding Erroneously Withheld,F990,PF,PART-06,Line 06d
+PF_06_CREDIT_PAY_BACKUP_WITHHOLD,DOUBLE,0,1995-2023,0.0794288552622731,Backup Withholding Erroneously Withheld,Backup Withholding Erroneously Withheld,F990,PF,PART-06,Line 06d
+PF_10_FMV_ASSET_NOCHARIT_TOT,BIGINT,0,1995-2023,42.8709630321464,Total FMV of Unused Assets,Total FMV of Unused Assets,F990,PF,PART-10,Line 01d
+PF_10_FMV_ASSET_NOCHARIT_TOT,BIGINT,0,1995-2023,42.8709630321464,Total FMV of Unused Assets,Total FMV of Unused Assets,F990,PF,PART-10,Line 01d
+PF_11_DIST_AMT_ADJ,BIGINT,0,1995-2023,15.1541190994447,Distributable Amount as Adjusted,Distributable Amount as Adjusted,F990,PF,PART-11,Line 07
+PF_11_DIST_AMT_ADJ,BIGINT,0,1995-2023,15.1541190994447,Distributable Amount as Adjusted,Distributable Amount as Adjusted,F990,PF,PART-11,Line 07
+PF_14_POF_LESSOR_ADJ_NET_CY,DOUBLE,0,1995-2023,1.21376058478659,Current Year,Lessor Adj Net Incm Min Invst Return - Current Year,F990,PF,PART-14,Line 02a Column (A)
+PF_14_POF_LESSOR_ADJ_NET_CY,DOUBLE,0,1995-2023,1.21376058478659,Current Year,Lessor Adj Net Incm Min Invst Ret Grp - Current Year,F990,PF,PART-14,Line 02a Column (A)
+PF_14_POF_LESSOR_ADJ_NET_CY_M1,DOUBLE,0,1995-2023,1.14458540775275,Year 1,Lessor Adj Net Incm Min Invst Return - Year 1,F990,PF,PART-14,Line 02a Column (B)
+PF_14_POF_LESSOR_ADJ_NET_CY_M1,DOUBLE,0,1995-2023,1.14458540775275,Year 1,Lessor Adj Net Incm Min Invst Ret Grp - Year 1,F990,PF,PART-14,Line 02a Column (B)
+PF_14_POF_LESSOR_ADJ_NET_CY_M2,INTEGER,0,1995-2023,1.11434490117085,Year 2,Lessor Adj Net Incm Min Invst Return - Year 2,F990,PF,PART-14,Line 02a Column (C)
+PF_14_POF_LESSOR_ADJ_NET_CY_M2,INTEGER,0,1995-2023,1.11434490117085,Year 2,Lessor Adj Net Incm Min Invst Ret Grp - Year 2,F990,PF,PART-14,Line 02a Column (C)
+PF_14_POF_LESSOR_ADJ_NET_CY_M3,INTEGER,0,1995-2023,1.08451222769704,Year 3,Lessor Adj Net Incm Min Invst Return - Year 3,F990,PF,PART-14,Line 02a Column (D)
+PF_14_POF_LESSOR_ADJ_NET_CY_M3,INTEGER,0,1995-2023,1.08451222769704,Year 3,Lessor Adj Net Incm Min Invst Ret Grp - Year 3,F990,PF,PART-14,Line 02a Column (D)
+PF_14_POF_LESSOR_ADJ_NET_TOT,DOUBLE,0,1995-2023,1.64114578167021,Total,Lessor Adj Net Incm Min Invst Return - Total,F990,PF,PART-14,Line 02a Column (E)
+PF_14_POF_LESSOR_ADJ_NET_TOT,DOUBLE,0,1995-2023,1.64114578167021,Total,Lessor Adj Net Incm Min Invst Ret Grp - Total,F990,PF,PART-14,Line 02a Column (E)
+PF_14_POF_DIST_QUAL_CY,DOUBLE,0,1995-2023,2.57932018856366,Current Year,Qualifying Distributions Grp - Current Year,F990,PF,PART-14,Line 02c Column (A)
+PF_14_POF_DIST_QUAL_CY,DOUBLE,0,1995-2023,2.57932018856366,Current Year,Qualifying Distributions - Current Year,F990,PF,PART-14,Line 02c Column (A)
+PF_14_POF_DIST_QUAL_CY_M1,DOUBLE,0,1995-2023,2.44520504941641,Year 1,Qualifying Distributions Grp - Year 1,F990,PF,PART-14,Line 02c Column (B)
+PF_14_POF_DIST_QUAL_CY_M1,DOUBLE,0,1995-2023,2.44520504941641,Year 1,Qualifying Distributions - Year 1,F990,PF,PART-14,Line 02c Column (B)
+PF_14_POF_DIST_QUAL_CY_M2,DOUBLE,0,1995-2023,2.3462347639072,Year 2,Qualifying Distributions Grp - Year 2,F990,PF,PART-14,Line 02c Column (C)
+PF_14_POF_DIST_QUAL_CY_M2,DOUBLE,0,1995-2023,2.3462347639072,Year 2,Qualifying Distributions - Year 2,F990,PF,PART-14,Line 02c Column (C)
+PF_14_POF_DIST_QUAL_CY_M3,DOUBLE,0,1995-2023,2.24091165601733,Year 3,Qualifying Distributions Grp - Year 3,F990,PF,PART-14,Line 02c Column (D)
+PF_14_POF_DIST_QUAL_CY_M3,DOUBLE,0,1995-2023,2.24091165601733,Year 3,Qualifying Distributions - Year 3,F990,PF,PART-14,Line 02c Column (D)
+PF_14_POF_DIST_QUAL_TOT,BIGINT,0,1995-2023,3.17425643186115,Total,Qualifying Distributions Grp - Total,F990,PF,PART-14,Line 02c Column (E)
+PF_14_POF_DIST_QUAL_TOT,BIGINT,0,1995-2023,3.17425643186115,Total,Qualifying Distributions - Total,F990,PF,PART-14,Line 02c Column (E)
+PF_14_POF_ASSET_TOT_CY,BIGINT,0,1995-2023,1.3909708932997,Current Year,Total Assets - Current Year,F990,PF,PART-14,Line 03a(1) Column (A)
+PF_14_POF_ASSET_TOT_CY,BIGINT,0,1995-2023,1.3909708932997,Current Year,Total Assets Grp - Current Year,F990,PF,PART-14,Line 03a(1) Column (A)
+PF_14_POF_ASSET_TOT_CY_M1,BIGINT,0,1995-2023,1.37618479208624,Year 1,Total Assets - Year 1,F990,PF,PART-14,Line 03a(1) Column (B)
+PF_14_POF_ASSET_TOT_CY_M1,BIGINT,0,1995-2023,1.37618479208624,Year 1,Total Assets Grp - Year 1,F990,PF,PART-14,Line 03a(1) Column (B)
+PF_14_POF_ASSET_TOT_CY_M2,BIGINT,0,1995-2023,1.32291024650808,Year 2,Total Assets - Year 2,F990,PF,PART-14,Line 03a(1) Column (C)
+PF_14_POF_ASSET_TOT_CY_M2,BIGINT,0,1995-2023,1.32291024650808,Year 2,Total Assets Grp - Year 2,F990,PF,PART-14,Line 03a(1) Column (C)
+PF_14_POF_ASSET_TOT_CY_M3,BIGINT,0,1995-2023,1.25559261987794,Year 3,Total Assets - Year 3,F990,PF,PART-14,Line 03a(1) Column (D)
+PF_14_POF_ASSET_TOT_CY_M3,BIGINT,0,1995-2023,1.25559261987794,Year 3,Total Assets Grp - Year 3,F990,PF,PART-14,Line 03a(1) Column (D)
+PF_14_POF_ASSET_TOT_TOT,BIGINT,0,1995-2023,1.66295342340967,Total,Total Assets - Total,F990,PF,PART-14,Line 03a(1) Column (E)
+PF_14_POF_ASSET_TOT_TOT,BIGINT,0,1995-2023,1.66295342340967,Total,Total Assets Grp - Total,F990,PF,PART-14,Line 03a(1) Column (E)
+PF_14_POF_ASSET_TOT_4942J3_CY,DOUBLE,0,1995-2023,1.0240675375606,Current Year,Total Assets Sect4942j3 Bi - Current Year,F990,PF,PART-14,Line 03a(2) Column (A)
+PF_14_POF_ASSET_TOT_4942J3_CY,DOUBLE,0,1995-2023,1.0240675375606,Current Year,Total Assets Sect4942j3 Bi Grp - Current Year,F990,PF,PART-14,Line 03a(2) Column (A)
+PF_14_POF_ASSET_TOT_4942J3_CY_M1,DOUBLE,0,1995-2023,1.02800554441644,Year 1,Total Assets Sect4942j3 Bi - Year 1,F990,PF,PART-14,Line 03a(2) Column (B)
+PF_14_POF_ASSET_TOT_4942J3_CY_M1,DOUBLE,0,1995-2023,1.02800554441644,Year 1,Total Assets Sect4942j3 Bi Grp - Year 1,F990,PF,PART-14,Line 03a(2) Column (B)
+PF_14_POF_ASSET_TOT_4942J3_CY_M2,DOUBLE,0,1995-2023,0.994272429085227,Year 2,Total Assets Sect4942j3 Bi - Year 2,F990,PF,PART-14,Line 03a(2) Column (C)
+PF_14_POF_ASSET_TOT_4942J3_CY_M2,DOUBLE,0,1995-2023,0.994272429085227,Year 2,Total Assets Sect4942j3 Bi Grp - Year 2,F990,PF,PART-14,Line 03a(2) Column (C)
+PF_14_POF_ASSET_TOT_4942J3_CY_M3,DOUBLE,0,1995-2023,0.953109112139203,Year 3,Total Assets Sect4942j3 Bi - Year 3,F990,PF,PART-14,Line 03a(2) Column (D)
+PF_14_POF_ASSET_TOT_4942J3_CY_M3,DOUBLE,0,1995-2023,0.953109112139203,Year 3,Total Assets Sect4942j3 Bi Grp - Year 3,F990,PF,PART-14,Line 03a(2) Column (D)
+PF_14_POF_ASSET_TOT_4942J3_TOT,BIGINT,0,1995-2023,1.24972276060225,Total,Total Assets Sect4942j3 Bi - Total,F990,PF,PART-14,Line 03a(2) Column (E)
+PF_14_POF_ASSET_TOT_4942J3_TOT,BIGINT,0,1995-2023,1.24972276060225,Total,Total Assets Sect4942j3 Bi Grp - Total,F990,PF,PART-14,Line 03a(2) Column (E)
+PF_14_POF_ENDOW_CY,INTEGER,0,1995-2023,1.25009427068299,Current Year,Two Thirds Min Invst Return - Current Year,F990,PF,PART-14,Line 03b Column (A)
+PF_14_POF_ENDOW_CY,INTEGER,0,1995-2023,1.25009427068299,Current Year,Two Thirds Minimum Invst Ret Grp - Current Year,F990,PF,PART-14,Line 03b Column (A)
+PF_14_POF_ENDOW_CY_M1,INTEGER,0,1995-2023,1.18938952349003,Year 1,Two Thirds Min Invst Return - Year 1,F990,PF,PART-14,Line 03b Column (B)
+PF_14_POF_ENDOW_CY_M1,INTEGER,0,1995-2023,1.18938952349003,Year 1,Two Thirds Minimum Invst Ret Grp - Year 1,F990,PF,PART-14,Line 03b Column (B)
+PF_14_POF_ENDOW_CY_M2,DOUBLE,0,1995-2023,1.14844911259245,Year 2,Two Thirds Min Invst Return - Year 2,F990,PF,PART-14,Line 03b Column (C)
+PF_14_POF_ENDOW_CY_M2,DOUBLE,0,1995-2023,1.14844911259245,Year 2,Two Thirds Minimum Invst Ret Grp - Year 2,F990,PF,PART-14,Line 03b Column (C)
+PF_14_POF_ENDOW_CY_M3,INTEGER,0,1995-2023,1.10624556742035,Year 3,Two Thirds Min Invst Return - Year 3,F990,PF,PART-14,Line 03b Column (D)
+PF_14_POF_ENDOW_CY_M3,INTEGER,0,1995-2023,1.10624556742035,Year 3,Two Thirds Minimum Invst Ret Grp - Year 3,F990,PF,PART-14,Line 03b Column (D)
+PF_14_POF_ENDOW_TOT,INTEGER,0,1995-2023,1.6022486762167,Total,Two Thirds Min Invst Return - Total,F990,PF,PART-14,Line 03b Column (E)
+PF_14_POF_ENDOW_TOT,INTEGER,0,1995-2023,1.6022486762167,Total,Two Thirds Minimum Invst Ret Grp - Total,F990,PF,PART-14,Line 03b Column (E)
+PF_14_POF_SUPPORT_TOT_CY,DOUBLE,0,1995-2023,0.260540019623162,Current Year,Total Support - Current Year,F990,PF,PART-14,Line 03c(1) Column (A)
+PF_14_POF_SUPPORT_TOT_CY,DOUBLE,0,1995-2023,0.260540019623162,Current Year,Total Support Grp - Current Year,F990,PF,PART-14,Line 03c(1) Column (A)
+PF_14_POF_SUPPORT_TOT_CY_M1,DOUBLE,0,1995-2023,0.257345032928796,Year 1,Total Support - Year 1,F990,PF,PART-14,Line 03c(1) Column (B)
+PF_14_POF_SUPPORT_TOT_CY_M1,DOUBLE,0,1995-2023,0.257345032928796,Year 1,Total Support Grp - Year 1,F990,PF,PART-14,Line 03c(1) Column (B)
+PF_14_POF_SUPPORT_TOT_CY_M2,DOUBLE,0,1995-2023,0.244416482119034,Year 2,Total Support - Year 2,F990,PF,PART-14,Line 03c(1) Column (C)
+PF_14_POF_SUPPORT_TOT_CY_M2,DOUBLE,0,1995-2023,0.244416482119034,Year 2,Total Support Grp - Year 2,F990,PF,PART-14,Line 03c(1) Column (C)
+PF_14_POF_SUPPORT_TOT_CY_M3,DOUBLE,0,1995-2023,0.231339327276976,Year 3,Total Support - Year 3,F990,PF,PART-14,Line 03c(1) Column (D)
+PF_14_POF_SUPPORT_TOT_CY_M3,DOUBLE,0,1995-2023,0.231339327276976,Year 3,Total Support Grp - Year 3,F990,PF,PART-14,Line 03c(1) Column (D)
+PF_14_POF_SUPPORT_TOT_TOT,BIGINT,0,1995-2023,0.342903804523284,Total,Total Support - Total,F990,PF,PART-14,Line 03c(1) Column (E)
+PF_14_POF_SUPPORT_TOT_TOT,BIGINT,0,1995-2023,0.342903804523284,Total,Total Support Grp - Total,F990,PF,PART-14,Line 03c(1) Column (E)
+PF_14_POF_SUPPORT_PUB_CY,DOUBLE,0,1995-2023,0.206150943802785,Current Year,Public Support - Current Year,F990,PF,PART-14,Line 03c(2) Column (A)
+PF_14_POF_SUPPORT_PUB_CY,DOUBLE,0,1995-2023,0.206150943802785,Current Year,Public Support Type - Current Year,F990,PF,PART-14,Line 03c(2) Column (A)
+PF_14_POF_SUPPORT_PUB_CY_M1,DOUBLE,0,1995-2023,0.199129403276793,Year 1,Public Support - Year 1,F990,PF,PART-14,Line 03c(2) Column (B)
+PF_14_POF_SUPPORT_PUB_CY_M1,DOUBLE,0,1995-2023,0.199129403276793,Year 1,Public Support Type - Year 1,F990,PF,PART-14,Line 03c(2) Column (B)
+PF_14_POF_SUPPORT_PUB_CY_M2,DOUBLE,0,1995-2023,0.1873896847254,Year 2,Public Support - Year 2,F990,PF,PART-14,Line 03c(2) Column (C)
+PF_14_POF_SUPPORT_PUB_CY_M2,DOUBLE,0,1995-2023,0.1873896847254,Year 2,Public Support Type - Year 2,F990,PF,PART-14,Line 03c(2) Column (C)
+PF_14_POF_SUPPORT_PUB_CY_M3,DOUBLE,0,1995-2023,0.174646888956008,Year 3,Public Support - Year 3,F990,PF,PART-14,Line 03c(2) Column (D)
+PF_14_POF_SUPPORT_PUB_CY_M3,DOUBLE,0,1995-2023,0.174646888956008,Year 3,Public Support Type - Year 3,F990,PF,PART-14,Line 03c(2) Column (D)
+PF_14_POF_SUPPORT_PUB_TOT,DOUBLE,0,1995-2023,0.266929993011895,Total,Public Support - Total,F990,PF,PART-14,Line 03c(2) Column (E)
+PF_14_POF_SUPPORT_PUB_TOT,DOUBLE,0,1995-2023,0.266929993011895,Total,Public Support Type - Total,F990,PF,PART-14,Line 03c(2) Column (E)
+PF_14_POF_SUPPORT_INVEST_CY,DOUBLE,0,1995-2023,0.16940859681757,Current Year,Gross Investment Income - Current Year,F990,PF,PART-14,Line 03c(4) Column (A)
+PF_14_POF_SUPPORT_INVEST_CY,DOUBLE,0,1995-2023,0.16940859681757,Current Year,Gross Investment Income Grp - Current Year,F990,PF,PART-14,Line 03c(4) Column (A)
+PF_14_POF_SUPPORT_INVEST_PY_Y1,INTEGER,0,1995-2020,0.2285458703986,,,,,,
+PF_14_POF_SUPPORT_INVEST_PY_Y2,INTEGER,0,1995-2020,0.223287292849606,,,,,,
+PF_14_POF_SUPPORT_INVEST_PY_Y3,INTEGER,0,1995-2020,0.215139386976988,,,,,,
+PF_14_POF_SUPPORT_INVEST_TOT,DOUBLE,0,1995-2023,0.232899669616085,Total,Gross Investment Income - Total,F990,PF,PART-14,Line 03c(4) Column (E)
+PF_14_POF_SUPPORT_INVEST_TOT,DOUBLE,0,1995-2023,0.232899669616085,Total,Gross Investment Income Grp - Total,F990,PF,PART-14,Line 03c(4) Column (E)
+IRS_DOC_ID,BIGINT,0,1997-2011,84.3176913705099,,,,,,
+IRS_EO_STATUS_CODE,VARCHAR,0,1995-2023,0.00190679891466629,,,,,,
+IRS_DOC_CODE,INTEGER,0,2005-2009,0.000534890935738203,,,,,,
+NAICS,VARCHAR,0,2009-2020,0.0167657786506628,,,,,,
+PF_00_FMV_ASSET_EOY,DOUBLE,0,1995-2023,72.2374171747931,Fair market value of all assets at end of year,Fair market value of all assets at end of year,F990,PF,PART-00,Section I
+PF_00_FMV_ASSET_EOY,DOUBLE,0,1995-2023,72.2374171747931,Fair market value of all assets at end of year,Fair market value of all assets at end of year,F990,PF,PART-00,Section I
+F9_00_TAX_YEAR,INTEGER,0,1995-2023,0.00291299204857206,,,,,,
+IRS_OPRTNG_FND_CD,VARCHAR,0,1995-2023,0.00020807086061229,,,,,,
+IRS_SUBSECTION_CODE,INTEGER,0,1995-2023,0.00020807086061229,,,,,,
+PF_01_REV_LESS_COST_GOODS_SOLD,DOUBLE,0,1995-2023,0.729912579027914,Cost of Goods Sold,Cost of Goods Sold,F990,PF,PART-01,Line 10b
+PF_01_REV_LESS_COST_GOODS_SOLD,DOUBLE,0,1995-2023,0.729912579027914,Cost of Goods Sold,Cost of Goods Sold,F990,PF,PART-01,Line 10b
+PF_02_LIAB_MTG_NOTE_EOY_BV,DOUBLE,0,1995-2023,0.729704508167302,Book Value,Mortgages and Notes Payable - End of Year - Book Value,F990,PF,PART-02,Line 21 Column (B)
+PF_02_LIAB_MTG_NOTE_EOY_BV,DOUBLE,0,1995-2023,0.729704508167302,Book Value,Mortgages and Notes Payable - End of Year - Book Value,F990,PF,PART-02,Line 21 Column (B)
+PF_02_NAFB_TOT_LIAB_NAFB_EOY_BV,DOUBLE,0,1995-2023,72.3970075248827,Book Value,Total Liabilities and Net Assets - End of Year - Book Value,F990,PF,PART-02,Line 31 Column (B)
+PF_02_NAFB_TOT_LIAB_NAFB_EOY_BV,DOUBLE,0,1995-2023,72.3970075248827,Book Value,Total Liabilities and Net Assets - End of Year - Book Value,F990,PF,PART-02,Line 31 Column (B)
+PF_06_EXCISE_TAX_INVEST_INCOME,DOUBLE,0,1995-2023,5.22101806991389,amount,Investment Income Excise Tax - amount,F990,PF,PART-06,Line 01
+PF_06_EXCISE_TAX_INVEST_INCOME,DOUBLE,0,1995-2023,5.22101806991389,amount,Investment Income Excise Tax - amount,F990,PF,PART-06,Line 01
+PF_05_4940E_4942_TAX_LIABLE_X,VARCHAR,0,1995-2023,0.00020807086061229,Liable for 4942 Tax?,Liable for 4942 Tax?,F990,PF,PART-05,Line 00
+PF_05_4940E_4942_TAX_LIABLE_X,VARCHAR,0,1995-2023,0.00020807086061229,Liable for 4942 Tax?,Liable for 4942 Tax?,F990,PF,PART-05,Line 00
+PF_07_LTD_X,VARCHAR,0,1995-2023,0.00020807086061229,Termination; etc.?,Termination; etc.?,F990,PF,PART-07-A,Line 05
+PF_07_LTD_X,VARCHAR,0,1995-2023,0.00020807086061229,Termination; etc.?,Termination; etc.?,F990,PF,PART-07-A,Line 05
+PF_07_4720_INCOME_UNDIST_PY_1,VARCHAR,0,1995-2023,0.00020807086061229,Undistributed Income Prior Year 1,Undistributed Income Prior Year 1,F990,PF,PART-07-B,Line 02a
+PF_07_4720_INCOME_UNDIST_PY_1,VARCHAR,0,1995-2023,0.00020807086061229,Undistributed Income Prior Year 1,Undistributed Income Prior Year 1,F990,PF,PART-07-B,Line 02a
+PF_07_4720_BIZ_HOLDING_EXCESS_X,VARCHAR,0,1995-2023,0.00020807086061229,Excess Business Holdings?,Excess Business Holdings?,F990,PF,PART-07-B,Line 03b
+PF_07_4720_BIZ_HOLDING_EXCESS_X,VARCHAR,0,1995-2023,0.00020807086061229,Excess Business Holdings?,Excess Business Holdings?,F990,PF,PART-07-B,Line 03b
+PF_14_POF_SUPPORT_INVEST_CY_M1,INTEGER,0,1995-2023,0.231790938722091,Year 1,Gross Investment Income - Year 1,F990,PF,PART-14,Line 03c(4) Column (B)
+PF_14_POF_SUPPORT_INVEST_CY_M1,INTEGER,0,1995-2023,0.231790938722091,Year 1,Gross Investment Income Grp - Year 1,F990,PF,PART-14,Line 03c(4) Column (B)
+PF_14_POF_SUPPORT_INVEST_CY_M2,DOUBLE,0,1995-2023,0.231790938722091,Year 2,Gross Investment Income - Year 2,F990,PF,PART-14,Line 03c(4) Column (C)
+PF_14_POF_SUPPORT_INVEST_CY_M2,DOUBLE,0,1995-2023,0.231790938722091,Year 2,Gross Investment Income Grp - Year 2,F990,PF,PART-14,Line 03c(4) Column (C)
+PF_14_POF_SUPPORT_INVEST_CY_M3,DOUBLE,0,1995-2023,0.234079718188826,Year 3,Gross Investment Income - Year 3,F990,PF,PART-14,Line 03c(4) Column (D)
+PF_14_POF_SUPPORT_INVEST_CY_M3,DOUBLE,0,1995-2023,0.234079718188826,Year 3,Gross Investment Income Grp - Year 3,F990,PF,PART-14,Line 03c(4) Column (D)
+PF_17_TRANSFER_OTH_ASSET_X,VARCHAR,0,1995-2023,0.00020807086061229,Transfers of other assets to noncharitable EO,Transfers of other assets to noncharitable EO,F990,PF,PART-17,Line 01a(2)
+PF_17_TRANSFER_OTH_ASSET_X,VARCHAR,0,1995-2023,0.00020807086061229,Transfers of other assets to noncharitable EO,Transfers of other assets to noncharitable EO,F990,PF,PART-17,Line 01a(2)
+IRS_SCHED_B_IND,VARCHAR,0,1997-2023; 1995,0.000231947793190709,,,,,,
+PF_01_REV_SALE_GRO_PRICE,DOUBLE,0,1997-2023; 1995,45.2460560177115,Gross Sales Price,Gross Sales Price,F990,PF,PART-01,Line 06b
+PF_01_REV_SALE_GRO_PRICE,DOUBLE,0,1997-2023; 1995,45.2460560177115,Gross Sales Price,Gross Sales Price,F990,PF,PART-01,Line 06b
+PF_01_EXP_PENSION_EMPL_BOOKS,DOUBLE,0,1997-2023; 1995,3.34214350411302,Revenue and Expenses per Books,Pension Plans; Employee Benefits - Revenue and Expenses per Books,F990,PF,PART-01,Line 15 Column (A)
+PF_01_EXP_PENSION_EMPL_BOOKS,DOUBLE,0,1997-2023; 1995,3.34214350411302,Revenue and Expenses per Books,Pension Plans; Employee Benefits - Revenue and Expenses per Books,F990,PF,PART-01,Line 15 Column (A)
+PF_01_EXP_LEGAL_BEN_BOOKS,DOUBLE,0,1997-2023; 1995,3.48340003780758,Revenue and Expenses per Books,Legal Fees - Revenue and Expenses per Books,F990,PF,PART-01,Line 16a Column (A)
+PF_01_EXP_LEGAL_BEN_BOOKS,DOUBLE,0,1997-2023; 1995,3.48340003780758,Revenue and Expenses per Books,Legal Fees - Revenue and Expenses per Books,F990,PF,PART-01,Line 16a Column (A)
+PF_01_EXP_ACC_FEE_BOOKS,DOUBLE,0,1997-2023; 1995,3.9446338691346,Revenue and Expenses per Books,Accounting Fees - Revenue and Expenses per Books,F990,PF,PART-01,Line 16b Column (A)
+PF_01_EXP_ACC_FEE_BOOKS,DOUBLE,0,1997-2023; 1995,3.9446338691346,Revenue and Expenses per Books,Accounting Fees - Revenue and Expenses per Books,F990,PF,PART-01,Line 16b Column (A)
+PF_01_EXP_INT_BOOKS,DOUBLE,0,1997-2023; 1995,1.67745033116423,Revenue and Expenses per Books,Interest - Revenue and Expenses per Books,F990,PF,PART-01,Line 17 Column (A)
+PF_01_EXP_INT_BOOKS,DOUBLE,0,1997-2023; 1995,1.67745033116423,Revenue and Expenses per Books,Interest - Revenue and Expenses per Books,F990,PF,PART-01,Line 17 Column (A)
+PF_01_EXP_DEPREC_BOOKS,DOUBLE,0,1997-2023; 1995,3.40279799271914,Revenue and Expenses per Books,Depreciation and Depletion - Revenue and Expenses per Books,F990,PF,PART-01,Line 19 Column (A)
+PF_01_EXP_DEPREC_BOOKS,DOUBLE,0,1997-2023; 1995,3.40279799271914,Revenue and Expenses per Books,Depreciation and Depletion - Revenue and Expenses per Books,F990,PF,PART-01,Line 19 Column (A)
+PF_01_EXP_OCCUPANCY_BOOKS,DOUBLE,0,1997-2023; 1995,3.77692627066947,Revenue and Expenses per Books,Occupancy - Revenue and Expenses per Books,F990,PF,PART-01,Line 20 Column (A)
+PF_01_EXP_OCCUPANCY_BOOKS,DOUBLE,0,1997-2023; 1995,3.77692627066947,Revenue and Expenses per Books,Occupancy - Revenue and Expenses per Books,F990,PF,PART-01,Line 20 Column (A)
+PF_01_EXP_TRAVEL_CONF_BOOKS,DOUBLE,0,1997-2023; 1995,3.36649417462442,Revenue and Expenses per Books,Travel; Conferences; and Meetings - Revenue and Expenses per Books,F990,PF,PART-01,Line 21 Column (A)
+PF_01_EXP_TRAVEL_CONF_BOOKS,DOUBLE,0,1997-2023; 1995,3.36649417462442,Revenue and Expenses per Books,Travel; Conferences; and Meetings - Revenue and Expenses per Books,F990,PF,PART-01,Line 21 Column (A)
+PF_01_EXP_PRINT_PUBLICA_BOOKS,INTEGER,0,1997-2023; 1995,1.18502539837172,Revenue and Expenses per Books,Printing and Publications - Revenue and Expenses per Books,F990,PF,PART-01,Line 22 Column (A)
+PF_01_EXP_PRINT_PUBLICA_BOOKS,INTEGER,0,1997-2023; 1995,1.18502539837172,Revenue and Expenses per Books,Printing and Publications - Revenue and Expenses per Books,F990,PF,PART-01,Line 22 Column (A)
+PF_02_ASSET_OTH_EOY_BV,DOUBLE,0,1997-2023; 1995,6.29284580208269,Book Value,Other Assets - End of Year - Book Value,F990,PF,PART-02,Line 15 Column (B)
+PF_02_ASSET_OTH_EOY_BV,DOUBLE,0,1997-2023; 1995,6.29284580208269,Book Value,Other Assets - End of Year - Book Value,F990,PF,PART-02,Line 15 Column (B)
+PF_02_LIAB_OTH_EOY_BV,DOUBLE,0,1997-2023; 1995,3.73656730784843,Book Value,Other Liabilities - End of Year - Book Value,F990,PF,PART-02,Line 22 Column (B)
+PF_02_LIAB_OTH_EOY_BV,DOUBLE,0,1997-2023; 1995,3.73656730784843,Book Value,Other Liabilities - End of Year - Book Value,F990,PF,PART-02,Line 22 Column (B)
+PF_04_CAP_GAINLOSS_NET_INCOME,DOUBLE,0,1997-2023; 1995,29.4856673659893,Capital Gain Net Income,Capital Gain Net Income,F990,PF,PART-04,Line 02
+PF_04_CAP_GAINLOSS_NET_INCOME,DOUBLE,0,1997-2023; 1995,29.4856673659893,Capital Gain Net Income,Capital Gain Net Income,F990,PF,PART-04,Line 02
+PF_06_EXCISE_TAX_DUE,DOUBLE,0,1997-2023; 1995,2.07430911450451,Tax Due,Excise Tax Based On Investment Incm - Tax Due,F990,PF,PART-06,Line 09
+PF_06_EXCISE_TAX_DUE,DOUBLE,0,1997-2023; 1995,2.07430911450451,Tax Due,Excise Tax Based On Invst Incm Grp - Tax Due,F990,PF,PART-06,Line 09
+PF_06_EXCISE_TAX_OVERPAY,DOUBLE,0,1997-2023; 1995,4.23861397276701,Overpayment,Excise Tax Based On Investment Incm - Overpayment,F990,PF,PART-06,Line 10
+PF_06_EXCISE_TAX_OVERPAY,DOUBLE,0,1997-2023; 1995,4.23861397276701,Overpayment,Excise Tax Based On Invst Incm Grp - Overpayment,F990,PF,PART-06,Line 10
+PF_07_ACT_NOT_PREVIOUSLY_REP_X,VARCHAR,0,1997-2023; 1995,0.000231947793190709,Activities Not Previously Reported?,Activities Not Previously Reported?,F990,PF,PART-07-A,Line 02
+PF_07_ACT_NOT_PREVIOUSLY_REP_X,VARCHAR,0,1997-2023; 1995,0.000231947793190709,Activities Not Previously Reported?,Activities Not Previously Reported?,F990,PF,PART-07-A,Line 02
+PF_07_CHANGE_ARTICLE_BYLAW_X,VARCHAR,0,1997-2023; 1995,0.000231947793190709,Changes to Articles or Bylaws?,Changes to Articles or Bylaws?,F990,PF,PART-07-A,Line 03
+PF_07_CHANGE_ARTICLE_BYLAW_X,VARCHAR,0,1997-2023; 1995,0.000231947793190709,Changes to Articles or Bylaws?,Changes to Articles or Bylaws?,F990,PF,PART-07-A,Line 03
+PF_07_UBIZ_INCOME_FORM_990_T_X,VARCHAR,0,1997-2023; 1995,0.000231947793190709,Form 990-T Filed?,Form 990-T Filed?,F990,PF,PART-07-A,Line 04b
+PF_07_UBIZ_INCOME_FORM_990_T_X,VARCHAR,0,1997-2023; 1995,0.000231947793190709,Form 990-T Filed?,Form 990-T Filed?,F990,PF,PART-07-A,Line 04b
+PF_07_FORM_990_PF_ATTORNEY_X,VARCHAR,0,1997-2023; 1995,0.000231947793190709,Form 990-PF Filed with Attorney General?,Form 990-PF Filed with Attorney General?,F990,PF,PART-07-A,Line 08b
+PF_07_FORM_990_PF_ATTORNEY_X,VARCHAR,0,1997-2023; 1995,0.000231947793190709,Form 990-PF Filed with Attorney General?,Form 990-PF Filed with Attorney General?,F990,PF,PART-07-A,Line 08b
+PF_07_NEW_SBST_CONTRIBUTOR_X,VARCHAR,0,1997-2023; 1995,0.000231947793190709,New Substantial Contributors?,New Substantial Contributors?,F990,PF,PART-07-A,Line 10
+PF_07_NEW_SBST_CONTRIBUTOR_X,VARCHAR,0,1997-2023; 1995,0.000231947793190709,New Substantial Contributors?,New Substantial Contributors?,F990,PF,PART-07-A,Line 10
+PF_07_DAF_X,VARCHAR,0,1997-2023; 1995,0.000263413336353806,Did Ihe organization acquire a direct or indirect interest in any applicable insurance contract?,Did Ihe organization acquire a direct or indirect interest in any applicable insurance contract?,F990,PF,PART-07-A,Line 12
+PF_07_COMPLY_PUB_INSPECTION_X,VARCHAR,0,1997-2023; 1995,0.000231947793190709,Comply with Public Inspection Requirements?,Comply with Public Inspection Requirements?,F990,PF,PART-07-A,Line 13
+PF_07_COMPLY_PUB_INSPECTION_X,VARCHAR,0,1997-2023; 1995,0.000231947793190709,Comply with Public Inspection Requirements?,Comply with Public Inspection Requirements?,F990,PF,PART-07-A,Line 13
+PF_07_4947_FORM_990_PF_1041_X,VARCHAR,0,1997-2023; 1995,0.000231947793190709,Section 4947(a)(1) Nonexempt Charitable Trusts Filing in lieu of Form 1041,Section 4947(a)(1) Nonexempt Charitable Trusts Filing in lieu of Form 1041,F990,PF,PART-07-A,Line 15
+PF_07_4947_FORM_990_PF_1041_X,VARCHAR,0,1997-2023; 1995,0.000231947793190709,Section 4947(a)(1) Nonexempt Charitable Trusts Filing in lieu of Form 1041,Section 4947(a)(1) Nonexempt Charitable Trusts Filing in lieu of Form 1041,F990,PF,PART-07-A,Line 15
+PF_07_4720_ACT_FAIL_EXCEPTION_X,VARCHAR,0,1997-2023; 1995,0.000231947793190709,Any Acts Fail to Qualify as Exceptions?,Any Acts Fail to Qualify as Exceptions?,F990,PF,PART-07-B,Line 01bi
+PF_07_4720_ACT_FAIL_EXCEPTION_X,VARCHAR,0,1997-2023; 1995,0.000231947793190709,Any Acts Fail to Qualify as Exceptions?,Any Acts Fail to Qualify as Exceptions?,F990,PF,PART-07-B,Line 01bi
+PF_07_4720_ACT_UNCORRECTED_X,VARCHAR,0,1997-2023; 1995,0.000231947793190709,Uncorrected Prior Acts?,Uncorrected Prior Acts?,F990,PF,PART-07-B,Line 01c
+PF_07_4720_ACT_UNCORRECTED_X,VARCHAR,0,1997-2023; 1995,0.000231947793190709,Uncorrected Prior Acts?,Uncorrected Prior Acts?,F990,PF,PART-07-B,Line 01c
+PF_07_4720_INCOME_UNDIST_N_APP_X,VARCHAR,0,1997-2023; 1995,0.000231947793190709,Undistributed Income 4942(a)(2) Not Applied?,Undistributed Income 4942(a)(2) Not Applied?,F990,PF,PART-07-B,Line 02b
+PF_07_4720_INCOME_UNDIST_N_APP_X,VARCHAR,0,1997-2023; 1995,0.000231947793190709,Undistributed Income 4942(a)(2) Not Applied?,Undistributed Income 4942(a)(2) Not Applied?,F990,PF,PART-07-B,Line 02b
+PF_07_4720_INVEST_UNCORRECTED_X,VARCHAR,0,1997-2023; 1995,0.000231947793190709,Uncorrected Jeopardy Investments?,Uncorrected Jeopardy Investments?,F990,PF,PART-07-B,Line 04b
+PF_07_4720_INVEST_UNCORRECTED_X,VARCHAR,0,1997-2023; 1995,0.000231947793190709,Uncorrected Jeopardy Investments?,Uncorrected Jeopardy Investments?,F990,PF,PART-07-B,Line 04b
+PF_07_4720_PAY_FAIL_EXCEPTION_X,VARCHAR,0,1997-2023; 1995,0.000231947793190709,Any Transactions Fail to Qualify as Exceptions?,Any Transactions Fail to Qualify as Exceptions?,F990,PF,PART-07-B,Line 05b
+PF_07_4720_PAY_FAIL_EXCEPTION_X,VARCHAR,0,1997-2023; 1995,0.000231947793190709,Any Transactions Fail to Qualify as Exceptions?,Any Transactions Fail to Qualify as Exceptions?,F990,PF,PART-07-B,Line 05b
+PF_07_4720_REC_FUND_PAY_X,VARCHAR,0,1997-2023; 1995,0.000231947793190709,Receive Funds to Pay Premiums on a Personal Benefit Contract?,Receive Funds to Pay Premiums on a Personal Benefit Contract?,F990,PF,PART-07-B,Line 06a
+PF_07_4720_REC_FUND_PAY_X,VARCHAR,0,1997-2023; 1995,0.000231947793190709,Receive Funds to Pay Premiums on a Personal Benefit Contract?,Receive Funds to Pay Premiums on a Personal Benefit Contract?,F990,PF,PART-07-B,Line 06a
+PF_07_4720_PAY_PREMIUM_KONTR_X,VARCHAR,0,1997-2023; 1995,0.000231947793190709,Pay Premiums on a Personal Benefit Contract?,Pay Premiums on a Personal Benefit Contract?,F990,PF,PART-07-B,Line 06b
+PF_07_4720_PAY_PREMIUM_KONTR_X,VARCHAR,0,1997-2023; 1995,0.000231947793190709,Pay Premiums on a Personal Benefit Contract?,Pay Premiums on a Personal Benefit Contract?,F990,PF,PART-07-B,Line 06b
+PF_10_ASSET_NOCHARIT_NET,DOUBLE,0,1997-2023; 1995,69.3961928045072,Net Noncharitable Assets,Net Noncharitable Assets,F990,PF,PART-10,Line 05
+PF_10_ASSET_NOCHARIT_NET,DOUBLE,0,1997-2023; 1995,69.3961928045072,Net Noncharitable Assets,Net Noncharitable Assets,F990,PF,PART-10,Line 05
+PF_15_G_FUTURE_AMT_TOT,DOUBLE,0,1997-2023; 1995,1.48017484224651,Total Grant or Contribution Approved for Future Payment,Total Grant or Contribution Approved for Future Payment,F990,PF,PART-15,Line 03b Column 05 Tot
+PF_15_G_FUTURE_AMT_TOT,DOUBLE,0,1997-2023; 1995,1.48017484224651,Total Grant or Contribution Approved for Future Payment,Total Grant or Contribution Approved for Future Payment,F990,PF,PART-15,Line 03b Column 05 Tot
+PF_15_G_FUTURE_AMT_TOT,DOUBLE,0,1997-2023; 1995,1.48017484224651,Total Grant or Contribution Approved for Future Payment,Total Grant or Contribution Approved for Future Payment,F990,PF,PART-15,Line 03b Column 05 Tot
+PF_16_REV_PROG_EXCL_AMT_A,DOUBLE,0,1997-2023; 1995,0.288659028625837,,,,,,
+PF_16_REV_PROG_RLTD_A,DOUBLE,0,1997-2023; 1995,1.61470456229712,,,,,,
+PF_16_REV_PROG_EXCL_AMT_B,INTEGER,0,1997-2023; 1995,0.0932430128626649,,,,,,
+PF_16_REV_PROG_RLTD_B,DOUBLE,0,1997-2023; 1995,0.555051069105366,,,,,,
+PF_16_REV_PROG_EXCL_AMT_C,INTEGER,0,1997-2023; 1995,0.0418665766709229,,,,,,
+PF_16_REV_PROG_RLTD_C,DOUBLE,0,1997-2023; 1995,0.278569299622041,,,,,,
+PF_16_REV_PROG_EXCL_AMT_D,INTEGER,0,1997-2023; 1995,0.0236586749054523,,,,,,
+PF_16_REV_PROG_RLTD_D,DOUBLE,0,1997-2023; 1995,0.14253191891569,,,,,,
+PF_16_REV_PROG_EXCL_AMT_E,INTEGER,0,1997-2023; 1995,0.0122932330391076,,,,,,
+PF_16_REV_PROG_RLTD_E,DOUBLE,0,1997-2023; 1995,0.0759629022699571,,,,,,
+PF_16_REV_PROG_EXCL_AMT_F,INTEGER,0,1997-2023; 1995,0.00695843379572126,,,,,,
+PF_16_REV_PROG_RLTD_F,INTEGER,0,1997-2023; 1995,0.0372276208071087,,,,,,
+PF_16_REV_PROG_FEES_EXCL_AMT,INTEGER,0,1997-2023; 1995,0.00765427717529339,Excluded by section 512; 513; or 514: Amount,Excluded by section 512; 513; or 514: Amount,F990,PF,PART-16-A,Line 01g Column (D)
+PF_16_REV_PROG_FEES_EXCL_AMT,INTEGER,0,1997-2023; 1995,0.00765427717529339,Excluded by section 512; 513; or 514: Amount,Excluded by section 512; 513; or 514: Amount,F990,PF,PART-16-A,Line 01g Column (D)
+PF_16_REV_PROG_FEES_RLTD,DOUBLE,0,1997-2023; 1995,0.0272538656999083,Related or exempt function income,Related or exempt function income,F990,PF,PART-16-A,Line 01g Column (E)
+PF_16_REV_PROG_FEES_RLTD,DOUBLE,0,1997-2023; 1995,0.0272538656999083,Related or exempt function income,Related or exempt function income,F990,PF,PART-16-A,Line 01g Column (E)
+PF_16_REV_MEMBSHIP_DUE_EXCL_AMT,INTEGER,0,1997-2023; 1995,0.0788622496848409,Excluded by section 512; 513; or 514: Amount,Excluded by section 512; 513; or 514: Amount,F990,PF,PART-16-A,Line 02 Column (D)
+PF_16_REV_MEMBSHIP_DUE_EXCL_AMT,INTEGER,0,1997-2023; 1995,0.0788622496848409,Excluded by section 512; 513; or 514: Amount,Excluded by section 512; 513; or 514: Amount,F990,PF,PART-16-A,Line 02 Column (D)
+PF_16_REV_MEMBSHIP_DUE_RLTD,DOUBLE,0,1997-2023; 1995,0.350705063304352,Related or exempt function income,Related or exempt function income,F990,PF,PART-16-A,Line 02 Column (E)
+PF_16_REV_MEMBSHIP_DUE_RLTD,DOUBLE,0,1997-2023; 1995,0.350705063304352,Related or exempt function income,Related or exempt function income,F990,PF,PART-16-A,Line 02 Column (E)
+PF_16_REV_INT_SAVING_EXCL_AMT,DOUBLE,0,1997-2023; 1995,4.64626221929968,Excluded by section 512; 513; or 514: Amount,Excluded by section 512; 513; or 514: Amount,F990,PF,PART-16-A,Line 03 Column (D)
+PF_16_REV_INT_SAVING_EXCL_AMT,DOUBLE,0,1997-2023; 1995,4.64626221929968,Excluded by section 512; 513; or 514: Amount,Excluded by section 512; 513; or 514: Amount,F990,PF,PART-16-A,Line 03 Column (D)
+PF_16_REV_INT_SAVING_RLTD,INTEGER,0,1997-2023; 1995,1.39470208045573,Related or exempt function income,Related or exempt function income,F990,PF,PART-16-A,Line 03 Column (E)
+PF_16_REV_INT_SAVING_RLTD,INTEGER,0,1997-2023; 1995,1.39470208045573,Related or exempt function income,Related or exempt function income,F990,PF,PART-16-A,Line 03 Column (E)
+PF_16_REV_DIVIDEND_SEC_EXCL_AMT,DOUBLE,0,1997-2023; 1995,20.6977453514763,Excluded by section 512; 513; or 514: Amount,Excluded by section 512; 513; or 514: Amount,F990,PF,PART-16-A,Line 04 Column (D)
+PF_16_REV_DIVIDEND_SEC_EXCL_AMT,DOUBLE,0,1997-2023; 1995,20.6977453514763,Excluded by section 512; 513; or 514: Amount,Excluded by section 512; 513; or 514: Amount,F990,PF,PART-16-A,Line 04 Column (D)
+PF_16_REV_DIVIDEND_SEC_RLTD,DOUBLE,0,1997-2023; 1995,4.23930981614658,Related or exempt function income,Related or exempt function income,F990,PF,PART-16-A,Line 04 Column (E)
+PF_16_REV_DIVIDEND_SEC_RLTD,DOUBLE,0,1997-2023; 1995,4.23930981614658,Related or exempt function income,Related or exempt function income,F990,PF,PART-16-A,Line 04 Column (E)
+PF_17_TRANSFER_CASH_X,VARCHAR,0,1997-2023; 1995,0.000231947793190709,Transfers of cash to noncharitable EO,Transfers of cash to noncharitable EO,F990,PF,PART-17,Line 01a(1)
+PF_17_TRANSFER_CASH_X,VARCHAR,0,1997-2023; 1995,0.000231947793190709,Transfers of cash to noncharitable EO,Transfers of cash to noncharitable EO,F990,PF,PART-17,Line 01a(1)
+PF_17_TRANSAC_SALE_ASSET_X,VARCHAR,0,1997-2023; 1995,0.000231947793190709,Other transactions : Sales or exchanges of assets with a noncharitable exempt organization,Other transactions : Sales or exchanges of assets with a noncharitable exempt organization,F990,PF,PART-17,Line 01b(1)
+PF_17_TRANSAC_SALE_ASSET_X,VARCHAR,0,1997-2023; 1995,0.000231947793190709,Other transactions : Sales or exchanges of assets with a noncharitable exempt organization,Other transactions : Sales or exchanges of assets with a noncharitable exempt organization,F990,PF,PART-17,Line 01b(1)
+PF_17_TRANSAC_PURCHASE_ASSET_X,VARCHAR,0,1997-2023; 1995,0.000231947793190709,Other transactions : Purchases of assets from a noncharitable exempt organization,Other transactions : Purchases of assets from a noncharitable exempt organization,F990,PF,PART-17,Line 01b(2)
+PF_17_TRANSAC_PURCHASE_ASSET_X,VARCHAR,0,1997-2023; 1995,0.000231947793190709,Other transactions : Purchases of assets from a noncharitable exempt organization,Other transactions : Purchases of assets from a noncharitable exempt organization,F990,PF,PART-17,Line 01b(2)
+PF_17_TRANSAC_RENT_FACILITIES_X,VARCHAR,0,1997-2023; 1995,0.000231947793190709,Other transactions : Rental of facilities; equipment; or other assets,Other transactions : Rental of facilities; equipment; or other assets,F990,PF,PART-17,Line 01b(3)
+PF_17_TRANSAC_RENT_FACILITIES_X,VARCHAR,0,1997-2023; 1995,0.000231947793190709,Other transactions : Rental of facilities; equipment; or other assets,Other transactions : Rental of facilities; equipment; or other assets,F990,PF,PART-17,Line 01b(3)
+PF_17_TRANSAC_REIMBURSE_X,VARCHAR,0,1997-2023; 1995,0.000231947793190709,Other transactions : Reimbursement arrangements,Other transactions : Reimbursement arrangements,F990,PF,PART-17,Line 01b(4)
+PF_17_TRANSAC_REIMBURSE_X,VARCHAR,0,1997-2023; 1995,0.000231947793190709,Other transactions : Reimbursement arrangements,Other transactions : Reimbursement arrangements,F990,PF,PART-17,Line 01b(4)
+PF_17_TRANSAC_LOAN_X,VARCHAR,0,1997-2023; 1995,0.000231947793190709,Other transactions : Loans or loan guarantees,Other transactions : Loans or loan guarantees,F990,PF,PART-17,Line 01b(5)
+PF_17_TRANSAC_LOAN_X,VARCHAR,0,1997-2023; 1995,0.000231947793190709,Other transactions : Loans or loan guarantees,Other transactions : Loans or loan guarantees,F990,PF,PART-17,Line 01b(5)
+PF_17_TRANSAC_PERFORM_SVC_X,VARCHAR,0,1997-2023; 1995,0.000231947793190709,Other transactions : Performance of Services or membership or fundraising solicitations,Other transactions : Performance of Services or membership or fundraising solicitations,F990,PF,PART-17,Line 01b(6)
+PF_17_TRANSAC_PERFORM_SVC_X,VARCHAR,0,1997-2023; 1995,0.000231947793190709,Other transactions : Performance of Services or membership or fundraising solicitations,Other transactions : Performance of Services or membership or fundraising solicitations,F990,PF,PART-17,Line 01b(6)
+PF_17_TRANSAC_SHARE_FACILITIES_X,VARCHAR,0,1997-2023; 1995,0.000231947793190709,Other transactions : Sharing of facilities; equipment; mailing lists; other assets; or paid employees,Other transactions : Sharing of facilities; equipment; mailing lists; other assets; or paid employees,F990,PF,PART-17,Line 01c
+PF_17_TRANSAC_SHARE_FACILITIES_X,VARCHAR,0,1997-2023; 1995,0.000231947793190709,Other transactions : Sharing of facilities; equipment; mailing lists; other assets; or paid employees,Other transactions : Sharing of facilities; equipment; mailing lists; other assets; or paid employees,F990,PF,PART-17,Line 01c
+IRS_EFILE_INDICATOR,VARCHAR,0,2000-2023,0.00036025715155478,,,,,,

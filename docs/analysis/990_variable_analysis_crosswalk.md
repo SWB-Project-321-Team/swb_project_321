@@ -1,5 +1,7 @@
 # 990 Variable Analysis Crosswalk
 
+> **Status reviewed 2026-07-23:** mappings refer to current local code and retained `2022-2024` artifacts. Former S3 artifact names are lineage identifiers, not active locations.
+
 This crosswalk maps the nonprofit-related analysis questions in the current draft to the 990-family
 source package in this repo.
 

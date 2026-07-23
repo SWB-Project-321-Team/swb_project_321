@@ -1,5 +1,7 @@
 # NCCS e-Postcard 990 Pipeline
 
+> **Infrastructure status (2026-07-23):** public-source discovery and local processing remain documented, but the former project S3 bucket was intentionally deleted. Upload and S3 verification steps are historical and must not recreate `swb-321-irs990-teos`.
+
 Pipeline for official NCCS 990-N e-Postcard monthly snapshots.
 
 This path:
@@ -48,8 +50,8 @@ python python/run_nccs_990_postcard.py
 - `01_data/staging/nccs_990/postcard/nccs_990_postcard_analysis_variables.parquet`
 - `01_data/staging/nccs_990/postcard/nccs_990_postcard_analysis_geography_metrics.parquet`
 - `01_data/raw/nccs_990/postcard/metadata/nccs_990_postcard_analysis_variable_coverage.csv`
-- `docs/final_preprocessing_docs/technical_docs/analysis_variable_mappings/nccs_990_postcard_analysis_variable_mapping.md`
-- `docs/final_preprocessing_docs/technical_docs/pipeline_docs/nccs_990_postcard_pipeline.md`
+- `docs/deliverables/preprocessing/technical_reference/variable_mappings/nccs_990_postcard_analysis_variable_mapping.md`
+- `docs/deliverables/preprocessing/technical_reference/pipelines/nccs_990_postcard_pipeline.md`
 
 ## S3 layout
 

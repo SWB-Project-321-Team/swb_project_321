@@ -267,8 +267,9 @@ def all_metadata_files(*, include_verification: bool = True) -> list[Path]:
     return union_metadata_files(include_verification=include_verification) + master_metadata_files()
 
 
-def _find_latest_postcard_input(root: Path = POSTCARD_STAGING_ROOT) -> SourceInput:
+def _find_latest_postcard_input(root: Path | None = None) -> SourceInput:
     """Find the latest postcard benchmark derivative restricted to `tax_year >= 2022`."""
+    root = POSTCARD_STAGING_ROOT if root is None else root
     candidates = sorted(root.glob("snapshot_year=*/nccs_990_postcard_benchmark_tax_year_start=2022_snapshot_year=*.parquet"))
     if not candidates:
         raise FileNotFoundError(f"No postcard tax_year>=2022 benchmark parquet outputs found under {root}")
@@ -285,8 +286,9 @@ def _find_latest_postcard_input(root: Path = POSTCARD_STAGING_ROOT) -> SourceInp
     )
 
 
-def _find_efile_inputs(root: Path = EFILE_STAGING_ROOT) -> list[SourceInput]:
+def _find_efile_inputs(root: Path | None = None) -> list[SourceInput]:
     """Find all annualized NCCS efile benchmark parquets from 2022 onward."""
+    root = EFILE_STAGING_ROOT if root is None else root
     candidates = sorted(root.glob("tax_year=*/nccs_efile_benchmark_tax_year=*.parquet"))
     if not candidates:
         raise FileNotFoundError(f"No annualized NCCS efile benchmark outputs found under {root}")
@@ -311,8 +313,9 @@ def _find_efile_inputs(root: Path = EFILE_STAGING_ROOT) -> list[SourceInput]:
     return inputs
 
 
-def _find_bmf_inputs(root: Path = BMF_STAGING_ROOT) -> list[SourceInput]:
+def _find_bmf_inputs(root: Path | None = None) -> list[SourceInput]:
     """Find the filtered yearly NCCS BMF parquet outputs from 2022-present."""
+    root = BMF_STAGING_ROOT if root is None else root
     candidates = sorted(root.glob("year=*/nccs_bmf_benchmark_year=*.parquet"))
     if not candidates:
         raise FileNotFoundError(f"No filtered NCCS BMF outputs found under {root}")
@@ -345,7 +348,7 @@ def _find_bmf_inputs(root: Path = BMF_STAGING_ROOT) -> list[SourceInput]:
     return inputs
 
 
-def discover_bmf_exact_year_lookup_inputs(root: Path = BMF_STAGING_ROOT) -> dict[str, Path]:
+def discover_bmf_exact_year_lookup_inputs(root: Path | None = None) -> dict[str, Path]:
     """
     Discover the upstream exact-year BMF lookup artifacts used for overlay.
 
@@ -353,6 +356,7 @@ def discover_bmf_exact_year_lookup_inputs(root: Path = BMF_STAGING_ROOT) -> dict
     enrichment artifacts that let the combined build overlay exact-year
     identity/classification fields without resorting to master-only rescue logic.
     """
+    root = BMF_STAGING_ROOT if root is None else root
     candidates = sorted(root.glob("year=*/nccs_bmf_exact_year_lookup_year=*.parquet"))
     if not candidates:
         raise FileNotFoundError(f"No exact-year NCCS BMF lookup outputs found under {root}")

@@ -304,8 +304,10 @@ def ensure_output_dirs(
     results_figures_dir = results_dir / "figures"
     client_assets_dir = results_dir / "client_notebook_assets"
     resolved_docs_dir = docs_dir or default_docs_dir()
-    docs_assets_dir = resolved_docs_dir / "assets" / "section3_q9_2022"
-    docs_presentation_path = resolved_docs_dir / "Section3_Q9_2022_Client_Presentation.md"
+    docs_assets_dir = resolved_docs_dir / "analysis" / "revenue_sources" / "assets" / "q9_2022"
+    docs_presentation_path = (
+        resolved_docs_dir / "analysis" / "revenue_sources" / "q9_2022_client_presentation.md"
+    )
     tables_dir.mkdir(parents=True, exist_ok=True)
     figures_dir.mkdir(parents=True, exist_ok=True)
     results_tables_dir.mkdir(parents=True, exist_ok=True)
@@ -3446,7 +3448,7 @@ def build_2022_full_answer_slide_lines(
             "### What this presentation tested",
             "",
             "- **Question:** Do Black Hills nonprofits differ from Billings, Flagstaff, Sioux Falls, and Missoula in how they draw revenue from each source?",
-            "- **Year:** 2022 only (see `docs/Section3_Q9_Analysis.md` for the full multi-year analysis and additional statistical framings).",
+            "- **Year:** 2022 only (see `docs/analysis/revenue_sources/q9_analysis.md` for the full multi-year analysis and additional statistical framings).",
             "- **Unit:** Organization-level reported dollars per source, not regional aggregate totals or stacked-bar percentages.",
             "- **Comparison:** Black Hills vs each benchmark region separately (four pairwise tests per source).",
             f"- **Statistic:** Permutation test on the median difference among organizations with a **positive** value for that source ({PERMUTATION_ITERATIONS_2022:,} reshuffles); 95% percentile bootstrap CI on the same median gap ({BOOTSTRAP_ITERATIONS_2022:,} resamples). Slide bullets report medians for those reporters only.",
@@ -3498,7 +3500,7 @@ def build_2022_full_answer_slide_lines(
             "1. **Revenue-source patterns are not the same everywhere.** Several 2022 pairwise comparisons show statistically significant differences in dollar amounts among organizations that actually use a given source.",
             "2. **Black Hills is often lower among reporters, not universally higher.** Where this deck finds significance, the usual pattern is a **lower median among Black Hills reporters** than in the benchmark region being compared (for example program service revenue vs Flagstaff, government grants vs Flagstaff, fundraising events vs Billings and Sioux Falls, other revenue vs Billings and Sioux Falls).",
             "3. **Participation and dollars can tell different stories.** Black Hills sometimes has **more organizations reporting** a source (higher nonzero rate) while still showing a **lower median among reporters** on that same source. See `client_2022_pairwise_presentation_summary.csv` for reporting rates; do not describe a significant median gap as proof of higher participation without checking the rate.",
-            "4. **This deck does not replace the full Q9 report.** The broader analysis in `docs/Section3_Q9_Analysis.md` covers additional tax years and alternative statistical framings. Use this presentation for 2022 pairwise, conditional-dollar comparisons.",
+            "4. **This deck does not replace the full Q9 report.** The broader analysis in `docs/analysis/revenue_sources/q9_analysis.md` covers additional tax years and alternative statistical framings. Use this presentation for 2022 pairwise, conditional-dollar comparisons.",
             "",
             "### One-sentence takeaway",
             "",
@@ -3512,7 +3514,7 @@ def build_2022_full_answer_slide_lines(
         )
     else:
         lines.append(
-            "> **Under this 2022 positive-reporter permutation test on the median gap, no pairwise comparison reached p < 0.05; refer to `docs/Section3_Q9_Analysis.md` for the full multi-year, all-filer Q9 conclusion.**"
+            "> **Under this 2022 positive-reporter permutation test on the median gap, no pairwise comparison reached p < 0.05; refer to `docs/analysis/revenue_sources/q9_analysis.md` for the full multi-year, all-filer Q9 conclusion.**"
         )
     lines.append("")
     return lines
@@ -3526,7 +3528,7 @@ def write_2022_client_presentation_markdown(
     full_universe_frame: pd.DataFrame | None = None,
     special_org_sensitivity_comparison: pd.DataFrame | None = None,
     special_org_exclusion_summary: pd.DataFrame | None = None,
-    image_dir_relative: str = "assets/section3_q9_2022",
+    image_dir_relative: str = "assets/q9_2022",
 ) -> None:
     """Write slide-ready Markdown for the 2022 Q9 client presentation."""
 

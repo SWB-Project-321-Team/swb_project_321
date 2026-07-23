@@ -1,5 +1,7 @@
 # NCCS BMF Deliverable Brief
 
+> **Status reviewed 2026-07-23:** source roles and field mappings reflect current local code and retained `2022-2024` artifacts. Former S3 targets are historical and inactive.
+
 ## Purpose In The Analysis
 
 NCCS BMF is the primary census, classification, geography, and reference-total source for the current

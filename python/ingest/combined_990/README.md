@@ -1,5 +1,7 @@
 # Combined Filtered 990 Union + Master Pipeline
 
+> **Infrastructure status (2026-07-23):** local union-building remains documented, but the former project S3 bucket was intentionally deleted. Upload and S3 parity steps are historical and must not recreate `swb-321-irs990-teos`.
+
 This pipeline builds two outputs from already-filtered inputs:
 - GivingTuesday benchmark filings
 - NCCS postcard benchmark output restricted to `tax_year >= 2022`

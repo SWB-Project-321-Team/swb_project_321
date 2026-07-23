@@ -1,34 +1,24 @@
-# docs/
+# Documentation
 
-Project documentation (methodology, data sources, structure, and decisions). Lives in the repo with the code.
+Documentation is grouped by purpose so planning material, technical references, analysis outputs, and client deliverables do not get mixed together.
 
-## Core (top-level)
+| Directory | Contents |
+| --- | --- |
+| [`planning/`](planning/) | Analysis plans and the project scope/variable checklist |
+| [`analysis/`](analysis/) | Source assessments, schema questions, and analysis results |
+| [`analysis/revenue_sources/`](analysis/revenue_sources/) | Section 3/Q9 analysis, presentation, and chart assets |
+| [`data_sources/`](data_sources/) | IRS 990, IRS SOI, and USAspending source notes |
+| [`infrastructure/`](infrastructure/) | S3 snapshots, OneDrive setup, and infrastructure audits |
+| [`deliverables/preprocessing/`](deliverables/preprocessing/) | Client guides and technical preprocessing references |
+| [`deliverables/final_report/`](deliverables/final_report/) | Source, working, published, review-note, and supporting report artifacts |
 
-| Doc | Description |
-|-----|--------------|
-| [methodology.md](methodology.md) | Analytical approach, definitions, and assumptions. |
-| [data_sources.md](data_sources.md) | Data sources, provenance, and refresh. |
-| [benchmark_regions.md](benchmark_regions.md) | How benchmark regions are chosen and where outputs live. |
-| [decisions.md](decisions.md) | Architecture and process decisions (ADRs or notes). |
-| [project_purpose_methods_data_sources_variables.md](project_purpose_methods_data_sources_variables.md) | Project purpose, scope, deliverables, variable checklist (client-facing overview). |
+## Key files
 
-## By topic
+- [Project scope and variables](planning/project_scope_and_variables.md)
+- [Analysis plan draft](planning/analysis_plan_draft.md)
+- [Final report workflow](deliverables/final_report/README.md)
+- [S3 decommissioning status and historical snapshots](infrastructure/s3/README.md)
+- [Last confirmed S3 bucket snapshot (2026-05-02)](infrastructure/s3/bucket_tree_2026-05-02.md)
+- [OneDrive structure](infrastructure/onedrive/structure.md)
 
-### [onedrive/](onedrive/) — Data location and setup
-
-| Doc | Description |
-|-----|--------------|
-| [OneDrive_Structure.md](onedrive/OneDrive_Structure.md) | How OneDrive and GitHub fit together; folder layout and medallion rules. |
-| [ONEDRIVE_LOCAL_SETUP.md](onedrive/ONEDRIVE_LOCAL_SETUP.md) | Local OneDrive sync and project folder setup. |
-
-### [990/](990/) — Form 990 and IRS pipeline
-
-| Doc | Description |
-|-----|--------------|
-| [990_irs_teos_s3_plan.md](990/990_irs_teos_s3_plan.md) | IRS TEOS 990 XML → S3 streaming plan; bucket layout; scripts 01–03. |
-| [990_data_fetch_plan.md](990/990_data_fetch_plan.md) | Plan to fetch 990 data (GivingTuesday, BMF, EIN list, ZIP–county). |
-| [990_api_403_investigation.md](990/990_api_403_investigation.md) | GivingTuesday API 403 investigation and workarounds. |
-
----
-
-Data-specific docs (e.g. data dictionary, limitations) live in OneDrive `03_docs/` next to the data.
+Raw and curated data remain outside the repository. Documentation metadata and small fixtures are the only data-like artifacts that should be committed here.

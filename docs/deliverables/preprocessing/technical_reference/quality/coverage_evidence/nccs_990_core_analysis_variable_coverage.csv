@@ -1,0 +1,82 @@
+tax_year,core_scope,canonical_variable,variable_role,row_count,populated_row_count,fill_rate,notes
+2022,pc,analysis_total_revenue_amount,direct,111,111,1.0,"PZ/PC revenue totals and PF books revenue are kept separate upstream, then harmonized here."
+2022,pc,analysis_total_expense_amount,direct,111,111,1.0,Expense totals come directly from the filtered Core benchmark files.
+2022,pc,analysis_total_assets_amount,direct,111,111,1.0,Uses EOY total assets for PC/PZ and PF book-value total assets.
+2022,pc,analysis_net_asset_amount,direct,111,111,1.0,Net-asset or fund-balance concept remains source-faithful.
+2022,pc,analysis_calculated_surplus_amount,calculated,111,111,1.0,PZ and PF carry direct surplus-like fields; PC falls back to revenue minus expense.
+2022,pc,analysis_calculated_net_margin_ratio,calculated,111,110,0.990990990990991,"Null when revenue is missing, zero, or negative."
+2022,pc,analysis_calculated_cleaned_net_margin_ratio,calculated,111,110,0.990990990990991,Convenience field that suppresses tiny-denominator and extreme-ratio outliers while preserving the raw ratio separately.
+2022,pc,analysis_calculated_months_of_reserves,calculated,111,111,1.0,Only calculated when expense is present and positive.
+2022,pc,analysis_program_service_revenue_amount,direct,111,111,1.0,Promoted draft-aligned Core program-service revenue field.
+2022,pc,analysis_program_service_revenue_candidate_amount,direct,111,111,1.0,Source-faithful supporting field retained alongside the promoted draft-aligned variable.
+2022,pc,analysis_calculated_total_contributions_amount,direct,111,111,1.0,Promoted draft-aligned total-contributions field from the best available Core contribution concept.
+2022,pc,analysis_contribution_candidate_amount,direct,111,111,1.0,Source-faithful supporting field retained alongside the promoted draft-aligned variable.
+2022,pc,analysis_gifts_grants_received_candidate_amount,direct,111,111,1.0,Kept distinct from contribution and grants-paid concepts.
+2022,pc,analysis_grants_paid_candidate_amount,calculated,111,111,1.0,Distinct grant-paid concept preserved for analysts.
+2022,pc,analysis_ntee_code,enriched,111,111,1.0,Classification enrichment only; unresolved rows remain explicitly unknown rather than blank.
+2022,pc,analysis_subsection_code,enriched,111,111,1.0,Supports political-organization classification.
+2022,pc,analysis_calculated_ntee_broad_code,calculated,111,98,0.8828828828828829,Broad field code for field-composition analyses.
+2022,pc,analysis_is_hospital,proxy,111,111,1.0,Source-backed hospital flag used before name-based imputation.
+2022,pc,analysis_is_university,proxy,111,111,1.0,Source-backed university flag used before name-based imputation.
+2022,pc,analysis_is_political_org,proxy,111,111,1.0,Source-backed political proxy used before name-based imputation.
+2022,pc,analysis_imputed_is_hospital,imputed,111,111,1.0,Complete exclusion-ready hospital flag.
+2022,pc,analysis_imputed_is_university,imputed,111,111,1.0,Complete exclusion-ready university flag.
+2022,pc,analysis_imputed_is_political_org,imputed,111,111,1.0,Complete exclusion-ready political flag.
+2022,pc,analysis_other_contributions_amount,unavailable,111,0,0.0,Unavailable by design.
+2022,pc,analysis_calculated_grants_total_amount,unavailable,111,0,0.0,Use the distinct candidate fields instead.
+2022,pc,analysis_foundation_grants_amount,unavailable,111,0,0.0,Unavailable by design.
+2022,pc,analysis_government_grants_amount,unavailable,111,0,0.0,Unavailable by design.
+2022,pf,analysis_total_revenue_amount,direct,304,304,1.0,"PZ/PC revenue totals and PF books revenue are kept separate upstream, then harmonized here."
+2022,pf,analysis_total_expense_amount,direct,304,304,1.0,Expense totals come directly from the filtered Core benchmark files.
+2022,pf,analysis_total_assets_amount,direct,304,304,1.0,Uses EOY total assets for PC/PZ and PF book-value total assets.
+2022,pf,analysis_net_asset_amount,direct,304,304,1.0,Net-asset or fund-balance concept remains source-faithful.
+2022,pf,analysis_calculated_surplus_amount,calculated,304,304,1.0,PZ and PF carry direct surplus-like fields; PC falls back to revenue minus expense.
+2022,pf,analysis_calculated_net_margin_ratio,calculated,304,284,0.9342105263157895,"Null when revenue is missing, zero, or negative."
+2022,pf,analysis_calculated_cleaned_net_margin_ratio,calculated,304,242,0.7960526315789473,Convenience field that suppresses tiny-denominator and extreme-ratio outliers while preserving the raw ratio separately.
+2022,pf,analysis_calculated_months_of_reserves,calculated,304,304,1.0,Only calculated when expense is present and positive.
+2022,pf,analysis_program_service_revenue_amount,direct,304,304,1.0,Promoted draft-aligned Core program-service revenue field.
+2022,pf,analysis_program_service_revenue_candidate_amount,direct,304,304,1.0,Source-faithful supporting field retained alongside the promoted draft-aligned variable.
+2022,pf,analysis_calculated_total_contributions_amount,direct,304,304,1.0,Promoted draft-aligned total-contributions field from the best available Core contribution concept.
+2022,pf,analysis_contribution_candidate_amount,direct,304,304,1.0,Source-faithful supporting field retained alongside the promoted draft-aligned variable.
+2022,pf,analysis_gifts_grants_received_candidate_amount,direct,304,0,0.0,Kept distinct from contribution and grants-paid concepts.
+2022,pf,analysis_grants_paid_candidate_amount,calculated,304,303,0.9967105263157895,Distinct grant-paid concept preserved for analysts.
+2022,pf,analysis_ntee_code,enriched,304,304,1.0,Classification enrichment only; unresolved rows remain explicitly unknown rather than blank.
+2022,pf,analysis_subsection_code,enriched,304,304,1.0,Supports political-organization classification.
+2022,pf,analysis_calculated_ntee_broad_code,calculated,304,290,0.9539473684210527,Broad field code for field-composition analyses.
+2022,pf,analysis_is_hospital,proxy,304,304,1.0,Source-backed hospital flag used before name-based imputation.
+2022,pf,analysis_is_university,proxy,304,304,1.0,Source-backed university flag used before name-based imputation.
+2022,pf,analysis_is_political_org,proxy,304,304,1.0,Source-backed political proxy used before name-based imputation.
+2022,pf,analysis_imputed_is_hospital,imputed,304,304,1.0,Complete exclusion-ready hospital flag.
+2022,pf,analysis_imputed_is_university,imputed,304,304,1.0,Complete exclusion-ready university flag.
+2022,pf,analysis_imputed_is_political_org,imputed,304,304,1.0,Complete exclusion-ready political flag.
+2022,pf,analysis_other_contributions_amount,unavailable,304,0,0.0,Unavailable by design.
+2022,pf,analysis_calculated_grants_total_amount,unavailable,304,0,0.0,Use the distinct candidate fields instead.
+2022,pf,analysis_foundation_grants_amount,unavailable,304,0,0.0,Unavailable by design.
+2022,pf,analysis_government_grants_amount,unavailable,304,0,0.0,Unavailable by design.
+2022,pz,analysis_total_revenue_amount,direct,192,192,1.0,"PZ/PC revenue totals and PF books revenue are kept separate upstream, then harmonized here."
+2022,pz,analysis_total_expense_amount,direct,192,192,1.0,Expense totals come directly from the filtered Core benchmark files.
+2022,pz,analysis_total_assets_amount,direct,192,192,1.0,Uses EOY total assets for PC/PZ and PF book-value total assets.
+2022,pz,analysis_net_asset_amount,direct,192,192,1.0,Net-asset or fund-balance concept remains source-faithful.
+2022,pz,analysis_calculated_surplus_amount,calculated,192,192,1.0,PZ and PF carry direct surplus-like fields; PC falls back to revenue minus expense.
+2022,pz,analysis_calculated_net_margin_ratio,calculated,192,191,0.9947916666666666,"Null when revenue is missing, zero, or negative."
+2022,pz,analysis_calculated_cleaned_net_margin_ratio,calculated,192,189,0.984375,Convenience field that suppresses tiny-denominator and extreme-ratio outliers while preserving the raw ratio separately.
+2022,pz,analysis_calculated_months_of_reserves,calculated,192,192,1.0,Only calculated when expense is present and positive.
+2022,pz,analysis_program_service_revenue_amount,direct,192,192,1.0,Promoted draft-aligned Core program-service revenue field.
+2022,pz,analysis_program_service_revenue_candidate_amount,direct,192,192,1.0,Source-faithful supporting field retained alongside the promoted draft-aligned variable.
+2022,pz,analysis_calculated_total_contributions_amount,direct,192,192,1.0,Promoted draft-aligned total-contributions field from the best available Core contribution concept.
+2022,pz,analysis_contribution_candidate_amount,direct,192,192,1.0,Source-faithful supporting field retained alongside the promoted draft-aligned variable.
+2022,pz,analysis_gifts_grants_received_candidate_amount,direct,192,192,1.0,Kept distinct from contribution and grants-paid concepts.
+2022,pz,analysis_grants_paid_candidate_amount,calculated,192,111,0.578125,Distinct grant-paid concept preserved for analysts.
+2022,pz,analysis_ntee_code,enriched,192,192,1.0,Classification enrichment only; unresolved rows remain explicitly unknown rather than blank.
+2022,pz,analysis_subsection_code,enriched,192,192,1.0,Supports political-organization classification.
+2022,pz,analysis_calculated_ntee_broad_code,calculated,192,175,0.9114583333333334,Broad field code for field-composition analyses.
+2022,pz,analysis_is_hospital,proxy,192,192,1.0,Source-backed hospital flag used before name-based imputation.
+2022,pz,analysis_is_university,proxy,192,192,1.0,Source-backed university flag used before name-based imputation.
+2022,pz,analysis_is_political_org,proxy,192,192,1.0,Source-backed political proxy used before name-based imputation.
+2022,pz,analysis_imputed_is_hospital,imputed,192,192,1.0,Complete exclusion-ready hospital flag.
+2022,pz,analysis_imputed_is_university,imputed,192,192,1.0,Complete exclusion-ready university flag.
+2022,pz,analysis_imputed_is_political_org,imputed,192,192,1.0,Complete exclusion-ready political flag.
+2022,pz,analysis_other_contributions_amount,unavailable,192,0,0.0,Unavailable by design.
+2022,pz,analysis_calculated_grants_total_amount,unavailable,192,0,0.0,Use the distinct candidate fields instead.
+2022,pz,analysis_foundation_grants_amount,unavailable,192,0,0.0,Unavailable by design.
+2022,pz,analysis_government_grants_amount,unavailable,192,0,0.0,Unavailable by design.

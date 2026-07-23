@@ -1,0 +1,5 @@
+state_code,source_url,local_path,source_content_length_bytes,source_content_type,source_last_modified,local_size_bytes
+az,https://www.irs.gov/pub/irs-soi/eo_az.csv,C:\Users\eilke\Desktop\Github Repo\swb_project_321\data\321_Black_Hills_Area_Community_Foundation_2025_08\01_data\raw\irs_bmf\eo_az.csv,,text/csv,"Mon, 09 Mar 2026 04:11:00 GMT",5263962
+mn,https://www.irs.gov/pub/irs-soi/eo_mn.csv,C:\Users\eilke\Desktop\Github Repo\swb_project_321\data\321_Black_Hills_Area_Community_Foundation_2025_08\01_data\raw\irs_bmf\eo_mn.csv,,text/csv,"Mon, 09 Mar 2026 04:11:29 GMT",6877718
+mt,https://www.irs.gov/pub/irs-soi/eo_mt.csv,C:\Users\eilke\Desktop\Github Repo\swb_project_321\data\321_Black_Hills_Area_Community_Foundation_2025_08\01_data\raw\irs_bmf\eo_mt.csv,,text/csv,"Mon, 09 Mar 2026 04:11:33 GMT",2084020
+sd,https://www.irs.gov/pub/irs-soi/eo_sd.csv,C:\Users\eilke\Desktop\Github Repo\swb_project_321\data\321_Black_Hills_Area_Community_Foundation_2025_08\01_data\raw\irs_bmf\eo_sd.csv,,text/csv,"Mon, 09 Mar 2026 04:11:53 GMT",1253270

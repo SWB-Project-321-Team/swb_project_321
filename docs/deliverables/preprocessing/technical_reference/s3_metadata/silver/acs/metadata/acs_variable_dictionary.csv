@@ -1,0 +1,30 @@
+variable,description
+NAME,Geographic Area Name
+B01003_001E,Estimate!!Total
+B19013_001E,Estimate!!Median household income in the past 12 months (in 2024 inflation-adjusted dollars)
+B23025_003E,Estimate!!Total:!!In labor force:!!Civilian labor force:
+B23025_004E,Estimate!!Total:!!In labor force:!!Civilian labor force:!!Employed
+B23025_005E,Estimate!!Total:!!In labor force:!!Civilian labor force:!!Unemployed
+B02001_004E,Estimate!!Total:!!American Indian and Alaska Native alone
+state,State
+county,County
+S1902_C01_001E,Estimate!!Number!!HOUSEHOLD INCOME!!All households
+S2402_C01_001E,"Estimate!!Total!!Full-time, year-round civilian employed population 16 years and over"
+S2402_C01_002E,"Estimate!!Total!!Full-time, year-round civilian employed population 16 years and over!!Management, business, science, and arts occupations:"
+S2402_C01_026E,"Estimate!!Total!!Full-time, year-round civilian employed population 16 years and over!!Sales and office occupations:"
+S2402_C01_029E,"Estimate!!Total!!Full-time, year-round civilian employed population 16 years and over!!Natural resources, construction, and maintenance occupations:"
+S2402_C01_033E,"Estimate!!Total!!Full-time, year-round civilian employed population 16 years and over!!Production, transportation, and material moving occupations:"
+DP03_0002E,Estimate!!EMPLOYMENT STATUS!!Population 16 years and over!!In labor force
+DP03_0006E,Estimate!!EMPLOYMENT STATUS!!Population 16 years and over!!In labor force!!Armed Forces
+DP03_0064E,Estimate!!INCOME AND BENEFITS (IN 2024 INFLATION-ADJUSTED DOLLARS)!!Total households!!With earnings
+DP03_0052E,"Estimate!!INCOME AND BENEFITS (IN 2024 INFLATION-ADJUSTED DOLLARS)!!Total households!!Less than $10,000"
+DP03_0053E,"Estimate!!INCOME AND BENEFITS (IN 2024 INFLATION-ADJUSTED DOLLARS)!!Total households!!$10,000 to $14,999"
+DP03_0054E,"Estimate!!INCOME AND BENEFITS (IN 2024 INFLATION-ADJUSTED DOLLARS)!!Total households!!$15,000 to $24,999"
+DP03_0055E,"Estimate!!INCOME AND BENEFITS (IN 2024 INFLATION-ADJUSTED DOLLARS)!!Total households!!$25,000 to $34,999"
+DP03_0056E,"Estimate!!INCOME AND BENEFITS (IN 2024 INFLATION-ADJUSTED DOLLARS)!!Total households!!$35,000 to $49,999"
+DP03_0057E,"Estimate!!INCOME AND BENEFITS (IN 2024 INFLATION-ADJUSTED DOLLARS)!!Total households!!$50,000 to $74,999"
+DP03_0058E,"Estimate!!INCOME AND BENEFITS (IN 2024 INFLATION-ADJUSTED DOLLARS)!!Total households!!$75,000 to $99,999"
+DP03_0059E,"Estimate!!INCOME AND BENEFITS (IN 2024 INFLATION-ADJUSTED DOLLARS)!!Total households!!$100,000 to $149,999"
+DP03_0060E,"Estimate!!INCOME AND BENEFITS (IN 2024 INFLATION-ADJUSTED DOLLARS)!!Total households!!$150,000 to $199,999"
+DP03_0061E,"Estimate!!INCOME AND BENEFITS (IN 2024 INFLATION-ADJUSTED DOLLARS)!!Total households!!$200,000 or more"
+DP03_0068E,Estimate!!INCOME AND BENEFITS (IN 2024 INFLATION-ADJUSTED DOLLARS)!!Total households!!With retirement income

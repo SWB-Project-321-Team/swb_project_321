@@ -1,0 +1,58 @@
+canonical_variable,availability_status,variable_role,draft_variable,tax_year,row_count,populated_count,fill_rate,notes
+analysis_ntee_code,available,enriched,NTEE filed classification code,all,2938,2806,0.955071477195371,Classification enrichment only.
+analysis_ntee_code,available,enriched,NTEE filed classification code,2022,208,197,0.9471153846153846,Classification enrichment only.
+analysis_ntee_code,available,enriched,NTEE filed classification code,2023,511,485,0.949119373776908,Classification enrichment only.
+analysis_ntee_code,available,enriched,NTEE filed classification code,2024,2219,2124,0.957187922487607,Classification enrichment only.
+analysis_calculated_ntee_broad_code,available,calculated,Broad NTEE field classification code,all,2938,2806,0.955071477195371,Broad NTEE field category.
+analysis_calculated_ntee_broad_code,available,calculated,Broad NTEE field classification code,2022,208,197,0.9471153846153846,Broad NTEE field category.
+analysis_calculated_ntee_broad_code,available,calculated,Broad NTEE field classification code,2023,511,485,0.949119373776908,Broad NTEE field category.
+analysis_calculated_ntee_broad_code,available,calculated,Broad NTEE field classification code,2024,2219,2124,0.957187922487607,Broad NTEE field category.
+analysis_subsection_code,available,enriched,Subsection code,all,2938,2896,0.9857045609257998,Supports political-organization classification.
+analysis_subsection_code,available,enriched,Subsection code,2022,208,202,0.9711538461538461,Supports political-organization classification.
+analysis_subsection_code,available,enriched,Subsection code,2023,511,505,0.9882583170254403,Supports political-organization classification.
+analysis_subsection_code,available,enriched,Subsection code,2024,2219,2189,0.9864803965750338,Supports political-organization classification.
+analysis_is_hospital,available,proxy,Hospital flag,all,2938,2806,0.955071477195371,Source-backed classification proxy.
+analysis_is_hospital,available,proxy,Hospital flag,2022,208,197,0.9471153846153846,Source-backed classification proxy.
+analysis_is_hospital,available,proxy,Hospital flag,2023,511,485,0.949119373776908,Source-backed classification proxy.
+analysis_is_hospital,available,proxy,Hospital flag,2024,2219,2124,0.957187922487607,Source-backed classification proxy.
+analysis_is_university,available,proxy,University flag,all,2938,2806,0.955071477195371,Source-backed classification proxy.
+analysis_is_university,available,proxy,University flag,2022,208,197,0.9471153846153846,Source-backed classification proxy.
+analysis_is_university,available,proxy,University flag,2023,511,485,0.949119373776908,Source-backed classification proxy.
+analysis_is_university,available,proxy,University flag,2024,2219,2124,0.957187922487607,Source-backed classification proxy.
+analysis_is_political_org,available,proxy,Political organization flag,all,2938,2896,0.9857045609257998,Source-backed classification proxy.
+analysis_is_political_org,available,proxy,Political organization flag,2022,208,202,0.9711538461538461,Source-backed classification proxy.
+analysis_is_political_org,available,proxy,Political organization flag,2023,511,505,0.9882583170254403,Source-backed classification proxy.
+analysis_is_political_org,available,proxy,Political organization flag,2024,2219,2189,0.9864803965750338,Source-backed classification proxy.
+analysis_imputed_is_hospital,available,proxy,Hospital flag,all,2938,2938,1.0,Complete analysis-ready hospital flag.
+analysis_imputed_is_hospital,available,proxy,Hospital flag,2022,208,208,1.0,Complete analysis-ready hospital flag.
+analysis_imputed_is_hospital,available,proxy,Hospital flag,2023,511,511,1.0,Complete analysis-ready hospital flag.
+analysis_imputed_is_hospital,available,proxy,Hospital flag,2024,2219,2219,1.0,Complete analysis-ready hospital flag.
+analysis_imputed_is_university,available,proxy,University flag,all,2938,2938,1.0,Complete analysis-ready university flag.
+analysis_imputed_is_university,available,proxy,University flag,2022,208,208,1.0,Complete analysis-ready university flag.
+analysis_imputed_is_university,available,proxy,University flag,2023,511,511,1.0,Complete analysis-ready university flag.
+analysis_imputed_is_university,available,proxy,University flag,2024,2219,2219,1.0,Complete analysis-ready university flag.
+analysis_imputed_is_political_org,available,proxy,Political organization flag,all,2938,2938,1.0,Complete analysis-ready political flag.
+analysis_imputed_is_political_org,available,proxy,Political organization flag,2022,208,208,1.0,Complete analysis-ready political flag.
+analysis_imputed_is_political_org,available,proxy,Political organization flag,2023,511,511,1.0,Complete analysis-ready political flag.
+analysis_imputed_is_political_org,available,proxy,Political organization flag,2024,2219,2219,1.0,Complete analysis-ready political flag.
+analysis_gross_receipts_under_25000,available,direct,Gross receipts under $25K flag,all,2938,2938,1.0,Small-filer support field.
+analysis_gross_receipts_under_25000,available,direct,Gross receipts under $25K flag,2022,208,208,1.0,Small-filer support field.
+analysis_gross_receipts_under_25000,available,direct,Gross receipts under $25K flag,2023,511,511,1.0,Small-filer support field.
+analysis_gross_receipts_under_25000,available,direct,Gross receipts under $25K flag,2024,2219,2219,1.0,Small-filer support field.
+analysis_terminated,available,direct,Terminated flag,all,2938,2938,1.0,Entity status support field.
+analysis_terminated,available,direct,Terminated flag,2022,208,208,1.0,Entity status support field.
+analysis_terminated,available,direct,Terminated flag,2023,511,511,1.0,Entity status support field.
+analysis_terminated,available,direct,Terminated flag,2024,2219,2219,1.0,Entity status support field.
+analysis_is_small_filer_support,available,direct,Small-filer support flag,all,2938,2938,1.0,Documents that postcard is being used only as a small-filer support layer.
+analysis_is_small_filer_support,available,direct,Small-filer support flag,2022,208,208,1.0,Documents that postcard is being used only as a small-filer support layer.
+analysis_is_small_filer_support,available,direct,Small-filer support flag,2023,511,511,1.0,Documents that postcard is being used only as a small-filer support layer.
+analysis_is_small_filer_support,available,direct,Small-filer support flag,2024,2219,2219,1.0,Documents that postcard is being used only as a small-filer support layer.
+analysis_total_revenue_amount,unavailable,unavailable,Total revenue,all,2938,0,0.0,Postcard does not carry this financial-performance or revenue-source field.
+analysis_program_service_revenue_amount,unavailable,unavailable,Program service revenue,all,2938,0,0.0,Postcard does not carry this financial-performance or revenue-source field.
+analysis_calculated_total_contributions_amount,unavailable,unavailable,Total contributions,all,2938,0,0.0,Postcard does not carry this financial-performance or revenue-source field.
+analysis_calculated_grants_total_amount,unavailable,unavailable,Grants (total amount),all,2938,0,0.0,Postcard does not carry this financial-performance or revenue-source field.
+analysis_total_expense_amount,unavailable,unavailable,Total expense,all,2938,0,0.0,Postcard does not carry this financial-performance or revenue-source field.
+analysis_net_asset_amount,unavailable,unavailable,Net asset,all,2938,0,0.0,Postcard does not carry this financial-performance or revenue-source field.
+analysis_calculated_surplus_amount,unavailable,unavailable,Surplus,all,2938,0,0.0,Postcard does not carry this financial-performance or revenue-source field.
+analysis_calculated_net_margin_ratio,unavailable,unavailable,Net margin,all,2938,0,0.0,Postcard does not carry this financial-performance or revenue-source field.
+analysis_calculated_months_of_reserves,unavailable,unavailable,Months of reserves,all,2938,0,0.0,Postcard does not carry this financial-performance or revenue-source field.

@@ -1,0 +1,58 @@
+canonical_variable,availability_status,variable_role,draft_variable,tax_year,row_count,populated_count,fill_rate,notes
+analysis_total_revenue_amount,available,direct,Total revenue,all,17390,10564,0.60747556066705,Regionwide total-revenue metric.
+analysis_total_revenue_amount,available,direct,Total revenue,2022,5596,1647,0.29431736954967835,Regionwide total-revenue metric.
+analysis_total_revenue_amount,available,direct,Total revenue,2023,5805,4399,0.7577950043066322,Regionwide total-revenue metric.
+analysis_total_revenue_amount,available,direct,Total revenue,2024,5989,4518,0.7543830355652029,Regionwide total-revenue metric.
+analysis_total_assets_amount,available,direct,Total assets,all,17390,13942,0.8017251293847039,Regionwide total-assets metric.
+analysis_total_assets_amount,available,direct,Total assets,2022,5596,4501,0.8043245175125089,Regionwide total-assets metric.
+analysis_total_assets_amount,available,direct,Total assets,2023,5805,4638,0.7989664082687339,Regionwide total-assets metric.
+analysis_total_assets_amount,available,direct,Total assets,2024,5989,4803,0.8019702788445483,Regionwide total-assets metric.
+analysis_total_income_amount,available,direct,Total income,all,17390,13942,0.8017251293847039,Performance support metric for the draft's time-trend notes.
+analysis_total_income_amount,available,direct,Total income,2022,5596,4501,0.8043245175125089,Performance support metric for the draft's time-trend notes.
+analysis_total_income_amount,available,direct,Total income,2023,5805,4638,0.7989664082687339,Performance support metric for the draft's time-trend notes.
+analysis_total_income_amount,available,direct,Total income,2024,5989,4803,0.8019702788445483,Performance support metric for the draft's time-trend notes.
+analysis_ntee_code,available,enriched,NTEE filed classification code,all,17390,16902,0.9719378953421507,Analysis-ready classification support field.
+analysis_ntee_code,available,enriched,NTEE filed classification code,2022,5596,5459,0.975518227305218,Analysis-ready classification support field.
+analysis_ntee_code,available,enriched,NTEE filed classification code,2023,5805,5637,0.9710594315245478,Analysis-ready classification support field.
+analysis_ntee_code,available,enriched,NTEE filed classification code,2024,5989,5806,0.9694439806311571,Analysis-ready classification support field.
+analysis_calculated_ntee_broad_code,available,calculated,Broad NTEE field classification code,all,17390,16902,0.9719378953421507,Broad field representation metric.
+analysis_calculated_ntee_broad_code,available,calculated,Broad NTEE field classification code,2022,5596,5459,0.975518227305218,Broad field representation metric.
+analysis_calculated_ntee_broad_code,available,calculated,Broad NTEE field classification code,2023,5805,5637,0.9710594315245478,Broad field representation metric.
+analysis_calculated_ntee_broad_code,available,calculated,Broad NTEE field classification code,2024,5989,5806,0.9694439806311571,Broad field representation metric.
+analysis_subsection_code,available,enriched,Subsection code,all,17390,17390,1.0,Political-organization support field.
+analysis_subsection_code,available,enriched,Subsection code,2022,5596,5596,1.0,Political-organization support field.
+analysis_subsection_code,available,enriched,Subsection code,2023,5805,5805,1.0,Political-organization support field.
+analysis_subsection_code,available,enriched,Subsection code,2024,5989,5989,1.0,Political-organization support field.
+analysis_is_hospital,available,proxy,Hospital flag,all,17390,16902,0.9719378953421507,Source-backed hospital proxy.
+analysis_is_hospital,available,proxy,Hospital flag,2022,5596,5459,0.975518227305218,Source-backed hospital proxy.
+analysis_is_hospital,available,proxy,Hospital flag,2023,5805,5637,0.9710594315245478,Source-backed hospital proxy.
+analysis_is_hospital,available,proxy,Hospital flag,2024,5989,5806,0.9694439806311571,Source-backed hospital proxy.
+analysis_is_university,available,proxy,University flag,all,17390,16902,0.9719378953421507,Source-backed university proxy.
+analysis_is_university,available,proxy,University flag,2022,5596,5459,0.975518227305218,Source-backed university proxy.
+analysis_is_university,available,proxy,University flag,2023,5805,5637,0.9710594315245478,Source-backed university proxy.
+analysis_is_university,available,proxy,University flag,2024,5989,5806,0.9694439806311571,Source-backed university proxy.
+analysis_is_political_org,available,proxy,Political organization flag,all,17390,17390,1.0,Source-backed political proxy.
+analysis_is_political_org,available,proxy,Political organization flag,2022,5596,5596,1.0,Source-backed political proxy.
+analysis_is_political_org,available,proxy,Political organization flag,2023,5805,5805,1.0,Source-backed political proxy.
+analysis_is_political_org,available,proxy,Political organization flag,2024,5989,5989,1.0,Source-backed political proxy.
+analysis_imputed_is_hospital,available,imputed,Hospital flag,all,17390,17390,1.0,Complete hospital flag for analysis exclusions.
+analysis_imputed_is_hospital,available,imputed,Hospital flag,2022,5596,5596,1.0,Complete hospital flag for analysis exclusions.
+analysis_imputed_is_hospital,available,imputed,Hospital flag,2023,5805,5805,1.0,Complete hospital flag for analysis exclusions.
+analysis_imputed_is_hospital,available,imputed,Hospital flag,2024,5989,5989,1.0,Complete hospital flag for analysis exclusions.
+analysis_imputed_is_university,available,imputed,University flag,all,17390,17390,1.0,Complete university flag for analysis exclusions.
+analysis_imputed_is_university,available,imputed,University flag,2022,5596,5596,1.0,Complete university flag for analysis exclusions.
+analysis_imputed_is_university,available,imputed,University flag,2023,5805,5805,1.0,Complete university flag for analysis exclusions.
+analysis_imputed_is_university,available,imputed,University flag,2024,5989,5989,1.0,Complete university flag for analysis exclusions.
+analysis_imputed_is_political_org,available,imputed,Political organization flag,all,17390,17390,1.0,Complete political-organization flag for analysis exclusions.
+analysis_imputed_is_political_org,available,imputed,Political organization flag,2022,5596,5596,1.0,Complete political-organization flag for analysis exclusions.
+analysis_imputed_is_political_org,available,imputed,Political organization flag,2023,5805,5805,1.0,Complete political-organization flag for analysis exclusions.
+analysis_imputed_is_political_org,available,imputed,Political organization flag,2024,5989,5989,1.0,Complete political-organization flag for analysis exclusions.
+analysis_program_service_revenue_amount,unavailable,unavailable,Program service revenue,all,17390,0,0.0,BMF does not carry this 990-style revenue-source field.
+analysis_calculated_total_contributions_amount,unavailable,unavailable,Total contributions,all,17390,0,0.0,BMF does not carry this 990-style revenue-source field.
+analysis_other_contributions_amount,unavailable,unavailable,Other contributions,all,17390,0,0.0,BMF does not carry this 990-style revenue-source field.
+analysis_calculated_grants_total_amount,unavailable,unavailable,Grants (total amount),all,17390,0,0.0,BMF does not carry this 990-style revenue-source field.
+analysis_total_expense_amount,unavailable,unavailable,Total expense,all,17390,0,0.0,BMF does not carry this expense field.
+analysis_net_asset_amount,unavailable,unavailable,Net asset,all,17390,0,0.0,BMF does not provide a direct net-asset field in the current pipeline.
+analysis_calculated_surplus_amount,unavailable,unavailable,Surplus,all,17390,0,0.0,BMF does not carry a direct revenue-minus-expense surplus field in the current pipeline.
+analysis_calculated_net_margin_ratio,unavailable,unavailable,Net margin,all,17390,0,0.0,BMF cannot calculate net margin without total expenses.
+analysis_calculated_months_of_reserves,unavailable,unavailable,Months of reserves,all,17390,0,0.0,BMF cannot calculate months of reserves without total expenses and a direct net-asset field.

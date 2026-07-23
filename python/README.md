@@ -1,26 +1,27 @@
 # python/
 
-Python code for ingestion, transformation, and export. All scripts should be reproducible and
-assume data lives in OneDrive (paths from env or config).
+Python code for ingestion, transformation, analysis, and export. Active local processing uses the configured data root (normally the project OneDrive location) through environment or repository path helpers.
 
-- **ingest/** - Pull raw data from sources into OneDrive `01_data/raw/`.
+**Infrastructure status as of 2026-07-23:** the former bucket `swb-321-irs990-teos` was intentionally deleted and must not be recreated. S3 upload, download, and parity-check stages remain in the codebase for historical reproducibility but are inactive unless a different, separately approved target is configured.
+
+- **ingest/** - Pull raw data from public sources into the configured local `01_data/raw/`; retained pipelines also document their former S3 publication stages.
 - **transform/** - Orchestrate running SQL staging/curated and writing to OneDrive staging/curated.
 - **export/** - Export CSV/Excel and other deliverables to OneDrive `02_outputs/`.
 - **utils/** - Shared helpers (paths, logging, DB connection, etc.). No data or credentials in repo.
 
-## Run order (ingest)
+## Retained ingest run order
 
-Run from **repo root** (e.g. `cd` to the repo, then run the commands below).
+Run local/public-source stages from the **repo root**. Commands below that upload to or verify S3 describe the former end-to-end workflow and must not be run against the deleted bucket.
 
-**990_irs** (IRS TEOS 990 XML -> S3 -> staging): run **01 -> 02 -> 03**.
+**irs_990** (IRS TEOS 990 XML -> S3 -> staging): run **01 -> 02 -> 03**.
 ```bash
-python python/ingest/990_irs/01_upload_irs_990_index_to_s3.py
-python python/ingest/990_irs/02_upload_irs_990_zips_to_s3.py
-python python/ingest/990_irs/03_parse_irs_990_zips_to_staging.py
+python python/ingest/irs_990/01_upload_irs_990_index_to_s3.py
+python python/ingest/irs_990/02_upload_irs_990_zips_to_s3.py
+python python/ingest/irs_990/03_parse_irs_990_zips_to_staging.py
 ```
-Or use the runner: `python python/run_990_irs.py` (see `ingest/990_irs/README.md` for options).
+Or use the runner: `python python/run_irs_990.py` (see `ingest/irs_990/README.md` for options).
 
-**990_givingtuesday**: run **01 -> 02 -> 03 -> 04**. See `ingest/990_givingtuesday/api/README.md`
+**givingtuesday_990**: run **01 -> 02 -> 03 -> 04**. See `ingest/givingtuesday_990/api/README.md`
 and `ingest/README.md`.
 
 **irs_soi** (IRS SOI county raw -> S3 -> benchmark county CSVs): run **01 -> 06**.
@@ -32,7 +33,7 @@ python python/ingest/irs_soi/04_verify_county_release_source_local_s3.py
 python python/ingest/irs_soi/05_filter_county_release_to_benchmark_local.py
 python python/ingest/irs_soi/06_upload_filtered_county_release_to_s3.py
 ```
-Or use the runner: `python python/run_irs_soi_county.py` (see `ingest/irs_soi/README.md`).
+Or use the runner: `python python/run_irs_soi.py` (see `ingest/irs_soi/README.md`).
 
 **nccs_990_core** (NCCS Core raw + Unified BMF bridge -> S3 -> benchmark county CSVs): run **01 -> 06**.
 ```bash

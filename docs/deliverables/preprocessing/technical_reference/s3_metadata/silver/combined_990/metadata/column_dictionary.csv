@@ -1,0 +1,543 @@
+output_column,column_group,source_family,source_variant,original_column,is_harmonized,is_derived,schema_version,notes
+row_source_family,row_provenance,,,,False,True,1.6.0,Row-level source provenance.
+row_source_variant,row_provenance,,,,False,True,1.6.0,Row-level source provenance.
+row_source_file_name,row_provenance,,,,False,True,1.6.0,Row-level source provenance.
+row_source_file_path,row_provenance,,,,False,True,1.6.0,Row-level source provenance.
+row_source_row_number,row_provenance,,,,False,True,1.6.0,Row-level source provenance.
+row_source_time_basis,row_provenance,,,,False,True,1.6.0,Row-level source provenance.
+row_source_snapshot_year,row_provenance,,,,False,True,1.6.0,Row-level source provenance.
+row_source_snapshot_month,row_provenance,,,,False,True,1.6.0,Row-level source provenance.
+harm_ein,harmonized,,,,True,True,1.6.0,Harmonized field populated from source-specific mappings and optional year-aware BMF overlay.
+harm_tax_year,harmonized,,,,True,True,1.6.0,Harmonized field populated from source-specific mappings and optional year-aware BMF overlay.
+harm_filing_form,harmonized,,,,True,True,1.6.0,Harmonized field populated from source-specific mappings and optional year-aware BMF overlay.
+harm_org_name,harmonized,,,,True,True,1.6.0,Harmonized field populated from source-specific mappings and optional year-aware BMF overlay.
+harm_state,harmonized,,,,True,True,1.6.0,Harmonized field populated from source-specific mappings and optional year-aware BMF overlay.
+harm_zip5,harmonized,,,,True,True,1.6.0,Harmonized field populated from source-specific mappings and optional year-aware BMF overlay.
+harm_county_fips,harmonized,,,,True,True,1.6.0,Harmonized field populated from source-specific mappings and optional year-aware BMF overlay.
+harm_region,harmonized,,,,True,True,1.6.0,Harmonized field populated from source-specific mappings and optional year-aware BMF overlay.
+harm_ntee_code,harmonized,,,,True,True,1.6.0,Harmonized field populated from source-specific mappings and optional year-aware BMF overlay.
+harm_subsection_code,harmonized,,,,True,True,1.6.0,Harmonized field populated from source-specific mappings and optional year-aware BMF overlay.
+harm_revenue_amount,harmonized,,,,True,True,1.6.0,Harmonized field populated from source-specific mappings and optional year-aware BMF overlay.
+harm_expenses_amount,harmonized,,,,True,True,1.6.0,Harmonized field populated from source-specific mappings and optional year-aware BMF overlay.
+harm_assets_amount,harmonized,,,,True,True,1.6.0,Harmonized field populated from source-specific mappings and optional year-aware BMF overlay.
+harm_income_amount,harmonized,,,,True,True,1.6.0,Harmonized field populated from source-specific mappings and optional year-aware BMF overlay.
+harm_gross_receipts_under_25000_flag,harmonized,,,,True,True,1.6.0,Harmonized field populated from source-specific mappings and optional year-aware BMF overlay.
+harm_is_hospital,harmonized,,,,True,True,1.6.0,Harmonized field populated from source-specific mappings and optional year-aware BMF overlay.
+harm_is_university,harmonized,,,,True,True,1.6.0,Harmonized field populated from source-specific mappings and optional year-aware BMF overlay.
+harm_ein__source_family,field_provenance,,,,False,True,1.6.0,Per-harmonized-field provenance.
+harm_ein__source_variant,field_provenance,,,,False,True,1.6.0,Per-harmonized-field provenance.
+harm_ein__source_column,field_provenance,,,,False,True,1.6.0,Per-harmonized-field provenance.
+harm_tax_year__source_family,field_provenance,,,,False,True,1.6.0,Per-harmonized-field provenance.
+harm_tax_year__source_variant,field_provenance,,,,False,True,1.6.0,Per-harmonized-field provenance.
+harm_tax_year__source_column,field_provenance,,,,False,True,1.6.0,Per-harmonized-field provenance.
+harm_filing_form__source_family,field_provenance,,,,False,True,1.6.0,Per-harmonized-field provenance.
+harm_filing_form__source_variant,field_provenance,,,,False,True,1.6.0,Per-harmonized-field provenance.
+harm_filing_form__source_column,field_provenance,,,,False,True,1.6.0,Per-harmonized-field provenance.
+harm_org_name__source_family,field_provenance,,,,False,True,1.6.0,Per-harmonized-field provenance.
+harm_org_name__source_variant,field_provenance,,,,False,True,1.6.0,Per-harmonized-field provenance.
+harm_org_name__source_column,field_provenance,,,,False,True,1.6.0,Per-harmonized-field provenance.
+harm_state__source_family,field_provenance,,,,False,True,1.6.0,Per-harmonized-field provenance.
+harm_state__source_variant,field_provenance,,,,False,True,1.6.0,Per-harmonized-field provenance.
+harm_state__source_column,field_provenance,,,,False,True,1.6.0,Per-harmonized-field provenance.
+harm_zip5__source_family,field_provenance,,,,False,True,1.6.0,Per-harmonized-field provenance.
+harm_zip5__source_variant,field_provenance,,,,False,True,1.6.0,Per-harmonized-field provenance.
+harm_zip5__source_column,field_provenance,,,,False,True,1.6.0,Per-harmonized-field provenance.
+harm_county_fips__source_family,field_provenance,,,,False,True,1.6.0,Per-harmonized-field provenance.
+harm_county_fips__source_variant,field_provenance,,,,False,True,1.6.0,Per-harmonized-field provenance.
+harm_county_fips__source_column,field_provenance,,,,False,True,1.6.0,Per-harmonized-field provenance.
+harm_region__source_family,field_provenance,,,,False,True,1.6.0,Per-harmonized-field provenance.
+harm_region__source_variant,field_provenance,,,,False,True,1.6.0,Per-harmonized-field provenance.
+harm_region__source_column,field_provenance,,,,False,True,1.6.0,Per-harmonized-field provenance.
+harm_ntee_code__source_family,field_provenance,,,,False,True,1.6.0,Per-harmonized-field provenance.
+harm_ntee_code__source_variant,field_provenance,,,,False,True,1.6.0,Per-harmonized-field provenance.
+harm_ntee_code__source_column,field_provenance,,,,False,True,1.6.0,Per-harmonized-field provenance.
+harm_subsection_code__source_family,field_provenance,,,,False,True,1.6.0,Per-harmonized-field provenance.
+harm_subsection_code__source_variant,field_provenance,,,,False,True,1.6.0,Per-harmonized-field provenance.
+harm_subsection_code__source_column,field_provenance,,,,False,True,1.6.0,Per-harmonized-field provenance.
+harm_revenue_amount__source_family,field_provenance,,,,False,True,1.6.0,Per-harmonized-field provenance.
+harm_revenue_amount__source_variant,field_provenance,,,,False,True,1.6.0,Per-harmonized-field provenance.
+harm_revenue_amount__source_column,field_provenance,,,,False,True,1.6.0,Per-harmonized-field provenance.
+harm_expenses_amount__source_family,field_provenance,,,,False,True,1.6.0,Per-harmonized-field provenance.
+harm_expenses_amount__source_variant,field_provenance,,,,False,True,1.6.0,Per-harmonized-field provenance.
+harm_expenses_amount__source_column,field_provenance,,,,False,True,1.6.0,Per-harmonized-field provenance.
+harm_assets_amount__source_family,field_provenance,,,,False,True,1.6.0,Per-harmonized-field provenance.
+harm_assets_amount__source_variant,field_provenance,,,,False,True,1.6.0,Per-harmonized-field provenance.
+harm_assets_amount__source_column,field_provenance,,,,False,True,1.6.0,Per-harmonized-field provenance.
+harm_income_amount__source_family,field_provenance,,,,False,True,1.6.0,Per-harmonized-field provenance.
+harm_income_amount__source_variant,field_provenance,,,,False,True,1.6.0,Per-harmonized-field provenance.
+harm_income_amount__source_column,field_provenance,,,,False,True,1.6.0,Per-harmonized-field provenance.
+harm_gross_receipts_under_25000_flag__source_family,field_provenance,,,,False,True,1.6.0,Per-harmonized-field provenance.
+harm_gross_receipts_under_25000_flag__source_variant,field_provenance,,,,False,True,1.6.0,Per-harmonized-field provenance.
+harm_gross_receipts_under_25000_flag__source_column,field_provenance,,,,False,True,1.6.0,Per-harmonized-field provenance.
+harm_is_hospital__source_family,field_provenance,,,,False,True,1.6.0,Per-harmonized-field provenance.
+harm_is_hospital__source_variant,field_provenance,,,,False,True,1.6.0,Per-harmonized-field provenance.
+harm_is_hospital__source_column,field_provenance,,,,False,True,1.6.0,Per-harmonized-field provenance.
+harm_is_university__source_family,field_provenance,,,,False,True,1.6.0,Per-harmonized-field provenance.
+harm_is_university__source_variant,field_provenance,,,,False,True,1.6.0,Per-harmonized-field provenance.
+harm_is_university__source_column,field_provenance,,,,False,True,1.6.0,Per-harmonized-field provenance.
+org_match_quality,overlay_diagnostic,,,,False,True,1.6.0,Overlay or match-quality diagnostic.
+bmf_overlay_applied,overlay_diagnostic,,,,False,True,1.6.0,Overlay or match-quality diagnostic.
+bmf_overlay_field_count,overlay_diagnostic,,,,False,True,1.6.0,Overlay or match-quality diagnostic.
+bmf_overlay_fields,overlay_diagnostic,,,,False,True,1.6.0,Overlay or match-quality diagnostic.
+harm_revenue_amount_num,numeric_helper,,,,False,True,1.6.0,Parsed numeric helper derived from a harmonized string amount.
+harm_expenses_amount_num,numeric_helper,,,,False,True,1.6.0,Parsed numeric helper derived from a harmonized string amount.
+harm_assets_amount_num,numeric_helper,,,,False,True,1.6.0,Parsed numeric helper derived from a harmonized string amount.
+harm_income_amount_num,numeric_helper,,,,False,True,1.6.0,Parsed numeric helper derived from a harmonized string amount.
+harm_revenue_amount_num_parse_ok,numeric_helper,,,,False,True,1.6.0,Parsed numeric helper derived from a harmonized string amount.
+harm_expenses_amount_num_parse_ok,numeric_helper,,,,False,True,1.6.0,Parsed numeric helper derived from a harmonized string amount.
+harm_assets_amount_num_parse_ok,numeric_helper,,,,False,True,1.6.0,Parsed numeric helper derived from a harmonized string amount.
+harm_income_amount_num_parse_ok,numeric_helper,,,,False,True,1.6.0,Parsed numeric helper derived from a harmonized string amount.
+gt__ACCOFEESTOTA,source_native,givingtuesday_datamart,,ACCOFEESTOTA,False,False,1.6.0,Source-native column preserved with source-family prefix.
+gt__ACTNOTPRERPT,source_native,givingtuesday_datamart,,ACTNOTPRERPT,False,False,1.6.0,Source-native column preserved with source-family prefix.
+gt__ADDRESCHANGE,source_native,givingtuesday_datamart,,ADDRESCHANGE,False,False,1.6.0,Source-native column preserved with source-family prefix.
+gt__ADVERTTOTALO,source_native,givingtuesday_datamart,,ADVERTTOTALO,False,False,1.6.0,Source-native column preserved with source-family prefix.
+gt__AGGAMOJOICOS,source_native,givingtuesday_datamart,,AGGAMOJOICOS,False,False,1.6.0,Source-native column preserved with source-family prefix.
+gt__AIPAMDAAEAMO,source_native,givingtuesday_datamart,,AIPAMDAAEAMO,False,False,1.6.0,Source-native column preserved with source-family prefix.
+gt__AIPAMDAAROEF,source_native,givingtuesday_datamart,,AIPAMDAAROEF,False,False,1.6.0,Source-native column preserved with source-family prefix.
+gt__AIPAMDAAUBIA,source_native,givingtuesday_datamart,,AIPAMDAAUBIA,False,False,1.6.0,Source-native column preserved with source-family prefix.
+gt__ALLOOTHECONT,source_native,givingtuesday_datamart,,ALLOOTHECONT,False,False,1.6.0,Source-native column preserved with source-family prefix.
+gt__AMENDERETURN,source_native,givingtuesday_datamart,,AMENDERETURN,False,False,1.6.0,Source-native column preserved with source-family prefix.
+gt__ANREEXADNEIN,source_native,givingtuesday_datamart,,ANREEXADNEIN,False,False,1.6.0,Source-native column preserved with source-family prefix.
+gt__ANREEXNEININ,source_native,givingtuesday_datamart,,ANREEXNEININ,False,False,1.6.0,Source-native column preserved with source-family prefix.
+gt__ANREEXTOREEX,source_native,givingtuesday_datamart,,ANREEXTOREEX,False,False,1.6.0,Source-native column preserved with source-family prefix.
+gt__ARECDTREXPNS,source_native,givingtuesday_datamart,,ARECDTREXPNS,False,False,1.6.0,Source-native column preserved with source-family prefix.
+gt__ARECGPDCPRPS,source_native,givingtuesday_datamart,,ARECGPDCPRPS,False,False,1.6.0,Source-native column preserved with source-family prefix.
+gt__ARECPREXPNSS,source_native,givingtuesday_datamart,,ARECPREXPNSS,False,False,1.6.0,Source-native column preserved with source-family prefix.
+gt__ARECRREXPNSS,source_native,givingtuesday_datamart,,ARECRREXPNSS,False,False,1.6.0,Source-native column preserved with source-family prefix.
+gt__AREEROEXPENS,source_native,givingtuesday_datamart,,AREEROEXPENS,False,False,1.6.0,Source-native column preserved with source-family prefix.
+gt__AREOESWREXPN,source_native,givingtuesday_datamart,,AREOESWREXPN,False,False,1.6.0,Source-native column preserved with source-family prefix.
+gt__AREPEBREXPNS,source_native,givingtuesday_datamart,,AREPEBREXPNS,False,False,1.6.0,Source-native column preserved with source-family prefix.
+gt__ARETEANINCM,source_native,givingtuesday_datamart,,ARETEANINCM,False,False,1.6.0,Source-native column preserved with source-family prefix.
+gt__ARETEDCHRTBL,source_native,givingtuesday_datamart,,ARETEDCHRTBL,False,False,1.6.0,Source-native column preserved with source-family prefix.
+gt__ARETENIINCM,source_native,givingtuesday_datamart,,ARETENIINCM,False,False,1.6.0,Source-native column preserved with source-family prefix.
+gt__ARETEREXPNSS,source_native,givingtuesday_datamart,,ARETEREXPNSS,False,False,1.6.0,Source-native column preserved with source-family prefix.
+gt__ARETOEANINCM,source_native,givingtuesday_datamart,,ARETOEANINCM,False,False,1.6.0,Source-native column preserved with source-family prefix.
+gt__ARETOEDCHRTB,source_native,givingtuesday_datamart,,ARETOEDCHRTB,False,False,1.6.0,Source-native column preserved with source-family prefix.
+gt__ARETOENIINCM,source_native,givingtuesday_datamart,,ARETOENIINCM,False,False,1.6.0,Source-native column preserved with source-family prefix.
+gt__ARETOEREXPNS,source_native,givingtuesday_datamart,,ARETOEREXPNS,False,False,1.6.0,Source-native column preserved with source-family prefix.
+gt__ASSEOYOYY,source_native,givingtuesday_datamart,,ASSEOYOYY,False,False,1.6.0,Source-native column preserved with source-family prefix.
+gt__BENTOMMEMTOT,source_native,givingtuesday_datamart,,BENTOMMEMTOT,False,False,1.6.0,Source-native column preserved with source-family prefix.
+gt__BEPATOFOMEEM,source_native,givingtuesday_datamart,,BEPATOFOMEEM,False,False,1.6.0,Source-native column preserved with source-family prefix.
+gt__BEPATOMECUYE,source_native,givingtuesday_datamart,,BEPATOMECUYE,False,False,1.6.0,Source-native column preserved with source-family prefix.
+gt__BSNRLTWITORG,source_native,givingtuesday_datamart,,BSNRLTWITORG,False,False,1.6.0,Source-native column preserved with source-family prefix.
+gt__BSRLTHFAMEEM,source_native,givingtuesday_datamart,,BSRLTHFAMEEM,False,False,1.6.0,Source-native column preserved with source-family prefix.
+gt__CASAINBOOYY,source_native,givingtuesday_datamart,,CASAINBOOYY,False,False,1.6.0,Source-native column preserved with source-family prefix.
+gt__CASAINEOOYY,source_native,givingtuesday_datamart,,CASAINEOOYY,False,False,1.6.0,Source-native column preserved with source-family prefix.
+gt__CNIBEOY,source_native,givingtuesday_datamart,,CNIBEOY,False,False,1.6.0,Source-native column preserved with source-family prefix.
+gt__CNTRPRFUNEVE,source_native,givingtuesday_datamart,,CNTRPRFUNEVE,False,False,1.6.0,Source-native column preserved with source-family prefix.
+gt__COCUOFDITOOT,source_native,givingtuesday_datamart,,COCUOFDITOOT,False,False,1.6.0,Source-native column preserved with source-family prefix.
+gt__CONCONMEETOT,source_native,givingtuesday_datamart,,CONCONMEETOT,False,False,1.6.0,Source-native column preserved with source-family prefix.
+gt__CONFINTEPOLI,source_native,givingtuesday_datamart,,CONFINTEPOLI,False,False,1.6.0,Source-native column preserved with source-family prefix.
+gt__CONGIFGRAETC,source_native,givingtuesday_datamart,,CONGIFGRAETC,False,False,1.6.0,Source-native column preserved with source-family prefix.
+gt__COPRCEEOO,source_native,givingtuesday_datamart,,COPRCEEOO,False,False,1.6.0,Source-native column preserved with source-family prefix.
+gt__CYYRRELEEXXP,source_native,givingtuesday_datamart,,CYYRRELEEXXP,False,False,1.6.0,Source-native column preserved with source-family prefix.
+gt__DBANBNLINE11,source_native,givingtuesday_datamart,,DBANBNLINE11,False,False,1.6.0,Source-native column preserved with source-family prefix.
+gt__DBANBNLINE22,source_native,givingtuesday_datamart,,DBANBNLINE22,False,False,1.6.0,Source-native column preserved with source-family prefix.
+gt__DBANBNLINE33,source_native,givingtuesday_datamart,,DBANBNLINE33,False,False,1.6.0,Source-native column preserved with source-family prefix.
+gt__DEPRDEPLTOTA,source_native,givingtuesday_datamart,,DEPRDEPLTOTA,False,False,1.6.0,Source-native column preserved with source-family prefix.
+gt__DIREPLTCEXPE,source_native,givingtuesday_datamart,,DIREPLTCEXPE,False,False,1.6.0,Source-native column preserved with source-family prefix.
+gt__DOCURETEPOLI,source_native,givingtuesday_datamart,,DOCURETEPOLI,False,False,1.6.0,Source-native column preserved with source-family prefix.
+gt__DOEORGHAVHOS,source_native,givingtuesday_datamart,,DOEORGHAVHOS,False,False,1.6.0,Source-native column preserved with source-family prefix.
+gt__DOFFPOLTYEAR,source_native,givingtuesday_datamart,,DOFFPOLTYEAR,False,False,1.6.0,Source-native column preserved with source-family prefix.
+gt__DONOADVIFNDS,source_native,givingtuesday_datamart,,DONOADVIFNDS,False,False,1.6.0,Source-native column preserved with source-family prefix.
+gt__DONOADVIFUND,source_native,givingtuesday_datamart,,DONOADVIFUND,False,False,1.6.0,Source-native column preserved with source-family prefix.
+gt__ENGINLLOBACT,source_native,givingtuesday_datamart,,ENGINLLOBACT,False,False,1.6.0,Source-native column preserved with source-family prefix.
+gt__ENGPOLCMPACT,source_native,givingtuesday_datamart,,ENGPOLCMPACT,False,False,1.6.0,Source-native column preserved with source-family prefix.
+gt__EXCDEFFORYEA,source_native,givingtuesday_datamart,,EXCDEFFORYEA,False,False,1.6.0,Source-native column preserved with source-family prefix.
+gt__EXCEBENETRAN,source_native,givingtuesday_datamart,,EXCEBENETRAN,False,False,1.6.0,Source-native column preserved with source-family prefix.
+gt__FEDERACAMPAI,source_native,givingtuesday_datamart,,FEDERACAMPAI,False,False,1.6.0,Source-native column preserved with source-family prefix.
+gt__FEFOSELOTOOT,source_native,givingtuesday_datamart,,FEFOSELOTOOT,False,False,1.6.0,Source-native column preserved with source-family prefix.
+gt__FEFOSEMATOOT,source_native,givingtuesday_datamart,,FEFOSEMATOOT,False,False,1.6.0,Source-native column preserved with source-family prefix.
+gt__FEFOSEOTTOOT,source_native,givingtuesday_datamart,,FEFOSEOTTOOT,False,False,1.6.0,Source-native column preserved with source-family prefix.
+gt__FEFOSEPRFUTO,source_native,givingtuesday_datamart,,FEFOSEPRFUTO,False,False,1.6.0,Source-native column preserved with source-family prefix.
+gt__FEOTPYTOCNNT,source_native,givingtuesday_datamart,,FEOTPYTOCNNT,False,False,1.6.0,Source-native column preserved with source-family prefix.
+gt__FFSIMFTOTAL,source_native,givingtuesday_datamart,,FFSIMFTOTAL,False,False,1.6.0,Source-native column preserved with source-family prefix.
+gt__FILEREIN,source_native,givingtuesday_datamart,,FILEREIN,False,False,1.6.0,Source-native column preserved with source-family prefix.
+gt__FILERFOR1,source_native,givingtuesday_datamart,,FILERFOR1,False,False,1.6.0,Source-native column preserved with source-family prefix.
+gt__FILERFOR2,source_native,givingtuesday_datamart,,FILERFOR2,False,False,1.6.0,Source-native column preserved with source-family prefix.
+gt__FILERFORCITY,source_native,givingtuesday_datamart,,FILERFORCITY,False,False,1.6.0,Source-native column preserved with source-family prefix.
+gt__FILERFORCTRY,source_native,givingtuesday_datamart,,FILERFORCTRY,False,False,1.6.0,Source-native column preserved with source-family prefix.
+gt__FILERFORPOST,source_native,givingtuesday_datamart,,FILERFORPOST,False,False,1.6.0,Source-native column preserved with source-family prefix.
+gt__FILERFORSTATE,source_native,givingtuesday_datamart,,FILERFORSTATE,False,False,1.6.0,Source-native column preserved with source-family prefix.
+gt__FILERNAME1,source_native,givingtuesday_datamart,,FILERNAME1,False,False,1.6.0,Source-native column preserved with source-family prefix.
+gt__FILERNAME2,source_native,givingtuesday_datamart,,FILERNAME2,False,False,1.6.0,Source-native column preserved with source-family prefix.
+gt__FILERNAMECTRL,source_native,givingtuesday_datamart,,FILERNAMECTRL,False,False,1.6.0,Source-native column preserved with source-family prefix.
+gt__FILERPHONE,source_native,givingtuesday_datamart,,FILERPHONE,False,False,1.6.0,Source-native column preserved with source-family prefix.
+gt__FILERUS1,source_native,givingtuesday_datamart,,FILERUS1,False,False,1.6.0,Source-native column preserved with source-family prefix.
+gt__FILERUS2,source_native,givingtuesday_datamart,,FILERUS2,False,False,1.6.0,Source-native column preserved with source-family prefix.
+gt__FILERUSCITY,source_native,givingtuesday_datamart,,FILERUSCITY,False,False,1.6.0,Source-native column preserved with source-family prefix.
+gt__FILERUSSTATE,source_native,givingtuesday_datamart,,FILERUSSTATE,False,False,1.6.0,Source-native column preserved with source-family prefix.
+gt__FILERUSZIP,source_native,givingtuesday_datamart,,FILERUSZIP,False,False,1.6.0,Source-native column preserved with source-family prefix.
+gt__FILESCHEA,source_native,givingtuesday_datamart,,FILESCHEA,False,False,1.6.0,Source-native column preserved with source-family prefix.
+gt__FINALRRETURN,source_native,givingtuesday_datamart,,FINALRRETURN,False,False,1.6.0,Source-native column preserved with source-family prefix.
+gt__FOPRTOGOBOOD,source_native,givingtuesday_datamart,,FOPRTOGOBOOD,False,False,1.6.0,Source-native column preserved with source-family prefix.
+gt__FOREGRANTOTA,source_native,givingtuesday_datamart,,FOREGRANTOTA,False,False,1.6.0,Source-native column preserved with source-family prefix.
+gt__FOREIGOFFICE,source_native,givingtuesday_datamart,,FOREIGOFFICE,False,False,1.6.0,Source-native column preserved with source-family prefix.
+gt__FORMATIONORM,source_native,givingtuesday_datamart,,FORMATIONORM,False,False,1.6.0,Source-native column preserved with source-family prefix.
+gt__FUNDDIREEXPE,source_native,givingtuesday_datamart,,FUNDDIREEXPE,False,False,1.6.0,Source-native column preserved with source-family prefix.
+gt__FUNDGROSINCO,source_native,givingtuesday_datamart,,FUNDGROSINCO,False,False,1.6.0,Source-native column preserved with source-family prefix.
+gt__FUNDRAEVENTS,source_native,givingtuesday_datamart,,FUNDRAEVENTS,False,False,1.6.0,Source-native column preserved with source-family prefix.
+gt__FUNDRAEXPENS,source_native,givingtuesday_datamart,,FUNDRAEXPENS,False,False,1.6.0,Source-native column preserved with source-family prefix.
+gt__FileSha256,source_native,givingtuesday_datamart,,FileSha256,False,False,1.6.0,Source-native column preserved with source-family prefix.
+gt__GAMIGROSINCO,source_native,givingtuesday_datamart,,GAMIGROSINCO,False,False,1.6.0,Source-native column preserved with source-family prefix.
+gt__GOVERNGRANTS,source_native,givingtuesday_datamart,,GOVERNGRANTS,False,False,1.6.0,Source-native column preserved with source-family prefix.
+gt__GRAALLPAITOT,source_native,givingtuesday_datamart,,GRAALLPAITOT,False,False,1.6.0,Source-native column preserved with source-family prefix.
+gt__GRANTOORORGA,source_native,givingtuesday_datamart,,GRANTOORORGA,False,False,1.6.0,Source-native column preserved with source-family prefix.
+gt__GRASIMAMOPAI,source_native,givingtuesday_datamart,,GRASIMAMOPAI,False,False,1.6.0,Source-native column preserved with source-family prefix.
+gt__GRATODDOMTOT,source_native,givingtuesday_datamart,,GRATODDOMTOT,False,False,1.6.0,Source-native column preserved with source-family prefix.
+gt__GROINCFUNEVE,source_native,givingtuesday_datamart,,GROINCFUNEVE,False,False,1.6.0,Source-native column preserved with source-family prefix.
+gt__GROSSRRECEIP,source_native,givingtuesday_datamart,,GROSSRRECEIP,False,False,1.6.0,Source-native column preserved with source-family prefix.
+gt__GROUEXEMNUMU,source_native,givingtuesday_datamart,,GROUEXEMNUMU,False,False,1.6.0,Source-native column preserved with source-family prefix.
+gt__GRPAEOOYY,source_native,givingtuesday_datamart,,GRPAEOOYY,False,False,1.6.0,Source-native column preserved with source-family prefix.
+gt__GRSIAMCYY,source_native,givingtuesday_datamart,,GRSIAMCYY,False,False,1.6.0,Source-native column preserved with source-family prefix.
+gt__IFIBPTRCOLUM,source_native,givingtuesday_datamart,,IFIBPTRCOLUM,False,False,1.6.0,Source-native column preserved with source-family prefix.
+gt__IISOPIII,source_native,givingtuesday_datamart,,IISOPIII,False,False,1.6.0,Source-native column preserved with source-family prefix.
+gt__IISOPIV,source_native,givingtuesday_datamart,,IISOPIV,False,False,1.6.0,Source-native column preserved with source-family prefix.
+gt__IISOPVI,source_native,givingtuesday_datamart,,IISOPVI,False,False,1.6.0,Source-native column preserved with source-family prefix.
+gt__INCARENM,source_native,givingtuesday_datamart,,INCARENM,False,False,1.6.0,Source-native column preserved with source-family prefix.
+gt__INFOTECHTOTA,source_native,givingtuesday_datamart,,INFOTECHTOTA,False,False,1.6.0,Source-native column preserved with source-family prefix.
+gt__ININSCOPPAV,source_native,givingtuesday_datamart,,ININSCOPPAV,False,False,1.6.0,Source-native column preserved with source-family prefix.
+gt__ININTORECOOL,source_native,givingtuesday_datamart,,ININTORECOOL,False,False,1.6.0,Source-native column preserved with source-family prefix.
+gt__INITIARETURN,source_native,givingtuesday_datamart,,INITIARETURN,False,False,1.6.0,Source-native column preserved with source-family prefix.
+gt__INREFOPUCHHR,source_native,givingtuesday_datamart,,INREFOPUCHHR,False,False,1.6.0,Source-native column preserved with source-family prefix.
+gt__INTERETOTALO,source_native,givingtuesday_datamart,,INTERETOTALO,False,False,1.6.0,Source-native column preserved with source-family prefix.
+gt__JOCORPINPRSE,source_native,givingtuesday_datamart,,JOCORPINPRSE,False,False,1.6.0,Source-native column preserved with source-family prefix.
+gt__JOINTCCOSTSO,source_native,givingtuesday_datamart,,JOINTCCOSTSO,False,False,1.6.0,Source-native column preserved with source-family prefix.
+gt__LEGAFEESTOTA,source_native,givingtuesday_datamart,,LEGAFEESTOTA,False,False,1.6.0,Source-native column preserved with source-family prefix.
+gt__LOTOOFDQQPP,source_native,givingtuesday_datamart,,LOTOOFDQQPP,False,False,1.6.0,Source-native column preserved with source-family prefix.
+gt__MACHTOORETDO,source_native,givingtuesday_datamart,,MACHTOORETDO,False,False,1.6.0,Source-native column preserved with source-family prefix.
+gt__MALOTOFROFFF,source_native,givingtuesday_datamart,,MALOTOFROFFF,False,False,1.6.0,Source-native column preserved with source-family prefix.
+gt__MANAGENEEXPE,source_native,givingtuesday_datamart,,MANAGENEEXPE,False,False,1.6.0,Source-native column preserved with source-family prefix.
+gt__MAONINLOEXXP,source_native,givingtuesday_datamart,,MAONINLOEXXP,False,False,1.6.0,Source-native column preserved with source-family prefix.
+gt__MATEDIVEMISU,source_native,givingtuesday_datamart,,MATEDIVEMISU,False,False,1.6.0,Source-native column preserved with source-family prefix.
+gt__MEMBERDUESUE,source_native,givingtuesday_datamart,,MEMBERDUESUE,False,False,1.6.0,Source-native column preserved with source-family prefix.
+gt__MINUGOVEBODY,source_native,givingtuesday_datamart,,MINUGOVEBODY,False,False,1.6.0,Source-native column preserved with source-family prefix.
+gt__NAFBBOY,source_native,givingtuesday_datamart,,NAFBBOY,False,False,1.6.0,Source-native column preserved with source-family prefix.
+gt__NAFBEOY,source_native,givingtuesday_datamart,,NAFBEOY,False,False,1.6.0,Source-native column preserved with source-family prefix.
+gt__NBREVOTIMEMB,source_native,givingtuesday_datamart,,NBREVOTIMEMB,False,False,1.6.0,Source-native column preserved with source-family prefix.
+gt__NBVOMEGOBOOD,source_native,givingtuesday_datamart,,NBVOMEGOBOOD,False,False,1.6.0,Source-native column preserved with source-family prefix.
+gt__NIFFETRCOLUM,source_native,givingtuesday_datamart,,NIFFETRCOLUM,False,False,1.6.0,Source-native column preserved with source-family prefix.
+gt__NONCASCONTRI,source_native,givingtuesday_datamart,,NONCASCONTRI,False,False,1.6.0,Source-native column preserved with source-family prefix.
+gt__O4947RTRPFFIINND,source_native,givingtuesday_datamart,,O4947RTRPFFIINND,False,False,1.6.0,Source-native column preserved with source-family prefix.
+gt__O501REXPFFIINND,source_native,givingtuesday_datamart,,O501REXPFFIINND,False,False,1.6.0,Source-native column preserved with source-family prefix.
+gt__O501RTAPFFIINND,source_native,givingtuesday_datamart,,O501RTAPFFIINND,False,False,1.6.0,Source-native column preserved with source-family prefix.
+gt__OCCUPATOTALO,source_native,givingtuesday_datamart,,OCCUPATOTALO,False,False,1.6.0,Source-native column preserved with source-family prefix.
+gt__ODTKEITNOCPO50k,source_native,givingtuesday_datamart,,ODTKEITNOCPO50k,False,False,1.6.0,Source-native column preserved with source-family prefix.
+gt__ODTKEITNOEPO50K,source_native,givingtuesday_datamart,,ODTKEITNOEPO50K,False,False,1.6.0,Source-native column preserved with source-family prefix.
+gt__OFENWIBSRLLT,source_native,givingtuesday_datamart,,OFENWIBSRLLT,False,False,1.6.0,Source-native column preserved with source-family prefix.
+gt__OFFICERNAME,source_native,givingtuesday_datamart,,OFFICERNAME,False,False,1.6.0,Source-native column preserved with source-family prefix.
+gt__OFFICERSIGNDATE,source_native,givingtuesday_datamart,,OFFICERSIGNDATE,False,False,1.6.0,Source-native column preserved with source-family prefix.
+gt__OFFICERTITLE,source_native,givingtuesday_datamart,,OFFICERTITLE,False,False,1.6.0,Source-native column preserved with source-family prefix.
+gt__OFFIEXPETOTA,source_native,givingtuesday_datamart,,OFFIEXPETOTA,False,False,1.6.0,Source-native column preserved with source-family prefix.
+gt__OPERATHOSPIT,source_native,givingtuesday_datamart,,OPERATHOSPIT,False,False,1.6.0,Source-native column preserved with source-family prefix.
+gt__OPERATSCHOOL,source_native,givingtuesday_datamart,,OPERATSCHOOL,False,False,1.6.0,Source-native column preserved with source-family prefix.
+gt__ORGADISSETCT,source_native,givingtuesday_datamart,,ORGADISSETCT,False,False,1.6.0,Source-native column preserved with source-family prefix.
+gt__ORGANIZATION,source_native,givingtuesday_datamart,,ORGANIZATION,False,False,1.6.0,Source-native column preserved with source-family prefix.
+gt__ORGANIZATION1,source_native,givingtuesday_datamart,,ORGANIZATION1,False,False,1.6.0,Source-native column preserved with source-family prefix.
+gt__ORGANIZATION3,source_native,givingtuesday_datamart,,ORGANIZATION3,False,False,1.6.0,Source-native column preserved with source-family prefix.
+gt__ORGANIZATION7,source_native,givingtuesday_datamart,,ORGANIZATION7,False,False,1.6.0,Source-native column preserved with source-family prefix.
+gt__ORHAUBBII,source_native,givingtuesday_datamart,,ORHAUBBII,False,False,1.6.0,Source-native column preserved with source-family prefix.
+gt__ORNOPFFIINND,source_native,givingtuesday_datamart,,ORNOPFFIINND,False,False,1.6.0,Source-native column preserved with source-family prefix.
+gt__OTCHINNEASSS,source_native,givingtuesday_datamart,,OTCHINNEASSS,False,False,1.6.0,Source-native column preserved with source-family prefix.
+gt__OTHEEXPEDESC,source_native,givingtuesday_datamart,,OTHEEXPEDESC,False,False,1.6.0,Source-native column preserved with source-family prefix.
+gt__OTHEEXPETOTA,source_native,givingtuesday_datamart,,OTHEEXPETOTA,False,False,1.6.0,Source-native column preserved with source-family prefix.
+gt__OTHEMPBENTOT,source_native,givingtuesday_datamart,,OTHEMPBENTOT,False,False,1.6.0,Source-native column preserved with source-family prefix.
+gt__OTHEREVETOTA,source_native,givingtuesday_datamart,,OTHEREVETOTA,False,False,1.6.0,Source-native column preserved with source-family prefix.
+gt__OTHSALWAGTOT,source_native,givingtuesday_datamart,,OTHSALWAGTOT,False,False,1.6.0,Source-native column preserved with source-family prefix.
+gt__PAYMTOAFAFFI,source_native,givingtuesday_datamart,,PAYMTOAFAFFI,False,False,1.6.0,Source-native column preserved with source-family prefix.
+gt__PAYRTAXETOTA,source_native,givingtuesday_datamart,,PAYRTAXETOTA,False,False,1.6.0,Source-native column preserved with source-family prefix.
+gt__PENPLACONTOT,source_native,givingtuesday_datamart,,PENPLACONTOT,False,False,1.6.0,Source-native column preserved with source-family prefix.
+gt__PFSTSAIND,source_native,givingtuesday_datamart,,PFSTSAIND,False,False,1.6.0,Source-native column preserved with source-family prefix.
+gt__PREPAREDATE,source_native,givingtuesday_datamart,,PREPAREDATE,False,False,1.6.0,Source-native column preserved with source-family prefix.
+gt__PREPARENAME,source_native,givingtuesday_datamart,,PREPARENAME,False,False,1.6.0,Source-native column preserved with source-family prefix.
+gt__PRIEXCBENTRA,source_native,givingtuesday_datamart,,PRIEXCBENTRA,False,False,1.6.0,Source-native column preserved with source-family prefix.
+gt__PRIMEXEMPURP,source_native,givingtuesday_datamart,,PRIMEXEMPURP,False,False,1.6.0,Source-native column preserved with source-family prefix.
+gt__PRNAEOY,source_native,givingtuesday_datamart,,PRNAEOY,False,False,1.6.0,Source-native column preserved with source-family prefix.
+gt__PROGSERVEXPE,source_native,givingtuesday_datamart,,PROGSERVEXPE,False,False,1.6.0,Source-native column preserved with source-family prefix.
+gt__PROGSERVREVE,source_native,givingtuesday_datamart,,PROGSERVREVE,False,False,1.6.0,Source-native column preserved with source-family prefix.
+gt__PROPFODAOFRU,source_native,givingtuesday_datamart,,PROPFODAOFRU,False,False,1.6.0,Source-native column preserved with source-family prefix.
+gt__RELATEORGANI,source_native,givingtuesday_datamart,,RELATEORGANI,False,False,1.6.0,Source-native column preserved with source-family prefix.
+gt__RELORGCTRENT,source_native,givingtuesday_datamart,,RELORGCTRENT,False,False,1.6.0,Source-native column preserved with source-family prefix.
+gt__RELORGSECORG,source_native,givingtuesday_datamart,,RELORGSECORG,False,False,1.6.0,Source-native column preserved with source-family prefix.
+gt__RETURNTYPE,source_native,givingtuesday_datamart,,RETURNTYPE,False,False,1.6.0,Source-native column preserved with source-family prefix.
+gt__SAOTCOEMBEEN,source_native,givingtuesday_datamart,,SAOTCOEMBEEN,False,False,1.6.0,Source-native column preserved with source-family prefix.
+gt__SIASIRAALINE1.0,source_native,givingtuesday_datamart,,SIASIRAALINE1.0,False,False,1.6.0,Source-native column preserved with source-family prefix.
+gt__SIASIRAALINE1.1,source_native,givingtuesday_datamart,,SIASIRAALINE1.1,False,False,1.6.0,Source-native column preserved with source-family prefix.
+gt__SIASIRAALINE2,source_native,givingtuesday_datamart,,SIASIRAALINE2,False,False,1.6.0,Source-native column preserved with source-family prefix.
+gt__SIASIRACITY.0,source_native,givingtuesday_datamart,,SIASIRACITY.0,False,False,1.6.0,Source-native column preserved with source-family prefix.
+gt__SIASIRACITY.1,source_native,givingtuesday_datamart,,SIASIRACITY.1,False,False,1.6.0,Source-native column preserved with source-family prefix.
+gt__SIASIRASTATE.0,source_native,givingtuesday_datamart,,SIASIRASTATE.0,False,False,1.6.0,Source-native column preserved with source-family prefix.
+gt__SIASIRASTATE.1,source_native,givingtuesday_datamart,,SIASIRASTATE.1,False,False,1.6.0,Source-native column preserved with source-family prefix.
+gt__SIASIRAZIPCO.0,source_native,givingtuesday_datamart,,SIASIRAZIPCO.0,False,False,1.6.0,Source-native column preserved with source-family prefix.
+gt__SIASIRAZIPCO.1,source_native,givingtuesday_datamart,,SIASIRAZIPCO.1,False,False,1.6.0,Source-native column preserved with source-family prefix.
+gt__SIASIREADDRE,source_native,givingtuesday_datamart,,SIASIREADDRE,False,False,1.6.0,Source-native column preserved with source-family prefix.
+gt__SIASIRNAME.0,source_native,givingtuesday_datamart,,SIASIRNAME.0,False,False,1.6.0,Source-native column preserved with source-family prefix.
+gt__SIASIRNAME.1,source_native,givingtuesday_datamart,,SIASIRNAME.1,False,False,1.6.0,Source-native column preserved with source-family prefix.
+gt__SIASIRPNUMBE.0,source_native,givingtuesday_datamart,,SIASIRPNUMBE.0,False,False,1.6.0,Source-native column preserved with source-family prefix.
+gt__SIASIRPNUMBE.1,source_native,givingtuesday_datamart,,SIASIRPNUMBE.1,False,False,1.6.0,Source-native column preserved with source-family prefix.
+gt__SPECASSITOTA,source_native,givingtuesday_datamart,,SPECASSITOTA,False,False,1.6.0,Source-native column preserved with source-family prefix.
+gt__SPECCONDDESC,source_native,givingtuesday_datamart,,SPECCONDDESC,False,False,1.6.0,Source-native column preserved with source-family prefix.
+gt__SPEVNEINLOOS,source_native,givingtuesday_datamart,,SPEVNEINLOOS,False,False,1.6.0,Source-native column preserved with source-family prefix.
+gt__SPRIAOPRITOT,source_native,givingtuesday_datamart,,SPRIAOPRITOT,False,False,1.6.0,Source-native column preserved with source-family prefix.
+gt__SRAALIASSETS,source_native,givingtuesday_datamart,,SRAALIASSETS,False,False,1.6.0,Source-native column preserved with source-family prefix.
+gt__SRAANPREPORT,source_native,givingtuesday_datamart,,SRAANPREPORT,False,False,1.6.0,Source-native column preserved with source-family prefix.
+gt__SRACTAOBYLAW,source_native,givingtuesday_datamart,,SRACTAOBYLAW,False,False,1.6.0,Source-native column preserved with source-family prefix.
+gt__SRACWPIRQR,source_native,givingtuesday_datamart,,SRACWPIRQR,False,False,1.6.0,Source-native column preserved with source-family prefix.
+gt__SRAFPOLFILED,source_native,givingtuesday_datamart,,SRAFPOLFILED,False,False,1.6.0,Source-native column preserved with source-family prefix.
+gt__SRAUBIOVER100,source_native,givingtuesday_datamart,,SRAUBIOVER100,False,False,1.6.0,Source-native column preserved with source-family prefix.
+gt__STCIEOY,source_native,givingtuesday_datamart,,STCIEOY,False,False,1.6.0,Source-native column preserved with source-family prefix.
+gt__STREACAPINCO,source_native,givingtuesday_datamart,,STREACAPINCO,False,False,1.6.0,Source-native column preserved with source-family prefix.
+gt__STREACBUHOOL,source_native,givingtuesday_datamart,,STREACBUHOOL,False,False,1.6.0,Source-native column preserved with source-family prefix.
+gt__STREACGRTOIN,source_native,givingtuesday_datamart,,STREACGRTOIN,False,False,1.6.0,Source-native column preserved with source-family prefix.
+gt__STREACGRTOOR,source_native,givingtuesday_datamart,,STREACGRTOOR,False,False,1.6.0,Source-native column preserved with source-family prefix.
+gt__STREACINELLE,source_native,givingtuesday_datamart,,STREACINELLE,False,False,1.6.0,Source-native column preserved with source-family prefix.
+gt__STREACINLEEG,source_native,givingtuesday_datamart,,STREACINLEEG,False,False,1.6.0,Source-native column preserved with source-family prefix.
+gt__STREACJEINNV,source_native,givingtuesday_datamart,,STREACJEINNV,False,False,1.6.0,Source-native column preserved with source-family prefix.
+gt__STREACLEPOAC,source_native,givingtuesday_datamart,,STREACLEPOAC,False,False,1.6.0,Source-native column preserved with source-family prefix.
+gt__STREACMOTHSP,source_native,givingtuesday_datamart,,STREACMOTHSP,False,False,1.6.0,Source-native column preserved with source-family prefix.
+gt__STREACNESUCO,source_native,givingtuesday_datamart,,STREACNESUCO,False,False,1.6.0,Source-native column preserved with source-family prefix.
+gt__STREACNOPUUR,source_native,givingtuesday_datamart,,STREACNOPUUR,False,False,1.6.0,Source-native column preserved with source-family prefix.
+gt__STREACPROPFO,source_native,givingtuesday_datamart,,STREACPROPFO,False,False,1.6.0,Source-native column preserved with source-family prefix.
+gt__STREACSTFIWI,source_native,givingtuesday_datamart,,STREACSTFIWI,False,False,1.6.0,Source-native column preserved with source-family prefix.
+gt__STREACTEETTC,source_native,givingtuesday_datamart,,STREACTEETTC,False,False,1.6.0,Source-native column preserved with source-family prefix.
+gt__STREACWEADDD,source_native,givingtuesday_datamart,,STREACWEADDD,False,False,1.6.0,Source-native column preserved with source-family prefix.
+gt__STWHCOREISFI,source_native,givingtuesday_datamart,,STWHCOREISFI,False,False,1.6.0,Source-native column preserved with source-family prefix.
+gt__SUDICHACDEES1,source_native,givingtuesday_datamart,,SUDICHACDEES1,False,False,1.6.0,Source-native column preserved with source-family prefix.
+gt__SUDICHACDEES2,source_native,givingtuesday_datamart,,SUDICHACDEES2,False,False,1.6.0,Source-native column preserved with source-family prefix.
+gt__SUDICHACDEES3,source_native,givingtuesday_datamart,,SUDICHACDEES3,False,False,1.6.0,Source-native column preserved with source-family prefix.
+gt__SUDICHACDEES4,source_native,givingtuesday_datamart,,SUDICHACDEES4,False,False,1.6.0,Source-native column preserved with source-family prefix.
+gt__SUDICHACEXXP1,source_native,givingtuesday_datamart,,SUDICHACEXXP1,False,False,1.6.0,Source-native column preserved with source-family prefix.
+gt__SUDICHACEXXP2,source_native,givingtuesday_datamart,,SUDICHACEXXP2,False,False,1.6.0,Source-native column preserved with source-family prefix.
+gt__SUDICHACEXXP3,source_native,givingtuesday_datamart,,SUDICHACEXXP3,False,False,1.6.0,Source-native column preserved with source-family prefix.
+gt__SUDICHACEXXP4,source_native,givingtuesday_datamart,,SUDICHACEXXP4,False,False,1.6.0,Source-native column preserved with source-family prefix.
+gt__SUINONCOTOPR,source_native,givingtuesday_datamart,,SUINONCOTOPR,False,False,1.6.0,Source-native column preserved with source-family prefix.
+gt__SUPINFCONMAN.0,source_native,givingtuesday_datamart,,SUPINFCONMAN.0,False,False,1.6.0,Source-native column preserved with source-family prefix.
+gt__SUPINFCONMAN.1,source_native,givingtuesday_datamart,,SUPINFCONMAN.1,False,False,1.6.0,Source-native column preserved with source-family prefix.
+gt__SUPINFCONMAN.2,source_native,givingtuesday_datamart,,SUPINFCONMAN.2,False,False,1.6.0,Source-native column preserved with source-family prefix.
+gt__SUPINFCONMAN.3,source_native,givingtuesday_datamart,,SUPINFCONMAN.3,False,False,1.6.0,Source-native column preserved with source-family prefix.
+gt__SUPINFSHAMAN,source_native,givingtuesday_datamart,,SUPINFSHAMAN,False,False,1.6.0,Source-native column preserved with source-family prefix.
+gt__SUPRREINAMMO1,source_native,givingtuesday_datamart,,SUPRREINAMMO1,False,False,1.6.0,Source-native column preserved with source-family prefix.
+gt__SUPRREINAMMO2,source_native,givingtuesday_datamart,,SUPRREINAMMO2,False,False,1.6.0,Source-native column preserved with source-family prefix.
+gt__SUPRREINDEES1,source_native,givingtuesday_datamart,,SUPRREINDEES1,False,False,1.6.0,Source-native column preserved with source-family prefix.
+gt__SUPRREINDEES2,source_native,givingtuesday_datamart,,SUPRREINDEES2,False,False,1.6.0,Source-native column preserved with source-family prefix.
+gt__SUPRREINTOOT,source_native,givingtuesday_datamart,,SUPRREINTOOT,False,False,1.6.0,Source-native column preserved with source-family prefix.
+gt__TAXPERBEGIN,source_native,givingtuesday_datamart,,TAXPERBEGIN,False,False,1.6.0,Source-native column preserved with source-family prefix.
+gt__TAXPEREND,source_native,givingtuesday_datamart,,TAXPEREND,False,False,1.6.0,Source-native column preserved with source-family prefix.
+gt__TAXYEAR,source_native,givingtuesday_datamart,,TAXYEAR,False,False,1.6.0,Source-native column preserved with source-family prefix.
+gt__TERMINATED,source_native,givingtuesday_datamart,,TERMINATED,False,False,1.6.0,Source-native column preserved with source-family prefix.
+gt__TLNAEOY,source_native,givingtuesday_datamart,,TLNAEOY,False,False,1.6.0,Source-native column preserved with source-family prefix.
+gt__TNAFBEOY,source_native,givingtuesday_datamart,,TNAFBEOY,False,False,1.6.0,Source-native column preserved with source-family prefix.
+gt__TOASBOOYY,source_native,givingtuesday_datamart,,TOASBOOYY,False,False,1.6.0,Source-native column preserved with source-family prefix.
+gt__TOASEOOYY,source_native,givingtuesday_datamart,,TOASEOOYY,False,False,1.6.0,Source-native column preserved with source-family prefix.
+gt__TOJOCOMAANGE,source_native,givingtuesday_datamart,,TOJOCOMAANGE,False,False,1.6.0,Source-native column preserved with source-family prefix.
+gt__TOLIBOOYY,source_native,givingtuesday_datamart,,TOLIBOOYY,False,False,1.6.0,Source-native column preserved with source-family prefix.
+gt__TOLIEOOYY,source_native,givingtuesday_datamart,,TOLIEOOYY,False,False,1.6.0,Source-native column preserved with source-family prefix.
+gt__TONUCPO50K,source_native,givingtuesday_datamart,,TONUCPO50K,False,False,1.6.0,Source-native column preserved with source-family prefix.
+gt__TONUOTEMPO50K,source_native,givingtuesday_datamart,,TONUOTEMPO50K,False,False,1.6.0,Source-native column preserved with source-family prefix.
+gt__TORETORECOOL,source_native,givingtuesday_datamart,,TORETORECOOL,False,False,1.6.0,Source-native column preserved with source-family prefix.
+gt__TOTACASHCONT,source_native,givingtuesday_datamart,,TOTACASHCONT,False,False,1.6.0,Source-native column preserved with source-family prefix.
+gt__TOTAEMPLCNTN,source_native,givingtuesday_datamart,,TOTAEMPLCNTN,False,False,1.6.0,Source-native column preserved with source-family prefix.
+gt__TOTALEEXPENS,source_native,givingtuesday_datamart,,TOTALEEXPENS,False,False,1.6.0,Source-native column preserved with source-family prefix.
+gt__TOTALRREVENU,source_native,givingtuesday_datamart,,TOTALRREVENU,False,False,1.6.0,Source-native column preserved with source-family prefix.
+gt__TOTANBRVVOLU,source_native,givingtuesday_datamart,,TOTANBRVVOLU,False,False,1.6.0,Source-native column preserved with source-family prefix.
+gt__TOTEXPCURYEA,source_native,givingtuesday_datamart,,TOTEXPCURYEA,False,False,1.6.0,Source-native column preserved with source-family prefix.
+gt__TOTFUNEXPTOT,source_native,givingtuesday_datamart,,TOTFUNEXPTOT,False,False,1.6.0,Source-native column preserved with source-family prefix.
+gt__TOTJOICOSFUN,source_native,givingtuesday_datamart,,TOTJOICOSFUN,False,False,1.6.0,Source-native column preserved with source-family prefix.
+gt__TOTPROSEREXP,source_native,givingtuesday_datamart,,TOTPROSEREXP,False,False,1.6.0,Source-native column preserved with source-family prefix.
+gt__TOTPROSERREV,source_native,givingtuesday_datamart,,TOTPROSERREV,False,False,1.6.0,Source-native column preserved with source-family prefix.
+gt__TOTREVCURYEA,source_native,givingtuesday_datamart,,TOTREVCURYEA,False,False,1.6.0,Source-native column preserved with source-family prefix.
+gt__TRAVELTOTALO,source_native,givingtuesday_datamart,,TRAVELTOTALO,False,False,1.6.0,Source-native column preserved with source-family prefix.
+gt__TRAWITCONENT,source_native,givingtuesday_datamart,,TRAWITCONENT,False,False,1.6.0,Source-native column preserved with source-family prefix.
+gt__TREXNOCHRLOR,source_native,givingtuesday_datamart,,TREXNOCHRLOR,False,False,1.6.0,Source-native column preserved with source-family prefix.
+gt__TRNAEOY,source_native,givingtuesday_datamart,,TRNAEOY,False,False,1.6.0,Source-native column preserved with source-family prefix.
+gt__TTRWNEOLOLGU,source_native,givingtuesday_datamart,,TTRWNEOLOLGU,False,False,1.6.0,Source-native column preserved with source-family prefix.
+gt__TTRWNEOPANEO,source_native,givingtuesday_datamart,,TTRWNEOPANEO,False,False,1.6.0,Source-native column preserved with source-family prefix.
+gt__TTRWNEOPOSET,source_native,givingtuesday_datamart,,TTRWNEOPOSET,False,False,1.6.0,Source-native column preserved with source-family prefix.
+gt__TTRWNEORARRA,source_native,givingtuesday_datamart,,TTRWNEORARRA,False,False,1.6.0,Source-native column preserved with source-family prefix.
+gt__TTRWNEORNEOS,source_native,givingtuesday_datamart,,TTRWNEORNEOS,False,False,1.6.0,Source-native column preserved with source-family prefix.
+gt__TTRWNEOROFET,source_native,givingtuesday_datamart,,TTRWNEOROFET,False,False,1.6.0,Source-native column preserved with source-family prefix.
+gt__TTRWNEOSOEOA,source_native,givingtuesday_datamart,,TTRWNEOSOEOA,False,False,1.6.0,Source-native column preserved with source-family prefix.
+gt__TTRWNEOSOFET,source_native,givingtuesday_datamart,,TTRWNEOSOFET,False,False,1.6.0,Source-native column preserved with source-family prefix.
+gt__TTRWNEOTOANE,source_native,givingtuesday_datamart,,TTRWNEOTOANE,False,False,1.6.0,Source-native column preserved with source-family prefix.
+gt__TTRWNEOTOCTN,source_native,givingtuesday_datamart,,TTRWNEOTOCTN,False,False,1.6.0,Source-native column preserved with source-family prefix.
+gt__TYPEORGAASSO,source_native,givingtuesday_datamart,,TYPEORGAASSO,False,False,1.6.0,Source-native column preserved with source-family prefix.
+gt__TYPEORGACORP,source_native,givingtuesday_datamart,,TYPEORGACORP,False,False,1.6.0,Source-native column preserved with source-family prefix.
+gt__TYPEORGATRUS,source_native,givingtuesday_datamart,,TYPEORGATRUS,False,False,1.6.0,Source-native column preserved with source-family prefix.
+gt__TYPORGOTHDES.0,source_native,givingtuesday_datamart,,TYPORGOTHDES.0,False,False,1.6.0,Source-native column preserved with source-family prefix.
+gt__TYPORGOTHDES.1,source_native,givingtuesday_datamart,,TYPORGOTHDES.1,False,False,1.6.0,Source-native column preserved with source-family prefix.
+gt__UNNEASEOOYY,source_native,givingtuesday_datamart,,UNNEASEOOYY,False,False,1.6.0,Source-native column preserved with source-family prefix.
+gt__URL,source_native,givingtuesday_datamart,,URL,False,False,1.6.0,Source-native column preserved with source-family prefix.
+gt__WEBSITADDRES,source_native,givingtuesday_datamart,,WEBSITADDRES,False,False,1.6.0,Source-native column preserved with source-family prefix.
+gt__WEBSITSITEIT,source_native,givingtuesday_datamart,,WEBSITSITEIT,False,False,1.6.0,Source-native column preserved with source-family prefix.
+gt__WHISTLPOLICY,source_native,givingtuesday_datamart,,WHISTLPOLICY,False,False,1.6.0,Source-native column preserved with source-family prefix.
+gt__county_fips,source_native,givingtuesday_datamart,,county_fips,False,False,1.6.0,Source-native column preserved with source-family prefix.
+gt__derived_income_amount,source_native,givingtuesday_datamart,,derived_income_amount,False,False,1.6.0,Source-native column preserved with source-family prefix.
+gt__derived_income_derivation,source_native,givingtuesday_datamart,,derived_income_derivation,False,False,1.6.0,Source-native column preserved with source-family prefix.
+gt__ein,source_native,givingtuesday_datamart,,ein,False,False,1.6.0,Source-native column preserved with source-family prefix.
+gt__field_fill_count_from_basic,source_native,givingtuesday_datamart,,field_fill_count_from_basic,False,False,1.6.0,Source-native column preserved with source-family prefix.
+gt__form_type,source_native,givingtuesday_datamart,,form_type,False,False,1.6.0,Source-native column preserved with source-family prefix.
+gt__from_basic,source_native,givingtuesday_datamart,,from_basic,False,False,1.6.0,Source-native column preserved with source-family prefix.
+gt__from_combined,source_native,givingtuesday_datamart,,from_combined,False,False,1.6.0,Source-native column preserved with source-family prefix.
+gt__presilver_admission_basis,source_native,givingtuesday_datamart,,presilver_admission_basis,False,False,1.6.0,Source-native column preserved with source-family prefix.
+gt__presilver_admitted_by_basic_geography,source_native,givingtuesday_datamart,,presilver_admitted_by_basic_geography,False,False,1.6.0,Source-native column preserved with source-family prefix.
+gt__presilver_admitted_by_combined_key,source_native,givingtuesday_datamart,,presilver_admitted_by_combined_key,False,False,1.6.0,Source-native column preserved with source-family prefix.
+gt__region,source_native,givingtuesday_datamart,,region,False,False,1.6.0,Source-native column preserved with source-family prefix.
+gt__returntype_norm,source_native,givingtuesday_datamart,,returntype_norm,False,False,1.6.0,Source-native column preserved with source-family prefix.
+gt__source_dataset_id,field_provenance,givingtuesday_datamart,,source_dataset_id,False,True,1.6.0,Per-harmonized-field provenance.
+gt__source_dataset_title,field_provenance,givingtuesday_datamart,,source_dataset_title,False,True,1.6.0,Per-harmonized-field provenance.
+gt__source_filename,field_provenance,givingtuesday_datamart,,source_filename,False,True,1.6.0,Per-harmonized-field provenance.
+gt__tax_year,source_native,givingtuesday_datamart,,tax_year,False,False,1.6.0,Source-native column preserved with source-family prefix.
+gt__zip5,source_native,givingtuesday_datamart,,zip5,False,False,1.6.0,Source-native column preserved with source-family prefix.
+nccs_bmf__ACCPER,source_native,nccs_bmf,,ACCPER,False,False,1.6.0,Source-native column preserved with source-family prefix.
+nccs_bmf__ACCT_PD,source_native,nccs_bmf,,ACCT_PD,False,False,1.6.0,Source-native column preserved with source-family prefix.
+nccs_bmf__ACTIVITY,source_native,nccs_bmf,,ACTIVITY,False,False,1.6.0,Source-native column preserved with source-family prefix.
+nccs_bmf__ADDRESS,source_native,nccs_bmf,,ADDRESS,False,False,1.6.0,Source-native column preserved with source-family prefix.
+nccs_bmf__AFFILIATION,source_native,nccs_bmf,,AFFILIATION,False,False,1.6.0,Source-native column preserved with source-family prefix.
+nccs_bmf__ASSETS,source_native,nccs_bmf,,ASSETS,False,False,1.6.0,Source-native column preserved with source-family prefix.
+nccs_bmf__ASSET_AMT,source_native,nccs_bmf,,ASSET_AMT,False,False,1.6.0,Source-native column preserved with source-family prefix.
+nccs_bmf__ASSET_CD,source_native,nccs_bmf,,ASSET_CD,False,False,1.6.0,Source-native column preserved with source-family prefix.
+nccs_bmf__CASSETS,source_native,nccs_bmf,,CASSETS,False,False,1.6.0,Source-native column preserved with source-family prefix.
+nccs_bmf__CFINSRC,source_native,nccs_bmf,,CFINSRC,False,False,1.6.0,Source-native column preserved with source-family prefix.
+nccs_bmf__CITY,source_native,nccs_bmf,,CITY,False,False,1.6.0,Source-native column preserved with source-family prefix.
+nccs_bmf__CLASSIFICATION,source_native,nccs_bmf,,CLASSIFICATION,False,False,1.6.0,Source-native column preserved with source-family prefix.
+nccs_bmf__CTAXPER,source_native,nccs_bmf,,CTAXPER,False,False,1.6.0,Source-native column preserved with source-family prefix.
+nccs_bmf__CTOTREV,source_native,nccs_bmf,,CTOTREV,False,False,1.6.0,Source-native column preserved with source-family prefix.
+nccs_bmf__DEDUCTIBILITY,source_native,nccs_bmf,,DEDUCTIBILITY,False,False,1.6.0,Source-native column preserved with source-family prefix.
+nccs_bmf__EIN,source_native,nccs_bmf,,EIN,False,False,1.6.0,Source-native column preserved with source-family prefix.
+nccs_bmf__FILER,source_native,nccs_bmf,,FILER,False,False,1.6.0,Source-native column preserved with source-family prefix.
+nccs_bmf__FILING_REQ_CD,source_native,nccs_bmf,,FILING_REQ_CD,False,False,1.6.0,Source-native column preserved with source-family prefix.
+nccs_bmf__FIPS,source_native,nccs_bmf,,FIPS,False,False,1.6.0,Source-native column preserved with source-family prefix.
+nccs_bmf__FNDNCD,source_native,nccs_bmf,,FNDNCD,False,False,1.6.0,Source-native column preserved with source-family prefix.
+nccs_bmf__FOUNDATION,source_native,nccs_bmf,,FOUNDATION,False,False,1.6.0,Source-native column preserved with source-family prefix.
+nccs_bmf__FRCD,source_native,nccs_bmf,,FRCD,False,False,1.6.0,Source-native column preserved with source-family prefix.
+nccs_bmf__GROUP,source_native,nccs_bmf,,GROUP,False,False,1.6.0,Source-native column preserved with source-family prefix.
+nccs_bmf__ICO,source_native,nccs_bmf,,ICO,False,False,1.6.0,Source-native column preserved with source-family prefix.
+nccs_bmf__ID,source_native,nccs_bmf,,ID,False,False,1.6.0,Source-native column preserved with source-family prefix.
+nccs_bmf__INCOME,source_native,nccs_bmf,,INCOME,False,False,1.6.0,Source-native column preserved with source-family prefix.
+nccs_bmf__INCOME_AMT,source_native,nccs_bmf,,INCOME_AMT,False,False,1.6.0,Source-native column preserved with source-family prefix.
+nccs_bmf__INCOME_CD,source_native,nccs_bmf,,INCOME_CD,False,False,1.6.0,Source-native column preserved with source-family prefix.
+nccs_bmf__LEVEL1,source_native,nccs_bmf,,LEVEL1,False,False,1.6.0,Source-native column preserved with source-family prefix.
+nccs_bmf__LEVEL2,source_native,nccs_bmf,,LEVEL2,False,False,1.6.0,Source-native column preserved with source-family prefix.
+nccs_bmf__LEVEL3,source_native,nccs_bmf,,LEVEL3,False,False,1.6.0,Source-native column preserved with source-family prefix.
+nccs_bmf__LEVEL4,source_native,nccs_bmf,,LEVEL4,False,False,1.6.0,Source-native column preserved with source-family prefix.
+nccs_bmf__MAJGRPB,source_native,nccs_bmf,,MAJGRPB,False,False,1.6.0,Source-native column preserved with source-family prefix.
+nccs_bmf__MSA_NECH,source_native,nccs_bmf,,MSA_NECH,False,False,1.6.0,Source-native column preserved with source-family prefix.
+nccs_bmf__NAICS,source_native,nccs_bmf,,NAICS,False,False,1.6.0,Source-native column preserved with source-family prefix.
+nccs_bmf__NAME,source_native,nccs_bmf,,NAME,False,False,1.6.0,Source-native column preserved with source-family prefix.
+nccs_bmf__NTEE1,source_native,nccs_bmf,,NTEE1,False,False,1.6.0,Source-native column preserved with source-family prefix.
+nccs_bmf__NTEECC,source_native,nccs_bmf,,NTEECC,False,False,1.6.0,Source-native column preserved with source-family prefix.
+nccs_bmf__NTEEFINAL,source_native,nccs_bmf,,NTEEFINAL,False,False,1.6.0,Source-native column preserved with source-family prefix.
+nccs_bmf__NTEE_CD,source_native,nccs_bmf,,NTEE_CD,False,False,1.6.0,Source-native column preserved with source-family prefix.
+nccs_bmf__NTMAJ10,source_native,nccs_bmf,,NTMAJ10,False,False,1.6.0,Source-native column preserved with source-family prefix.
+nccs_bmf__NTMAJ12,source_native,nccs_bmf,,NTMAJ12,False,False,1.6.0,Source-native column preserved with source-family prefix.
+nccs_bmf__NTMAJ5,source_native,nccs_bmf,,NTMAJ5,False,False,1.6.0,Source-native column preserved with source-family prefix.
+nccs_bmf__ORGANIZATION,source_native,nccs_bmf,,ORGANIZATION,False,False,1.6.0,Source-native column preserved with source-family prefix.
+nccs_bmf__OUTNCCS,source_native,nccs_bmf,,OUTNCCS,False,False,1.6.0,Source-native column preserved with source-family prefix.
+nccs_bmf__OUTREAS,source_native,nccs_bmf,,OUTREAS,False,False,1.6.0,Source-native column preserved with source-family prefix.
+nccs_bmf__PF_FILING_REQ_CD,source_native,nccs_bmf,,PF_FILING_REQ_CD,False,False,1.6.0,Source-native column preserved with source-family prefix.
+nccs_bmf__PMSA,source_native,nccs_bmf,,PMSA,False,False,1.6.0,Source-native column preserved with source-family prefix.
+nccs_bmf__RANDNUM,source_native,nccs_bmf,,RANDNUM,False,False,1.6.0,Source-native column preserved with source-family prefix.
+nccs_bmf__REGION,source_native,nccs_bmf,,REGION,False,False,1.6.0,Source-native column preserved with source-family prefix.
+nccs_bmf__REVENUE_AMT,source_native,nccs_bmf,,REVENUE_AMT,False,False,1.6.0,Source-native column preserved with source-family prefix.
+nccs_bmf__RULEDATE,source_native,nccs_bmf,,RULEDATE,False,False,1.6.0,Source-native column preserved with source-family prefix.
+nccs_bmf__RULING,source_native,nccs_bmf,,RULING,False,False,1.6.0,Source-native column preserved with source-family prefix.
+nccs_bmf__RYEAR,source_native,nccs_bmf,,RYEAR,False,False,1.6.0,Source-native column preserved with source-family prefix.
+nccs_bmf__SEC_NAME,source_native,nccs_bmf,,SEC_NAME,False,False,1.6.0,Source-native column preserved with source-family prefix.
+nccs_bmf__SORT_NAME,source_native,nccs_bmf,,SORT_NAME,False,False,1.6.0,Source-native column preserved with source-family prefix.
+nccs_bmf__STATE,source_native,nccs_bmf,,STATE,False,False,1.6.0,Source-native column preserved with source-family prefix.
+nccs_bmf__STATUS,source_native,nccs_bmf,,STATUS,False,False,1.6.0,Source-native column preserved with source-family prefix.
+nccs_bmf__STREET,source_native,nccs_bmf,,STREET,False,False,1.6.0,Source-native column preserved with source-family prefix.
+nccs_bmf__SUBSECCD,source_native,nccs_bmf,,SUBSECCD,False,False,1.6.0,Source-native column preserved with source-family prefix.
+nccs_bmf__SUBSECTION,source_native,nccs_bmf,,SUBSECTION,False,False,1.6.0,Source-native column preserved with source-family prefix.
+nccs_bmf__TAXPER,source_native,nccs_bmf,,TAXPER,False,False,1.6.0,Source-native column preserved with source-family prefix.
+nccs_bmf__TAX_PERIOD,source_native,nccs_bmf,,TAX_PERIOD,False,False,1.6.0,Source-native column preserved with source-family prefix.
+nccs_bmf__ZFILER,source_native,nccs_bmf,,ZFILER,False,False,1.6.0,Source-native column preserved with source-family prefix.
+nccs_bmf__ZIP,source_native,nccs_bmf,,ZIP,False,False,1.6.0,Source-native column preserved with source-family prefix.
+nccs_bmf__ZIP5,source_native,nccs_bmf,,ZIP5,False,False,1.6.0,Source-native column preserved with source-family prefix.
+nccs_bmf__benchmark_match_source,source_native,nccs_bmf,,benchmark_match_source,False,False,1.6.0,Source-native column preserved with source-family prefix.
+nccs_bmf__bmf_snapshot_month,source_native,nccs_bmf,,bmf_snapshot_month,False,False,1.6.0,Source-native column preserved with source-family prefix.
+nccs_bmf__bmf_snapshot_year,source_native,nccs_bmf,,bmf_snapshot_year,False,False,1.6.0,Source-native column preserved with source-family prefix.
+nccs_bmf__county_fips,source_native,nccs_bmf,,county_fips,False,False,1.6.0,Source-native column preserved with source-family prefix.
+nccs_bmf__is_benchmark_county,source_native,nccs_bmf,,is_benchmark_county,False,False,1.6.0,Source-native column preserved with source-family prefix.
+nccs_bmf__region,source_native,nccs_bmf,,region,False,False,1.6.0,Source-native column preserved with source-family prefix.
+nccs_efile__EIN2,source_native,nccs_efile,,EIN2,False,False,1.6.0,Source-native column preserved with source-family prefix.
+nccs_efile__F9_00_BUILD_TIME_STAMP,source_native,nccs_efile,,F9_00_BUILD_TIME_STAMP,False,False,1.6.0,Source-native column preserved with source-family prefix.
+nccs_efile__F9_00_ORG_ADDR_STATE,source_native,nccs_efile,,F9_00_ORG_ADDR_STATE,False,False,1.6.0,Source-native column preserved with source-family prefix.
+nccs_efile__F9_00_ORG_ADDR_ZIP,source_native,nccs_efile,,F9_00_ORG_ADDR_ZIP,False,False,1.6.0,Source-native column preserved with source-family prefix.
+nccs_efile__F9_00_ORG_EIN,source_native,nccs_efile,,F9_00_ORG_EIN,False,False,1.6.0,Source-native column preserved with source-family prefix.
+nccs_efile__F9_00_ORG_NAME_L1,source_native,nccs_efile,,F9_00_ORG_NAME_L1,False,False,1.6.0,Source-native column preserved with source-family prefix.
+nccs_efile__F9_00_RETURN_AMENDED_X,source_native,nccs_efile,,F9_00_RETURN_AMENDED_X,False,False,1.6.0,Source-native column preserved with source-family prefix.
+nccs_efile__F9_00_RETURN_TIME_STAMP,source_native,nccs_efile,,F9_00_RETURN_TIME_STAMP,False,False,1.6.0,Source-native column preserved with source-family prefix.
+nccs_efile__F9_00_RETURN_TYPE,source_native,nccs_efile,,F9_00_RETURN_TYPE,False,False,1.6.0,Source-native column preserved with source-family prefix.
+nccs_efile__F9_00_TAX_PERIOD_BEGIN_DATE,source_native,nccs_efile,,F9_00_TAX_PERIOD_BEGIN_DATE,False,False,1.6.0,Source-native column preserved with source-family prefix.
+nccs_efile__F9_00_TAX_PERIOD_END_DATE,source_native,nccs_efile,,F9_00_TAX_PERIOD_END_DATE,False,False,1.6.0,Source-native column preserved with source-family prefix.
+nccs_efile__F9_00_TAX_YEAR,source_native,nccs_efile,,F9_00_TAX_YEAR,False,False,1.6.0,Source-native column preserved with source-family prefix.
+nccs_efile__F9_01_EXP_REV_LESS_EXP_CY,source_native,nccs_efile,,F9_01_EXP_REV_LESS_EXP_CY,False,False,1.6.0,Source-native column preserved with source-family prefix.
+nccs_efile__F9_01_EXP_TOT_CY,source_native,nccs_efile,,F9_01_EXP_TOT_CY,False,False,1.6.0,Source-native column preserved with source-family prefix.
+nccs_efile__F9_01_NAFB_ASSET_TOT_EOY,source_native,nccs_efile,,F9_01_NAFB_ASSET_TOT_EOY,False,False,1.6.0,Source-native column preserved with source-family prefix.
+nccs_efile__F9_01_REV_TOT_CY,source_native,nccs_efile,,F9_01_REV_TOT_CY,False,False,1.6.0,Source-native column preserved with source-family prefix.
+nccs_efile__ORG_EIN,source_native,nccs_efile,,ORG_EIN,False,False,1.6.0,Source-native column preserved with source-family prefix.
+nccs_efile__RETURN_AMENDED_X,source_native,nccs_efile,,RETURN_AMENDED_X,False,False,1.6.0,Source-native column preserved with source-family prefix.
+nccs_efile__RETURN_TIME_STAMP,source_native,nccs_efile,,RETURN_TIME_STAMP,False,False,1.6.0,Source-native column preserved with source-family prefix.
+nccs_efile__RETURN_TYPE,source_native,nccs_efile,,RETURN_TYPE,False,False,1.6.0,Source-native column preserved with source-family prefix.
+nccs_efile__SA_01_PCSTAT_HOSPITAL_X,source_native,nccs_efile,,SA_01_PCSTAT_HOSPITAL_X,False,False,1.6.0,Source-native column preserved with source-family prefix.
+nccs_efile__SA_01_PCSTAT_SCHOOL_X,source_native,nccs_efile,,SA_01_PCSTAT_SCHOOL_X,False,False,1.6.0,Source-native column preserved with source-family prefix.
+nccs_efile__TAX_PERIOD_BEGIN_DATE,source_native,nccs_efile,,TAX_PERIOD_BEGIN_DATE,False,False,1.6.0,Source-native column preserved with source-family prefix.
+nccs_efile__TAX_PERIOD_END_DATE,source_native,nccs_efile,,TAX_PERIOD_END_DATE,False,False,1.6.0,Source-native column preserved with source-family prefix.
+nccs_efile__TAX_YEAR,source_native,nccs_efile,,TAX_YEAR,False,False,1.6.0,Source-native column preserved with source-family prefix.
+nccs_efile__URL,source_native,nccs_efile,,URL,False,False,1.6.0,Source-native column preserved with source-family prefix.
+nccs_efile__county_fips,source_native,nccs_efile,,county_fips,False,False,1.6.0,Source-native column preserved with source-family prefix.
+nccs_efile__efile_is_partial_year,source_native,nccs_efile,,efile_is_partial_year,False,False,1.6.0,Source-native column preserved with source-family prefix.
+nccs_efile__efile_selected_build_timestamp,source_native,nccs_efile,,efile_selected_build_timestamp,False,False,1.6.0,Source-native column preserved with source-family prefix.
+nccs_efile__efile_selected_filing_url,source_native,nccs_efile,,efile_selected_filing_url,False,False,1.6.0,Source-native column preserved with source-family prefix.
+nccs_efile__efile_selected_return_amended,source_native,nccs_efile,,efile_selected_return_amended,False,False,1.6.0,Source-native column preserved with source-family prefix.
+nccs_efile__efile_selected_return_timestamp,source_native,nccs_efile,,efile_selected_return_timestamp,False,False,1.6.0,Source-native column preserved with source-family prefix.
+nccs_efile__harm_assets_amount,source_native,nccs_efile,,harm_assets_amount,False,False,1.6.0,Source-native column preserved with source-family prefix.
+nccs_efile__harm_county_fips,source_native,nccs_efile,,harm_county_fips,False,False,1.6.0,Source-native column preserved with source-family prefix.
+nccs_efile__harm_ein,source_native,nccs_efile,,harm_ein,False,False,1.6.0,Source-native column preserved with source-family prefix.
+nccs_efile__harm_expenses_amount,source_native,nccs_efile,,harm_expenses_amount,False,False,1.6.0,Source-native column preserved with source-family prefix.
+nccs_efile__harm_filing_form,source_native,nccs_efile,,harm_filing_form,False,False,1.6.0,Source-native column preserved with source-family prefix.
+nccs_efile__harm_income_amount,source_native,nccs_efile,,harm_income_amount,False,False,1.6.0,Source-native column preserved with source-family prefix.
+nccs_efile__harm_is_hospital,source_native,nccs_efile,,harm_is_hospital,False,False,1.6.0,Source-native column preserved with source-family prefix.
+nccs_efile__harm_is_university,source_native,nccs_efile,,harm_is_university,False,False,1.6.0,Source-native column preserved with source-family prefix.
+nccs_efile__harm_org_name,source_native,nccs_efile,,harm_org_name,False,False,1.6.0,Source-native column preserved with source-family prefix.
+nccs_efile__harm_region,source_native,nccs_efile,,harm_region,False,False,1.6.0,Source-native column preserved with source-family prefix.
+nccs_efile__harm_revenue_amount,source_native,nccs_efile,,harm_revenue_amount,False,False,1.6.0,Source-native column preserved with source-family prefix.
+nccs_efile__harm_state,source_native,nccs_efile,,harm_state,False,False,1.6.0,Source-native column preserved with source-family prefix.
+nccs_efile__harm_tax_year,source_native,nccs_efile,,harm_tax_year,False,False,1.6.0,Source-native column preserved with source-family prefix.
+nccs_efile__harm_zip5,source_native,nccs_efile,,harm_zip5,False,False,1.6.0,Source-native column preserved with source-family prefix.
+nccs_efile__is_benchmark_county,source_native,nccs_efile,,is_benchmark_county,False,False,1.6.0,Source-native column preserved with source-family prefix.
+nccs_efile__region,source_native,nccs_efile,,region,False,False,1.6.0,Source-native column preserved with source-family prefix.
+nccs_postcard__ID,source_native,nccs_postcard,,ID,False,False,1.6.0,Source-native column preserved with source-family prefix.
+nccs_postcard__benchmark_match_source,source_native,nccs_postcard,,benchmark_match_source,False,False,1.6.0,Source-native column preserved with source-family prefix.
+nccs_postcard__county_fips,source_native,nccs_postcard,,county_fips,False,False,1.6.0,Source-native column preserved with source-family prefix.
+nccs_postcard__dba_name_1,source_native,nccs_postcard,,dba_name_1,False,False,1.6.0,Source-native column preserved with source-family prefix.
+nccs_postcard__dba_name_2,source_native,nccs_postcard,,dba_name_2,False,False,1.6.0,Source-native column preserved with source-family prefix.
+nccs_postcard__dba_name_3,source_native,nccs_postcard,,dba_name_3,False,False,1.6.0,Source-native column preserved with source-family prefix.
+nccs_postcard__ein,source_native,nccs_postcard,,ein,False,False,1.6.0,Source-native column preserved with source-family prefix.
+nccs_postcard__gross_receipts_under_25000,source_native,nccs_postcard,,gross_receipts_under_25000,False,False,1.6.0,Source-native column preserved with source-family prefix.
+nccs_postcard__is_benchmark_county,source_native,nccs_postcard,,is_benchmark_county,False,False,1.6.0,Source-native column preserved with source-family prefix.
+nccs_postcard__legal_name,source_native,nccs_postcard,,legal_name,False,False,1.6.0,Source-native column preserved with source-family prefix.
+nccs_postcard__officer_address_line_1,source_native,nccs_postcard,,officer_address_line_1,False,False,1.6.0,Source-native column preserved with source-family prefix.
+nccs_postcard__officer_address_line_2,source_native,nccs_postcard,,officer_address_line_2,False,False,1.6.0,Source-native column preserved with source-family prefix.
+nccs_postcard__officer_city,source_native,nccs_postcard,,officer_city,False,False,1.6.0,Source-native column preserved with source-family prefix.
+nccs_postcard__officer_country,source_native,nccs_postcard,,officer_country,False,False,1.6.0,Source-native column preserved with source-family prefix.
+nccs_postcard__officer_name,source_native,nccs_postcard,,officer_name,False,False,1.6.0,Source-native column preserved with source-family prefix.
+nccs_postcard__officer_province,source_native,nccs_postcard,,officer_province,False,False,1.6.0,Source-native column preserved with source-family prefix.
+nccs_postcard__officer_state,source_native,nccs_postcard,,officer_state,False,False,1.6.0,Source-native column preserved with source-family prefix.
+nccs_postcard__officer_zip,source_native,nccs_postcard,,officer_zip,False,False,1.6.0,Source-native column preserved with source-family prefix.
+nccs_postcard__organization_address_line_1,source_native,nccs_postcard,,organization_address_line_1,False,False,1.6.0,Source-native column preserved with source-family prefix.
+nccs_postcard__organization_address_line_2,source_native,nccs_postcard,,organization_address_line_2,False,False,1.6.0,Source-native column preserved with source-family prefix.
+nccs_postcard__organization_city,source_native,nccs_postcard,,organization_city,False,False,1.6.0,Source-native column preserved with source-family prefix.
+nccs_postcard__organization_country,source_native,nccs_postcard,,organization_country,False,False,1.6.0,Source-native column preserved with source-family prefix.
+nccs_postcard__organization_province,source_native,nccs_postcard,,organization_province,False,False,1.6.0,Source-native column preserved with source-family prefix.
+nccs_postcard__organization_state,source_native,nccs_postcard,,organization_state,False,False,1.6.0,Source-native column preserved with source-family prefix.
+nccs_postcard__organization_zip,source_native,nccs_postcard,,organization_zip,False,False,1.6.0,Source-native column preserved with source-family prefix.
+nccs_postcard__region,source_native,nccs_postcard,,region,False,False,1.6.0,Source-native column preserved with source-family prefix.
+nccs_postcard__snapshot_month,source_native,nccs_postcard,,snapshot_month,False,False,1.6.0,Source-native column preserved with source-family prefix.
+nccs_postcard__snapshot_year,source_native,nccs_postcard,,snapshot_year,False,False,1.6.0,Source-native column preserved with source-family prefix.
+nccs_postcard__tax_period_begin_date,source_native,nccs_postcard,,tax_period_begin_date,False,False,1.6.0,Source-native column preserved with source-family prefix.
+nccs_postcard__tax_period_end_date,source_native,nccs_postcard,,tax_period_end_date,False,False,1.6.0,Source-native column preserved with source-family prefix.
+nccs_postcard__tax_year,source_native,nccs_postcard,,tax_year,False,False,1.6.0,Source-native column preserved with source-family prefix.
+nccs_postcard__terminated,source_native,nccs_postcard,,terminated,False,False,1.6.0,Source-native column preserved with source-family prefix.
+nccs_postcard__website,source_native,nccs_postcard,,website,False,False,1.6.0,Source-native column preserved with source-family prefix.

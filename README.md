@@ -1,108 +1,56 @@
 # SWB Project 321
 
-This repository contains the **code, SQL, and analytical logic** for *Statistics Without Borders (SWB) Project 321*, which analyzes IRS Form 990 filings to profile and benchmark nonprofit landscapes in the **Black Hills region** and comparable peer regions.
+This repository contains the code, tests, notebooks, SQL, and documentation for Statistics Without Borders Project 321. The project profiles the nonprofit landscape in the Black Hills region and compares it with selected peer regions using IRS Form 990 and complementary public data.
 
-The project supports SWB’s mission to provide pro bono statistical and data science support to nonprofit organizations.
+## Repository map
 
----
+| Location | Purpose |
+| --- | --- |
+| [`python/`](python/) | Reproducible ingestion, transformation, analysis, and export code |
+| [`sql/`](sql/) | Staging, curated, and metadata SQL |
+| [`notebooks/`](notebooks/) | Numbered exploratory and communication notebooks |
+| [`tests/`](tests/) | Automated tests, organized to mirror the source datasets |
+| [`scripts/reporting/`](scripts/reporting/) | Report and presentation generation utilities |
+| [`scripts/diagnostics/`](scripts/diagnostics/) | Manual audits, benchmarks, and data-quality checks |
+| [`docs/planning/`](docs/planning/) | Project scope and analysis plans |
+| [`docs/analysis/`](docs/analysis/) | Analysis notes, results, and presentation sources |
+| [`docs/data_sources/`](docs/data_sources/) | Source-specific documentation |
+| [`docs/infrastructure/`](docs/infrastructure/) | S3, OneDrive, and infrastructure audit documentation |
+| [`docs/deliverables/`](docs/deliverables/) | Client-facing preprocessing and final-report artifacts |
 
-## Project Overview
+See [`docs/README.md`](docs/README.md) for the full documentation index and [`scripts/README.md`](scripts/README.md) for script entry points.
 
-The goal of this project is to:
-- Build a clear, data-driven profile of the nonprofit ecosystem in the Black Hills region
-- Compare nonprofit scale, composition, and financial capacity against selected benchmark regions
-- Deliver transparent, reproducible analysis and analysis-ready datasets to the client
+## Data policy
 
-The analysis is based primarily on **IRS Form 990 filings** (Forms 990, 990-EZ, and 990-PF), supplemented with geographic reference data and **U.S. Census American Community Survey (ACS)** data for benchmark region comparisons.
+Raw and curated datasets live outside Git in the configured local/OneDrive data root. The former project bucket `swb-321-irs990-teos` was intentionally deleted by 2026-07-23 and must not be recreated; retained S3 paths and inventories are historical lineage only. This repository intentionally excludes row-level data, credentials, local environment files, and generated caches. Only small fixtures and documentation metadata belong in Git.
 
----
+## Getting started
 
-## Architecture (Separation of Concerns)
+From the repository root:
 
-This project intentionally separates **code**, **data**, and **outputs**:
-
-| Component | Location |
-|---|---|
-| Code & analysis logic | **GitHub (this repository)** |
-| Raw & curated data | **OneDrive** |
-| Analysis outputs | **OneDrive (CSV / Excel / report)** |
-
-⚠️ **No raw or curated data is stored in this repository.**
-
----
-
-## Data Policy
-
-- Raw source data (IRS 990 extracts, Census data) live in **OneDrive**
-- Curated, analysis-ready datasets are versioned and stored in **OneDrive**
-- This repository contains **no CSVs, Parquet files, Excel files, or credentials**
-- All local paths and secrets are environment-specific and excluded via `.gitignore`
-
----
-
-## Repository Structure
+```powershell
+python -m pip install -r python/requirements.txt
+pytest tests -q
 ```
-swb_project_321/
-│
-├── README.md
-├── LICENSE
-├── .gitignore
-│
-├── sql/ 
-│ ├── staging/ # Load and normalize raw source extracts
-│ ├── curated/ # Build analysis-ready tables
-│ └── meta/ # ETL logs, metadata
-│
-├── python/
-│ ├── ingest/ # Source ingestion scripts
-│ ├── transform/ # Data extraction, aggregation, and summarization
-│ │ ├── extract_acs_variables.py # ACS DP03 county-level extraction (raw → staging)
-│ │ └── compute_regional_summary.py # Weighted regional averages (staging → curated)
-│ ├── export/ # Export CSV / Excel deliverables
-│ └── utils/ # Shared helper functions
-│
-├── notebooks/ # Analysis and communication
-│ ├── 01_landscape_summary_example.ipynb
-│ └── 02_benchmark_comparison_example.ipynb
-│
-├── docs/
-│ ├── methodology.md
-│ ├── benchmark_regions.md
-│ ├── data_sources.md
-│ ├── decisions.md
-│ ├── project_purpose_methods_data_sources_variables.md
-│ ├── onedrive/          # OneDrive layout & local setup
-│ └── 990/                # Form 990 pipeline plans
-│
-└── tests/
+
+The following retained pipeline entry points describe the original end-to-end workflows. Their S3 upload and verification stages are inactive because the former bucket was deleted; do not run those stages without a separately approved replacement design.
+
+```powershell
+python python/run_irs_990.py
+python python/run_irs_soi.py
+python python/run_nccs_990_core.py
+python python/run_nccs_990_postcard.py
 ```
----
 
-## Collaboration Guidelines
+Dataset-specific options and run order are documented in [`python/README.md`](python/README.md) and [`python/ingest/README.md`](python/ingest/README.md).
 
-- The `main` branch contains stable, review-ready code
-- Use feature branches for new work
-- Open pull requests for:
-  - schema changes
-  - ETL logic changes
-  - methodology updates
-- Do **not** commit data files or credentials
+## Collaboration
 
----
+- Keep `main` stable and review-ready.
+- Use feature branches for material code, schema, or methodology changes.
+- Do not commit data extracts, credentials, private keys, or local environment files.
+- Preserve source documents in `docs/deliverables/final_report/source/`; generated working copies belong in the adjacent `working/` directory.
 
 ## License
 
-This project is released under the **MIT License**.
-
----
-
-## Attribution
-
-This repository is maintained by volunteers for  
-**Statistics Without Borders (ASA) — Project 321**.
-
----
-
-## Questions
-
-For questions about methodology, data access, or infrastructure, contact the current project leads or refer to the documentation in `docs/`.
+Released under the [MIT License](LICENSE).

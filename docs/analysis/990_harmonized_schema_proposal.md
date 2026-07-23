@@ -1,5 +1,7 @@
 # 990 Harmonized Schema Proposal
 
+> **Status reviewed 2026-07-23:** this proposal reflects the current local repository code and retained `2022-2024` planning artifacts. It does not imply that the former project S3 bucket remains available.
+
 ## Summary
 
 The cleaned 990-family deliverable should be one pooled **organization-year** dataset, with one row

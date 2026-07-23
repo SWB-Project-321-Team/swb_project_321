@@ -25,7 +25,7 @@ Scripts for Census/ACS location data and GEOID reference files used by the bench
 ```
 
 - **01_fetch_geoid_reference** does not read any project files; it only calls external APIs or uses hardcoded GEOIDs.
-- **02_fetch_zip_to_county** produces `zip_to_county_fips.csv` (Census ZCTA–county or `--local` CSV). **03_build_zip_list_for_geoids** reads project files: the GEOID reference (xlsx or 01’s CSV) and that file, and writes the benchmark ZIP list used by 990_irs.
+- **02_fetch_zip_to_county** produces `zip_to_county_fips.csv` (Census ZCTA–county or `--local` CSV). **03_build_zip_list_for_geoids** reads project files: the GEOID reference (xlsx or 01’s CSV) and that file, and writes the benchmark ZIP list used by irs_990.
 
 ## Purpose
 
@@ -54,7 +54,7 @@ All paths under `01_data/reference/` (or your `DATA/reference`). **Inputs** = fi
 | **02_fetch_zip_to_county.py** | No project files. **Census URL** (ZCTA–county) or **`--local`** CSV (e.g. HUD). | **`zip_to_county_fips.csv`** — ZIP, FIPS (one row per ZIP). |
 | **03_build_zip_list_for_geoids.py** | **`GEOID_reference.csv`** (from 01; fallback: xlsx); **`zip_to_county_fips.csv`** (from 02_fetch_zip_to_county or you provide). | **`zip_codes_in_benchmark_regions.csv`** — ZIP, GEOID, Region (only ZIPs in the 18 counties; Region from ref). |
 
-So: **01** doesn’t read any project files (only APIs/hardcoded data). **02** fetches the ZIP–county crosswalk. **03** reads the GEOID reference (01’s CSV, or xlsx if CSV missing) plus zip_to_county_fips, and writes the benchmark ZIP list used by 990_irs.
+So: **01** doesn’t read any project files (only APIs/hardcoded data). **02** fetches the ZIP–county crosswalk. **03** reads the GEOID reference (01’s CSV, or xlsx if CSV missing) plus zip_to_county_fips, and writes the benchmark ZIP list used by irs_990.
 
 ## Main inputs / outputs (summary)
 
@@ -84,17 +84,17 @@ python python/ingest/location_processing/02_fetch_zip_to_county.py
 python python/ingest/location_processing/03_build_zip_list_for_geoids.py
 ```
 
-## Integration with 990_irs pipeline (no 990_givingtuesday)
+## Integration with irs_990 pipeline (no givingtuesday_990)
 
-You can run **benchmark-region** 990 staging using **only** location_processing and 990_irs:
+You can run **benchmark-region** 990 staging using **only** location_processing and irs_990:
 
 1. **location_processing**: Run **01_fetch_geoid_reference.py** → `GEOID_reference.csv`. Run **02_fetch_zip_to_county.py** → `zip_to_county_fips.csv`. Then run **03_build_zip_list_for_geoids.py** (reads both). That produces **`01_data/reference/zip_codes_in_benchmark_regions.csv`** (ZIP, GEOID, Region).
 
-2. **990_irs**: Run **01** (index), **02** with **--all-parts** (upload all ZIPs; no EIN list), then **03** with **--benchmark-zips** (default path is that same CSV). Script 03 keeps only rows whose **org address ZIP** is in the benchmark list and sets **region** from the CSV. Script **04** (merge from silver parts) also accepts **--benchmark-zips** with the same behavior.
+2. **irs_990**: Run **01** (index), **02** with **--all-parts** (upload all ZIPs; no EIN list), then **03** with **--benchmark-zips** (default path is that same CSV). Script 03 keeps only rows whose **org address ZIP** is in the benchmark list and sets **region** from the CSV. Script **04** (merge from silver parts) also accepts **--benchmark-zips** with the same behavior.
 
-So **990_irs** reads **only** the benchmark ZIP list from location_processing. No EIN list and no 990_givingtuesday pipeline are required.
+So **irs_990** reads **only** the benchmark ZIP list from location_processing. No EIN list and no givingtuesday_990 pipeline are required.
 
-**Run order (location_processing + 990_irs only):**
+**Run order (location_processing + irs_990 only):**
 
 ```bash
 # 1. Geography (fetch ZIP→county, then GEOID reference, then benchmark ZIP list)
@@ -102,10 +102,10 @@ python python/ingest/location_processing/02_fetch_zip_to_county.py
 python python/ingest/location_processing/01_fetch_geoid_reference.py
 python python/ingest/location_processing/03_build_zip_list_for_geoids.py
 
-# 2. 990_irs: upload all parts, then parse and filter by benchmark ZIPs
-python python/ingest/990_irs/01_upload_irs_990_index_to_s3.py
-python python/ingest/990_irs/02_upload_irs_990_zips_to_s3.py
-python python/ingest/990_irs/03_parse_irs_990_zips_to_staging.py --benchmark-zips 01_data/reference/zip_codes_in_benchmark_regions.csv
+# 2. irs_990: upload all parts, then parse and filter by benchmark ZIPs
+python python/ingest/irs_990/01_upload_irs_990_index_to_s3.py
+python python/ingest/irs_990/02_upload_irs_990_zips_to_s3.py
+python python/ingest/irs_990/03_parse_irs_990_zips_to_staging.py --benchmark-zips 01_data/reference/zip_codes_in_benchmark_regions.csv
 ```
 
 If `zip_codes_in_benchmark_regions.csv` is already at the default path, you can omit the path: `--benchmark-zips` alone uses `01_data/reference/zip_codes_in_benchmark_regions.csv`.

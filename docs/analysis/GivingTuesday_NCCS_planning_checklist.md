@@ -1,5 +1,7 @@
 # GivingTuesday And NCCS Planning Checklist
 
+> **Status reviewed 2026-07-23:** this remains a planning artifact. Use the implemented pipeline references under `docs/deliverables/preprocessing/technical_reference/pipelines/` for actual processing behavior.
+
 ## Purpose
 This checklist translates the team meeting discussion into a concrete planning-phase task list for the GivingTuesday and NCCS nonprofit data.
 

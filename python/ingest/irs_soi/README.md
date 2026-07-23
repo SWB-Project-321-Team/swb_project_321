@@ -1,8 +1,8 @@
 # IRS SOI County Data -> Local Raw -> S3 -> Benchmark Filter
 
-Scripts that fetch the latest published **IRS Statistics of Income county release**, preserve the
-official raw assets locally, upload them to the project S3 bucket, and build separate
-benchmark-county filtered CSVs.
+> **Infrastructure status (2026-07-23):** local source and benchmark-filter steps remain documented, but the former project S3 bucket was intentionally deleted. Upload and S3 verification steps are historical and must not recreate `swb-321-irs990-teos`.
+
+Scripts that fetch the latest published **IRS Statistics of Income county release**, preserve the official raw assets locally, and build benchmark-county filtered CSVs. The original workflow also uploaded them to the former project bucket; that upload stage is now inactive.
 
 ## What this pipeline does
 
@@ -13,7 +13,7 @@ For the resolved tax year, the pipeline preserves exactly three official IRS ass
 - County Income Data Users Guide DOCX
 
 The raw files remain immutable. A later step builds benchmark-filtered county CSVs from the two
-raw county CSVs using the same benchmark county scope and region labels as the `990_irs` pipeline.
+raw county CSVs using the same benchmark county scope and region labels as the `irs_990` pipeline.
 
 ## Run order
 
@@ -31,7 +31,7 @@ python python/ingest/irs_soi/06_upload_filtered_county_release_to_s3.py
 Or use the runner:
 
 ```bash
-python python/run_irs_soi_county.py
+python python/run_irs_soi.py
 ```
 
 ## Defaults
@@ -62,14 +62,14 @@ Filtered:
 The county CSV is already county-level. The filter therefore does **not** use ZIP-to-county
 crosswalks at runtime.
 
-It matches the current `990_irs` benchmark geography semantics by:
+It matches the current `irs_990` benchmark geography semantics by:
 
 1. normalizing `STATEFIPS` to 2 digits
 2. normalizing `COUNTYFIPS` to 3 digits
 3. building `county_fips = STATEFIPS + COUNTYFIPS`
 4. excluding state totals where `COUNTYFIPS == 000`
 5. keeping only counties present in `GEOID_reference.csv`
-6. populating `region` from the same region/cluster column detection used by `990_irs`
+6. populating `region` from the same region/cluster column detection used by `irs_990`
 
 ## Notes
 

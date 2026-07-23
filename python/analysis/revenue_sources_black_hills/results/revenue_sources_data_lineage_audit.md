@@ -4,7 +4,7 @@
 
 This audit traces the raw GivingTuesday 990-family fields into the harmonized variables used by the Black Hills revenue-source analysis. It was run after inspecting the raw benchmark parquet and the regenerated analysis-variable parquet.
 
-**Current status as of May 17, 2026:** reviewed against the refreshed revenue-source run. The raw-field mapping, exclusion logic, and revenue-source construction below remain current for the client-facing rank-test notebook and regenerated results folder.
+**Last analysis refresh: May 17, 2026. Documentation review: July 23, 2026.** The raw-field mapping, exclusion logic, and revenue-source construction below describe the retained client-facing rank-test notebook and results folder. No analysis rerun occurred during the July documentation review.
 
 ## Raw Input Files
 

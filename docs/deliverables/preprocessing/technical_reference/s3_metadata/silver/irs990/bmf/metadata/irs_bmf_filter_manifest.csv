@@ -1,0 +1,9 @@
+artifact_type,source_state_code,source_state_file,input_row_count,rows_after_zip_geography_filter,state_mismatch_dropped_count,invalid_ein_dropped_count,missing_tax_year_dropped_count,out_of_range_tax_year_dropped_count,admitted_analysis_scope_row_count,duplicate_group_count_before_resolution,duplicate_rows_dropped_count,output_row_count,tax_year
+state_file,az,eo_az.csv,30724,729,0,0,161,169,399,,,399,
+state_file,mn,eo_mn.csv,39355,111,1,0,12,35,63,,,63,
+state_file,mt,eo_mt.csv,12161,2218,0,0,375,646,1197,,,1197,
+state_file,sd,eo_sd.csv,7342,3189,0,0,580,752,1857,,,1857,
+combined_filtered,,,3516,,,,,,3516,0,0,3516,
+benchmark_year,,,,,,,,,,,,77,2022
+benchmark_year,,,,,,,,,,,,218,2023
+benchmark_year,,,,,,,,,,,,3221,2024

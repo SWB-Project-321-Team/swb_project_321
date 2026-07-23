@@ -1,6 +1,8 @@
 # python/ingest/
 
-Scripts that pull raw data from sources and write to OneDrive `01_data/raw/`.
+Scripts that pull raw data from sources and write to the configured local data root, normally OneDrive `01_data/raw/`.
+
+**Infrastructure status as of 2026-07-23:** the former bucket `swb-321-irs990-teos` was intentionally deleted and must not be recreated. Tables below retain S3 upload and verification stages to document the historical pipeline; treat those stages as inactive unless a new target is separately approved and configured.
 
 - IRS 990 extracts, Giving Tuesday data, Census/ACS, or other APIs/files.
 - Output goes to the appropriate subfolder under `01_data/raw/` (for example `irs_990/`, `census_acs/`).
@@ -16,47 +18,47 @@ Scripts that pull raw data from sources and write to OneDrive `01_data/raw/`.
 Run from repo root, for example:
 `python python/ingest/location_processing/01_fetch_geoid_reference.py`
 
-## 990_givingtuesday/datamart/ - DataMart-first 990 pipeline (run in order)
+## givingtuesday_990/datamart/ - DataMart-first 990 pipeline (run in order)
 
 Scripts to fetch, verify, merge, and filter 990 DataMart files for benchmark analysis.
-Run from repo root. See `990_givingtuesday/datamart/README.md`.
-This pipeline runs independently of `990_givingtuesday/api` and `990_irs`; it only reads
+Run from repo root. See `givingtuesday_990/datamart/README.md`.
+This pipeline runs independently of `givingtuesday_990/api` and `irs_990`; it only reads
 `reference/GEOID_reference.csv` and `reference/zip_to_county_fips.csv` from `location_processing`.
 Per `secrets/coding_rules/CODING_RULES.md`, combine stages must consume filtered or explicitly
 admitted inputs rather than broad national intermediate outputs.
 
 | Step | Script | Output |
 |------|--------|--------|
-| 01 | `990_givingtuesday/datamart/01_fetch_datamart_catalog.py` | raw DataMart catalog JSON |
-| 02 | `990_givingtuesday/datamart/02_export_data_dictionary.py` | metadata CSV/MD + fields CSV/MD |
-| 03 | `990_givingtuesday/datamart/03_download_raw_datamarts.py` | full raw DataMart CSVs (Combined + Basic forms) |
-| 04 | `990_givingtuesday/datamart/04_upload_bronze_raw_and_dictionary.py` | Bronze raw + metadata upload |
-| 05 | `990_givingtuesday/datamart/05_verify_source_local_s3_sizes.py` | strict size verification report |
-| 06 | `990_givingtuesday/datamart/06_build_basic_allforms_presilver.py` | admitted Basic pre-Silver parquet |
-| 07 | `990_givingtuesday/datamart/07_build_basic_plus_combined_presilver.py` | admitted Basic+Combined pre-Silver parquet |
-| 08 | `990_givingtuesday/datamart/08_filter_benchmark_outputs_local.py` | local Silver filtered parquets + manifests |
-| 09 | `990_givingtuesday/datamart/09_upload_bronze_presilver_outputs.py` | Bronze pre-Silver parquet upload |
-| 10 | `990_givingtuesday/datamart/10_upload_silver_filtered_outputs.py` | Silver filtered parquet + manifest upload |
-| 11 | `990_givingtuesday/datamart/11_verify_curated_outputs_local_s3.py` | curated local/S3 parity report + GT artifact manifest |
-| 13 | `990_givingtuesday/datamart/13_extract_basic_analysis_variables_local.py` | GT analysis parquet + region metrics + coverage/mapping outputs |
-| 14 | `990_givingtuesday/datamart/14_upload_analysis_outputs.py` | GT analysis parquet + metadata upload |
-| Run all | `990_givingtuesday/datamart/run_990_datamart_pipeline.py` | orchestrates steps 01-11, 13, and 14 |
+| 01 | `givingtuesday_990/datamart/01_fetch_datamart_catalog.py` | raw DataMart catalog JSON |
+| 02 | `givingtuesday_990/datamart/02_export_data_dictionary.py` | metadata CSV/MD + fields CSV/MD |
+| 03 | `givingtuesday_990/datamart/03_download_raw_datamarts.py` | full raw DataMart CSVs (Combined + Basic forms) |
+| 04 | `givingtuesday_990/datamart/04_upload_bronze_raw_and_dictionary.py` | Bronze raw + metadata upload |
+| 05 | `givingtuesday_990/datamart/05_verify_source_local_s3_sizes.py` | strict size verification report |
+| 06 | `givingtuesday_990/datamart/06_build_basic_allforms_presilver.py` | admitted Basic pre-Silver parquet |
+| 07 | `givingtuesday_990/datamart/07_build_basic_plus_combined_presilver.py` | admitted Basic+Combined pre-Silver parquet |
+| 08 | `givingtuesday_990/datamart/08_filter_benchmark_outputs_local.py` | local Silver filtered parquets + manifests |
+| 09 | `givingtuesday_990/datamart/09_upload_bronze_presilver_outputs.py` | Bronze pre-Silver parquet upload |
+| 10 | `givingtuesday_990/datamart/10_upload_silver_filtered_outputs.py` | Silver filtered parquet + manifest upload |
+| 11 | `givingtuesday_990/datamart/11_verify_curated_outputs_local_s3.py` | curated local/S3 parity report + GT artifact manifest |
+| 13 | `givingtuesday_990/datamart/13_extract_basic_analysis_variables_local.py` | GT analysis parquet + region metrics + coverage/mapping outputs |
+| 14 | `givingtuesday_990/datamart/14_upload_analysis_outputs.py` | GT analysis parquet + metadata upload |
+| Run all | `givingtuesday_990/datamart/run_990_datamart_pipeline.py` | orchestrates steps 01-11, 13, and 14 |
 
-## 990_givingtuesday/api/ - Legacy per-EIN API pipeline
+## givingtuesday_990/api/ - Legacy per-EIN API pipeline
 
 This path is retained for reference/legacy support but is not the primary DataMart-first flow.
 
-## 990_irs/ - IRS TEOS 990 XML -> S3 (2021-present)
+## irs_990/ - IRS TEOS 990 XML -> S3 (2021-present)
 
-Scripts that stream IRS Form 990 series XML from IRS TEOS downloads directly to the project AWS bucket.
-Run 01 -> 02 -> 03 (optionally 04 to merge silver parts). See `990_irs/README.md`.
+Retained scripts that historically streamed IRS Form 990 series XML from IRS TEOS downloads directly to the former project AWS bucket. That streaming target is inactive.
+Run 01 -> 02 -> 03 (optionally 04 to merge silver parts). See `irs_990/README.md`.
 
 | Step | Script | Output |
 |------|--------|--------|
-| 01 | `990_irs/01_upload_irs_990_index_to_s3.py` | S3: `{prefix}/index/year={YEAR}/index_{YEAR}.csv` |
-| 02 | `990_irs/02_upload_irs_990_zips_to_s3.py` | S3: `{prefix}/zips/year={YEAR}/{YEAR}_TEOS_XML_*.zip` |
-| 03 | `990_irs/03_parse_irs_990_zips_to_staging.py` | `01_data/staging/filing/irs_990_filings.parquet` (or CSV fallback); optional `--output-parts-dir` |
-| 04 | `990_irs/04_merge_990_parts_to_staging.py` | merges silver part Parquets to single staging table |
+| 01 | `irs_990/01_upload_irs_990_index_to_s3.py` | S3: `{prefix}/index/year={YEAR}/index_{YEAR}.csv` |
+| 02 | `irs_990/02_upload_irs_990_zips_to_s3.py` | S3: `{prefix}/zips/year={YEAR}/{YEAR}_TEOS_XML_*.zip` |
+| 03 | `irs_990/03_parse_irs_990_zips_to_staging.py` | `01_data/staging/filing/irs_990_filings.parquet` (or CSV fallback); optional `--output-parts-dir` |
+| 04 | `irs_990/04_merge_990_parts_to_staging.py` | merges silver part Parquets to single staging table |
 
 Default bucket: `swb-321-irs990-teos`, prefix: `bronze/irs990/teos_xml`.
 
@@ -66,7 +68,7 @@ Scripts that download the IRS EO BMF state CSV extracts, upload and verify the r
 filter the state files to benchmark geography before any cross-state combine, and then build
 an IRS EO BMF analysis package for tax years `2022-2024` inferred from `TAX_PERIOD`.
 This pipeline follows the filter-first combine rule explicitly and keeps the older
-`990_irs/00_fetch_bmf.py` and `00b_filter_bmf_to_benchmark_upload_silver.py` scripts as
+`irs_990/00_fetch_bmf.py` and `00b_filter_bmf_to_benchmark_upload_silver.py` scripts as
 compatibility wrappers.
 
 | Step | Script | Output |
@@ -87,7 +89,7 @@ Default bucket: `swb-321-irs990-teos`, raw prefix: `bronze/irs990/bmf`, filtered
 
 Scripts that discover the latest IRS SOI county release, preserve the official raw county files
 locally, upload them to S3, and build separate benchmark-county filtered CSVs using the same
-benchmark county scope as `990_irs`.
+benchmark county scope as `irs_990`.
 
 | Step | Script | Output |
 |------|--------|--------|
@@ -97,7 +99,7 @@ benchmark county scope as `990_irs`.
 | 04 | `irs_soi/04_verify_county_release_source_local_s3.py` | raw source/local/S3 size verification report |
 | 05 | `irs_soi/05_filter_county_release_to_benchmark_local.py` | local benchmark-filtered county CSVs |
 | 06 | `irs_soi/06_upload_filtered_county_release_to_s3.py` | Silver filtered CSV upload |
-| Run all | `../run_irs_soi_county.py` | orchestrates steps 01-06 |
+| Run all | `../run_irs_soi.py` | orchestrates steps 01-06 |
 
 Default bucket: `swb-321-irs990-teos`, raw prefix: `bronze/irs_soi/county/raw`, filtered prefix: `silver/irs_soi/county`.
 
@@ -211,32 +213,32 @@ Default bucket: `swb-321-irs990-teos`, silver prefix: `silver/combined_990`.
 | Script | Output | Columns / contents | Sanity check |
 |--------|--------|--------------------|--------------|
 | location_processing/02_fetch_zip_to_county | reference/zip_to_county_fips.csv | ZIP (5-digit), FIPS (5-digit county); one row per ZIP | ~33.8k rows |
-| 990_givingtuesday/datamart/01_fetch_datamart_catalog | raw/givingtuesday_990/datamarts/metadata/datamart_catalog_raw.json | Full catalog payload from public API | Non-empty documents array |
-| 990_givingtuesday/datamart/02_export_data_dictionary | raw/givingtuesday_990/datamarts/metadata/datamart_catalog.csv/.md + datamart_fields.csv/.md | Flattened dataset metadata and full field dictionary | Required dataset rows present; field rows > 0 |
-| 990_givingtuesday/datamart/03_download_raw_datamarts | raw/givingtuesday_990/datamarts/raw/*.csv | Full unfiltered raw CSVs (Combined + Basic forms) | Local bytes == source Content-Length |
-| 990_givingtuesday/datamart/05_verify_source_local_s3_sizes | raw/givingtuesday_990/datamarts/metadata/size_verification_report.csv | source/local/S3 bytes for required datasets | Every required row has size_match=TRUE |
-| 990_givingtuesday/datamart/06_build_basic_allforms_presilver | staging/filing/givingtuesday_990_basic_allforms_presilver.parquet | Basic 990 + 990EZ + 990PF union restricted upstream to tax-year-in-scope ROI/admitted rows, with normalized keys, provenance, and admission metadata | Non-zero rows; expected key columns present; pre-Silver admission metadata present |
-| 990_givingtuesday/datamart/07_build_basic_plus_combined_presilver | staging/filing/givingtuesday_990_basic_plus_combined_presilver.parquet | ROI-scoped mixed pre-Silver build; Combined backbone enriched from admitted Basic by key, unmatched admitted Basic retained | Non-zero rows; ROI admission metadata present; fill/provenance columns present |
-| 990_givingtuesday/datamart/08_filter_benchmark_outputs_local | staging/filing/givingtuesday_990_basic_allforms_benchmark.parquet | Benchmark-filtered basic-only filing table with county_fips + region | Rows reduced vs pre-Silver and region populated |
-| 990_givingtuesday/datamart/08_filter_benchmark_outputs_local | staging/filing/givingtuesday_990_filings_benchmark.parquet | Benchmark-filtered mixed filing table with county_fips + region | Rows reduced vs pre-Silver and region populated |
-| 990_givingtuesday/datamart/08_filter_benchmark_outputs_local | raw/givingtuesday_990/datamarts/metadata/schema_snapshot_*.json | schema snapshots for the basic-only and mixed filtered artifacts | Column list matches the emitted parquet |
-| 990_givingtuesday/datamart/11_verify_curated_outputs_local_s3 | raw/givingtuesday_990/datamarts/metadata/curated_output_size_verification_report.csv | local/S3 bytes for Bronze pre-Silver and Silver filtered GT artifacts | Every emitted curated artifact row has size_match=TRUE |
-| 990_givingtuesday/datamart/11_verify_curated_outputs_local_s3 | raw/givingtuesday_990/datamarts/metadata/gt_pipeline_artifact_manifest.json/.csv | artifact-level bytes, signatures, row counts, and provenance summaries across GT steps 06-11 | Manifest rows exist for the emitted curated artifacts and build manifests |
-| 990_givingtuesday/api/02_fetch_bmf | raw/irs_bmf/eo_<state>.csv | EIN, NAME, STREET, CITY, STATE, ZIP, etc. | One CSV per state (default: sd, mn, mt, az) |
+| givingtuesday_990/datamart/01_fetch_datamart_catalog | raw/givingtuesday_990/datamarts/metadata/datamart_catalog_raw.json | Full catalog payload from public API | Non-empty documents array |
+| givingtuesday_990/datamart/02_export_data_dictionary | raw/givingtuesday_990/datamarts/metadata/datamart_catalog.csv/.md + datamart_fields.csv/.md | Flattened dataset metadata and full field dictionary | Required dataset rows present; field rows > 0 |
+| givingtuesday_990/datamart/03_download_raw_datamarts | raw/givingtuesday_990/datamarts/raw/*.csv | Full unfiltered raw CSVs (Combined + Basic forms) | Local bytes == source Content-Length |
+| givingtuesday_990/datamart/05_verify_source_local_s3_sizes | raw/givingtuesday_990/datamarts/metadata/size_verification_report.csv | source/local/S3 bytes for required datasets | Every required row has size_match=TRUE |
+| givingtuesday_990/datamart/06_build_basic_allforms_presilver | staging/filing/givingtuesday_990_basic_allforms_presilver.parquet | Basic 990 + 990EZ + 990PF union restricted upstream to tax-year-in-scope ROI/admitted rows, with normalized keys, provenance, and admission metadata | Non-zero rows; expected key columns present; pre-Silver admission metadata present |
+| givingtuesday_990/datamart/07_build_basic_plus_combined_presilver | staging/filing/givingtuesday_990_basic_plus_combined_presilver.parquet | ROI-scoped mixed pre-Silver build; Combined backbone enriched from admitted Basic by key, unmatched admitted Basic retained | Non-zero rows; ROI admission metadata present; fill/provenance columns present |
+| givingtuesday_990/datamart/08_filter_benchmark_outputs_local | staging/filing/givingtuesday_990_basic_allforms_benchmark.parquet | Benchmark-filtered basic-only filing table with county_fips + region | Rows reduced vs pre-Silver and region populated |
+| givingtuesday_990/datamart/08_filter_benchmark_outputs_local | staging/filing/givingtuesday_990_filings_benchmark.parquet | Benchmark-filtered mixed filing table with county_fips + region | Rows reduced vs pre-Silver and region populated |
+| givingtuesday_990/datamart/08_filter_benchmark_outputs_local | raw/givingtuesday_990/datamarts/metadata/schema_snapshot_*.json | schema snapshots for the basic-only and mixed filtered artifacts | Column list matches the emitted parquet |
+| givingtuesday_990/datamart/11_verify_curated_outputs_local_s3 | raw/givingtuesday_990/datamarts/metadata/curated_output_size_verification_report.csv | local/S3 bytes for Bronze pre-Silver and Silver filtered GT artifacts | Every emitted curated artifact row has size_match=TRUE |
+| givingtuesday_990/datamart/11_verify_curated_outputs_local_s3 | raw/givingtuesday_990/datamarts/metadata/gt_pipeline_artifact_manifest.json/.csv | artifact-level bytes, signatures, row counts, and provenance summaries across GT steps 06-11 | Manifest rows exist for the emitted curated artifacts and build manifests |
+| givingtuesday_990/api/02_fetch_bmf | raw/irs_bmf/eo_<state>.csv | EIN, NAME, STREET, CITY, STATE, ZIP, etc. | One CSV per state (default: sd, mn, mt, az) |
 | irs_bmf/01_fetch_bmf_release | raw/irs_bmf/eo_<state>.csv + metadata/irs_bmf_raw_manifest.csv | Raw IRS EO BMF state snapshots plus byte/source manifest | One CSV per state; manifest rows match downloaded states |
 | irs_bmf/04_filter_bmf_to_benchmark_local | staging/irs_bmf/irs_bmf_combined_filtered.parquet | Combined benchmark-filtered IRS EO BMF rows after state-by-state admission, tax-year derivation, and cross-state EIN-year dedupe | Non-zero rows; `county_fips`, `region`, and `tax_year` populated |
 | irs_bmf/04_filter_bmf_to_benchmark_local | staging/irs_bmf/year=YYYY/irs_bmf_benchmark_year=YYYY.parquet | Benchmark-filtered IRS EO BMF yearly parquet for analysis years `2022-2024` | Row `tax_year` matches directory year |
 | irs_bmf/07_extract_analysis_variables_local | staging/irs_bmf/irs_bmf_analysis_variables.parquet | IRS EO BMF analysis-ready rowset with direct classification, financial fields, broad NTEE, proxy flags, and imputed flags | Zero duplicate `ein + tax_year` rows |
 | irs_bmf/07_extract_analysis_variables_local | staging/irs_bmf/irs_bmf_analysis_geography_metrics.parquet | IRS EO BMF geography metrics by county/region, tax year, and exclusion variant | Two exclusion variants present |
 | irs_bmf/07_extract_analysis_variables_local | staging/irs_bmf/irs_bmf_analysis_field_metrics.parquet | IRS EO BMF broad-NTEE representation metrics by region, tax year, and exclusion variant | Broad NTEE rows aggregate to region-year totals |
-| 990_givingtuesday/api/03_build_ein_list | reference/eins_in_benchmark_regions.csv | EIN (9-digit, leading zeros) | One EIN per row |
-| 990_givingtuesday/api/04_fetch_990_givingtuesday | raw/givingtuesday_990/api_responses/ein_*.json | statusCode, body.query, body.no_results, body.results | One JSON per EIN |
-| 990_givingtuesday/api/04_fetch_990_givingtuesday | raw/givingtuesday_990/990_basic120_combined.csv | Basic 120 fields, one row per EIN x TAXYEAR (2021+) | Written only after full run completes |
+| givingtuesday_990/api/03_build_ein_list | reference/eins_in_benchmark_regions.csv | EIN (9-digit, leading zeros) | One EIN per row |
+| givingtuesday_990/api/04_fetch_givingtuesday_990 | raw/givingtuesday_990/api_responses/ein_*.json | statusCode, body.query, body.no_results, body.results | One JSON per EIN |
+| givingtuesday_990/api/04_fetch_givingtuesday_990 | raw/givingtuesday_990/990_basic120_combined.csv | Basic 120 fields, one row per EIN x TAXYEAR (2021+) | Written only after full run completes |
 | location_processing/fetch_location_data | data/locations.csv (default) | GEOID, County, State, State_name, State_FIPS, County_FIPS, NAME_full, City, ZIPs | State_name and ZIPs populated |
 | location_processing/01_fetch_geoid_reference | reference/GEOID_reference.csv, geoid_zip_codes.csv | GEOID, Cluster_ID, Cluster_name, ZIPs; GEOID, ZIP | 18 benchmark rows |
 | location_processing/03_build_zip_list_for_geoids | reference/zip_codes_in_benchmark_regions.csv | ZIP, GEOID, Region | One row per ZIP in 18 counties |
-| 990_irs/03_parse_irs_990_zips_to_staging | staging/filing/irs_990_filings.parquet | ein, tax_year, form_type, revenue, expenses, assets, source_file, source_zip, region | Parquet or CSV; geography filter + region |
-| 990_irs/04_merge_990_parts_to_staging | staging/filing/irs_990_filings.parquet | same as 03 | Merge from silver part Parquets; geography filter + region |
+| irs_990/03_parse_irs_990_zips_to_staging | staging/filing/irs_990_filings.parquet | ein, tax_year, form_type, revenue, expenses, assets, source_file, source_zip, region | Parquet or CSV; geography filter + region |
+| irs_990/04_merge_990_parts_to_staging | staging/filing/irs_990_filings.parquet | same as 03 | Merge from silver part Parquets; geography filter + region |
 | irs_soi/02_download_county_release | raw/irs_soi/county/raw/tax_year=YYYY/*.csv/.docx | official IRS county AGI CSV, no-AGI CSV, and users guide | Local bytes == source Content-Length |
 | irs_soi/04_verify_county_release_source_local_s3 | raw/irs_soi/county/metadata/size_verification_tax_year=YYYY.csv | source/local/S3 bytes for raw county assets | Every row has size_match=TRUE |
 | irs_soi/05_filter_county_release_to_benchmark_local | staging/irs_soi/tax_year=YYYY/irs_soi_county_benchmark_*.csv | benchmark-county subset with county_fips + region | Rows reduced vs raw and region populated |

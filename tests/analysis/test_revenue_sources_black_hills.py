@@ -364,8 +364,16 @@ def test_synthetic_run_writes_expected_outputs_and_prints_progress(tmp_path: Pat
     # The client presentation and its image assets must land in the test's tmp
     # docs path, not the repo's real docs/ directory. This guards against the
     # synthetic fixture overwriting the client-facing deliverables.
-    assert (tmp_path / "docs" / "Section3_Q9_2022_Client_Presentation.md").exists()
-    assert (tmp_path / "docs" / "assets" / "section3_q9_2022").is_dir()
+    assert (
+        tmp_path
+        / "docs"
+        / "analysis"
+        / "revenue_sources"
+        / "q9_2022_client_presentation.md"
+    ).exists()
+    assert (
+        tmp_path / "docs" / "analysis" / "revenue_sources" / "assets" / "q9_2022"
+    ).is_dir()
 
 
 def test_default_results_dir_is_next_to_analysis_code() -> None:
